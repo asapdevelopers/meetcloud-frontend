@@ -1,0 +1,1 @@
+angular.module("app", ["ngDialog", "ngRoute", "LocalStorageModule", "ui.bootstrap", 'ngSanitize', "ngFileUpload", 'debounce', 'angular-loading-bar', 'cfp.loadingBar','dndLists']);
