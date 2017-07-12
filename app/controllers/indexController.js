@@ -522,6 +522,7 @@ angular.module("app").controller("IndexController", [
         cfpLoadingBar.start();
 
         // If already connected, skip ws connect step
+        debugger;
         if ($scope.connected) {
           onconnect($scope.connected);
         } else {
