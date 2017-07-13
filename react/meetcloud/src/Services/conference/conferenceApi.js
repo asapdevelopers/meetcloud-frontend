@@ -11,9 +11,8 @@ export function authenticateDomain(domain, room) {
 }
 
 export function authenticateToken(token) {
-  return fetch(config.api.conference.authenticateToken, {
-    method: "POST",
-    body: JSON.stringify({token}),
+  return fetch(config.api.conference.authenticateToken({token}), {
+    method: "GET",
     headers: {
       "Content-Type": "application/json"
     }

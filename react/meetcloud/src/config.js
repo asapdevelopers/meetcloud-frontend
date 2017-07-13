@@ -11,12 +11,20 @@ switch (environment) {
     break;
 }
 
+function parseRoute(route, params) {
+  for (let k in params) {
+    route = route.replace('{' + k + '}', params[k])
+  }
+  return route;
+}
 
 export const config = {
   api: {
     conference: {
       authenticateDomain: conferenceApiPrefix + 'auth/domain/',
-      authenticateToken: conferenceApiPrefix + 'auth/token/'
+      authenticateToken: function(obj) {
+        return parseRoute(conferenceApiPrefix + 'auth/token/?token={token}', obj);
+      }
     },
     site: {
       backgroundImage: conferenceApiPrefix + 'site/background/'

@@ -10,8 +10,8 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 ReactDOM.render(
   <Router>
   <div>
+    <Route path="/" exact component={Home}/>
     <Route path="/conference" component={Conference}/>
-    <Route path="*" component={Home}/>
   </div>
 </Router>, document.getElementById('root'));
 
