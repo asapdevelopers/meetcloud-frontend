@@ -1,7 +1,7 @@
 import {config} from '../../config.js'
 
 export function authenticateDomain(domain, room) {
-  return fetch(config.api.conferente.authenticateDomain, {
+  return fetch(config.api.conference.authenticateDomain, {
     method: "POST",
     body: JSON.stringify({domain, room}),
     headers: {
@@ -11,7 +11,7 @@ export function authenticateDomain(domain, room) {
 }
 
 export function authenticateToken(token) {
-  return fetch(config.api.conferente.authenticateToken, {
+  return fetch(config.api.conference.authenticateToken, {
     method: "POST",
     body: JSON.stringify({token}),
     headers: {

@@ -5,7 +5,7 @@ import './Styles/flexboxgrid.css';
 import Home from './Components/Home/Home';
 import Conference from './Components/Conference/Conference';
 import registerServiceWorker from './registerServiceWorker';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
+import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 ReactDOM.render(
   <Router>
@@ -14,4 +14,5 @@ ReactDOM.render(
     <Route path="*" component={Home}/>
   </div>
 </Router>, document.getElementById('root'));
+
 registerServiceWorker();

@@ -1,12 +1,25 @@
-const conferenceApiPrefix = "http://localhost:8000/"
+const environments = ['local', 'test', 'prod'];
+const environment = environments[0]
+
+let conferenceApiPrefix = "http://localhost:8000/"
+switch (environment) {
+  case 'test':
+    conferenceApiPrefix = "http://localhost:8000/"
+    break;
+  case 'prod':
+    conferenceApiPrefix = "http://localhost:8000/"
+    break;
+}
+
 
 export const config = {
   api: {
     conference: {
       authenticateDomain: conferenceApiPrefix + 'auth/domain/',
       authenticateToken: conferenceApiPrefix + 'auth/token/'
+    },
+    site: {
+      backgroundImage: conferenceApiPrefix + 'site/background/'
     }
-  },
-  backgroundImagePrefix: 'https://bing.com',
-  backgroundImage: "http://feeds.feedburner.com/bingimages" //'http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US'
+  }
 };

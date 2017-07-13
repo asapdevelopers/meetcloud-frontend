@@ -3,6 +3,8 @@ import logo from '../../assets/logo.png';
 import './Home.css';
 import {config} from '../../config'
 import {getBackgroundImage} from '../../Services/helpers/general'
+import {authenticateDomain} from '../../Services/conference/conferenceApi'
+import {Redirect} from 'react-router-dom'
 
 const domain = window.location.hostname;
 
@@ -11,42 +13,68 @@ class Home extends Component {
   constructor(props) {
     super(props);
     let roomName = "";
-    if ((this.props.match.url.match(/\//g) || []).length == 1) {
+    if ((this.props.match.url.match(/\//g) || []).length === 1) {
       roomName = this.props.match.url.substring(1, this.props.match.url.length);
     }
+
+    let background = localStorage['background'] != undefined
+      ? localStorage['background']
+      : '/assets/background.jpg';
+
+    //State
     this.state = {
       roomName: roomName,
       userName: "",
-      bingImage: false,
-      backgroundImage: '/assets/background.jpg'
+      backgroundImage: background,
+      redirect: false
     };
-    console.log(props)
   }
 
   componentDidMount() {
     getBackgroundImage().then((response) => {
-      debugger;
       if (response.status === 200) {
-
         response.json().then((res) => {
-          debugger;
-          this.setState({
-            bingImage: true,
-            backgroundImage: config.backgroundImagePrefix + res.images[0].url
-          })
+          if (localStorage['background'] != res.url) {
+            localStorage['background'] = res.url;
+            this.setState({backgroundImage: res.url});
+          }
         })
       }
     })
   }
 
+  init = (data) => {
+    let domain = {
+      token: data.token,
+      id: data.id,
+      name: data.name,
+      friendlyName: data.friendlyName,
+      server: data.server,
+      roomName: data.room,
+      roomToJoin: `${data.name}.${data.room}`
+    }
+    localStorage['conference'] = JSON.stringify({domain});
+    this.setState({redirect: true})
+  }
+
   connect = (event) => {
-    console.log("Connect " + this.state.userName + " - " + this.state.roomName);
+    authenticateDomain(domain, this.state.roomName).then((response) => {
+      response.json().then((data) => {
+        this.init(data);
+      })
+    }, (error) => alert(error));
   };
 
   render() {
+    const {redirect} = this.state;
+
+    if (redirect) {
+      return <Redirect to='/conference'/>;
+    }
+
     var sectionStyle = {
       background: `url("${this.state.backgroundImage}") no-repeat center`,
-      'background-size': 'cover'
+      backgroundSize: 'cover'
     };
 
     return (

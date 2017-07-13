@@ -33,12 +33,12 @@
   margin: 0px padding;
   position: absolute;
   padding: 0 0px;
+  background-color: rgba(0, 0, 0, 0.40);
 }
 
 .line {
   box-sizing: border-box;
   height: 1px;
-  width: 95%;
   margin-bottom: 22px;
   border-top: 1px solid #FFFFFF;
   opacity: 0.71;
