@@ -1,29 +1,52 @@
 import React, {Component} from 'react';
-import logo from '../../logo.png';
+import logo from '../../assets/logo.png';
 import './Home.css';
+import {config} from '../../config'
 import {getBackgroundImage} from '../../Services/helpers/general'
+
+const domain = window.location.hostname;
 
 class Home extends Component {
 
   constructor(props) {
     super(props);
+    let roomName = "";
+    if ((this.props.match.url.match(/\//g) || []).length == 1) {
+      roomName = this.props.match.url.substring(1, this.props.match.url.length);
+    }
     this.state = {
-      roomName: "",
+      roomName: roomName,
       userName: "",
-      backgroundImage: ""
+      bingImage: false,
+      backgroundImage: '/assets/background.jpg'
     };
-
+    console.log(props)
   }
 
   componentDidMount() {
-    let image = getBackgroundImage();
-    this.setState({backgroundImage: "https://www.bing.com/az/hprichbg/rb/GhostCrab_EN-US12586461381_1920x1080.jpg"});
+    getBackgroundImage().then((response) => {
+      debugger;
+      if (response.status === 200) {
+
+        response.json().then((res) => {
+          debugger;
+          this.setState({
+            bingImage: true,
+            backgroundImage: config.backgroundImagePrefix + res.images[0].url
+          })
+        })
+      }
+    })
   }
 
+  connect = (event) => {
+    console.log("Connect " + this.state.userName + " - " + this.state.roomName);
+  };
+
   render() {
-    var background = this.state.backgroundImage;
     var sectionStyle = {
-      background: `url("${background}") no-repeat center`
+      background: `url("${this.state.backgroundImage}") no-repeat center`,
+      'background-size': 'cover'
     };
 
     return (
@@ -40,20 +63,20 @@ class Home extends Component {
             <div className="row center-xs form">
               <div className="col col-responsive">
                 <div className="row">
-                  <span className="text">Select a room</span>
+                  <span className="text">Room name</span>
                 </div>
                 <div className="row">
-                  <input className="inputText" type="text"></input>
+                  <input className="inputText" type="text" value={this.state.roomName} onChange={(event) => this.setState({roomName: event.target.value})}></input>
                 </div>
                 <div className="row">
                   <span className="text">Your name</span>
                 </div>
                 <div className="row">
-                  <input className="inputText" type="text"></input>
+                  <input className="inputText" type="text" value={this.state.userName} onChange={(event) => this.setState({userName: event.target.value})}></input>
                 </div>
                 <div className="row center-xs">
                   <div className="col full">
-                    <button className="button">Connect</button>
+                    <button className="button" onClick={(event) => this.connect(event)}>Connect</button>
                   </div>
                 </div>
               </div>
