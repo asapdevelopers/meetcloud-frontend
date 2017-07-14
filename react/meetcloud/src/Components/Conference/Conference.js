@@ -26,7 +26,7 @@ class Conference extends Component {
     alert("Invalid conference");
     this.setState({valid: false});
   }
-
+/*
   addMessage = () => {
     alert("addMessage not implemented yet");
   }
@@ -47,7 +47,8 @@ class Conference extends Component {
       $scope.pendingCallsDict = {};
       */
     // If we had a stream close it
-    if (this.state.mediaSourceWorking) {
+
+    /*if (this.state.mediaSourceWorking) {
       window.easyrtc.closeLocalStream(this.state.mediaSourceWorking.streamName);
       this.setState({mediaSourceWorking: null});
     }
@@ -116,7 +117,8 @@ class Conference extends Component {
       }
     }*/
 
-  }
+  //}
+
 
   // Conference logic
   initConference = () => {
@@ -142,9 +144,9 @@ class Conference extends Component {
     }).catch(e => alert("Could not get output devices: " + e));
 
     // listeners
-    window.easyrtc.setDisconnectListener(this.disconnectListener);
-    window.easyrtc.setPeerListener(this.peerListener(easyrtcid, msgType, msgData, targeting));
-    window.easyrtc.setRoomOccupantListener(this.roomOcupantListener(roomName, occupants));
+    //window.easyrtc.setDisconnectListener(this.disconnectListener);
+    //window.easyrtc.setPeerListener(this.peerListener(easyrtcid, msgType, msgData, targeting));
+    //window.easyrtc.setRoomOccupantListener(this.roomOcupantListener(roomName, occupants));
   }
 
   componentDidMount() {
