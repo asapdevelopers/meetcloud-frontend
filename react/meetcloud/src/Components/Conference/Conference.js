@@ -4,29 +4,63 @@ import {Redirect} from 'react-router-dom'
 import {authenticateToken} from '../../Services/conference/conferenceApi'
 import * as rtcHelper from '../../Services/helpers/easyrtcHelper'
 
+// About screen sharing:
+// Plugin: https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk
+// Plugin docs: https://github.com/muaz-khan/Chrome-Extensions/tree/master/desktopCapture
+// Helper lib to communicate with plugin: https://cdn.webrtc-experiment.com/getScreenId.js
+
+const CHAT_MESSAGE_TYPE = 'chatMessage';
+const WAKE_UP_MESSAGE_TYPE = 'wakeUpMessage';
+const SCREEN_SHARING_STREAM_NAME = 'ssharing';
+
+const WAKE_UP_AUDIO = new Audio('../../assets/audios/wake_up.mp3');
+const JOINED_AUDIO = new Audio('../../assets/audios/joined.mp3');
+const LEFT_AUDIO = new Audio('../../assets/audios/left.mp3');
+const NEW_MESSAGE_AUDIO = new Audio('/audios/new_message.mp3');
+
 class Conference extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       valid: true,
+      error: null,
+      username: null,
+      room: '',
       domain: {},
       conferenceData: {},
-      connected: false,
+      connected: null,
+      joined: null,
+      members: [],
+      membersDict: {},
       selectedAudioDevice: null,
       audioDevices: [],
       selectedVideoDevice: null,
       videoDevices: [],
       audioOutputDevices: [],
-      selectedAudioOutputDevice: null
+      selectedAudioOutputDevice: null,
+      messages: {
+        message: '',
+        list: []
+      },
+      mediaSourceWorking: null,
+      sharingScreen: false,
+      cameraEnabled: true, // Global camera setting, can be only changed while disconnected
+      camera: true, // Turn on/off cam
+      mic: true, // turn on/off mic
+      sharingWithMe: [],
+      sharingWithMeDict: {},
+      pendingCallsDict: {},
+      firstRoomListener: true
     };
+    const selfVideoElement = document.getElementById("self-video-div");
   }
 
   invalidConference = () => {
     alert("Invalid conference");
     this.setState({valid: false});
   }
-/*
+  /*
   addMessage = () => {
     alert("addMessage not implemented yet");
   }
@@ -46,9 +80,9 @@ class Conference extends Component {
       $scope.membersDict = {};
       $scope.pendingCallsDict = {};
       */
-    // If we had a stream close it
+  // If we had a stream close it
 
-    /*if (this.state.mediaSourceWorking) {
+  /*if (this.state.mediaSourceWorking) {
       window.easyrtc.closeLocalStream(this.state.mediaSourceWorking.streamName);
       this.setState({mediaSourceWorking: null});
     }
@@ -118,7 +152,6 @@ class Conference extends Component {
     }*/
 
   //}
-
 
   // Conference logic
   initConference = () => {
