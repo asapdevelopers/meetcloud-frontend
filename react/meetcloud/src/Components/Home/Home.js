@@ -53,6 +53,7 @@ class Home extends Component {
       roomToJoin: `${data.name}.${data.room}`
     }
     localStorage['conference'] = JSON.stringify({domain});
+    localStorage['username'] = this.state.userName;
     this.setState({redirect: true})
   }
 

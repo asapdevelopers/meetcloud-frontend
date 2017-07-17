@@ -1,3 +1,5 @@
+const browser = require('detect-browser');
+
 export function initializeEasyRTC(domainServer) {
   // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
   window.easyrtc.setSocketUrl(domainServer, {
@@ -131,6 +133,15 @@ export function * getAudioSinkList() {
       }
     })
   });
+}
+
+export function detectBrowser() {
+  debugger;
+  if (browser){
+    return browser.name;
+  }else{
+    return "other"
+  }
 }
 
 export function playSound(obj) {

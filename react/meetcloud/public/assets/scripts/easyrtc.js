@@ -513,7 +513,6 @@ if (typeof window === 'undefined' || !window.navigator) {
     /Edge\/(\d+).(\d+)$/)) {
   webrtcUtils.log('This appears to be Edge');
   webrtcDetectedBrowser = 'edge';
-debugger;
   webrtcDetectedVersion = webrtcUtils.extractVersion(navigator.userAgent,
       /Edge\/(\d+).(\d+)$/, 2);
 
@@ -7118,7 +7117,6 @@ var Easyrtc = function() {
      *                   });
      */
     this.connect = function(applicationName, successCallback, errorCallback) {
-        debugger;
         if (!window.io) {
             self.showError(self.errCodes.DEVELOPER_ERR, "Your HTML has not included the socket.io.js library");
         }
