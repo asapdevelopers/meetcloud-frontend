@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import logo from '../../assets/logo.png';
 import './Home.css';
-import {config} from '../../config'
 import {getBackgroundImage} from '../../Services/helpers/general'
 import {authenticateDomain} from '../../Services/conference/conferenceApi'
 import {Redirect} from 'react-router-dom'
@@ -17,7 +16,7 @@ class Home extends Component {
       roomName = this.props.match.url.substring(1, this.props.match.url.length);
     }
 
-    let background = localStorage['background'] != undefined
+    let background = localStorage['background'] !== undefined
       ? localStorage['background']
       : '/assets/background.jpg';
 
@@ -34,7 +33,7 @@ class Home extends Component {
     getBackgroundImage().then((response) => {
       if (response.status === 200) {
         response.json().then((res) => {
-          if (localStorage['background'] != res.url) {
+          if (localStorage['background'] !== res.url) {
             localStorage['background'] = res.url;
             this.setState({backgroundImage: res.url});
           }

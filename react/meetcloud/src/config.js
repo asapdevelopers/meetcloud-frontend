@@ -9,6 +9,8 @@ switch (environment) {
   case 'prod':
     conferenceApiPrefix = "http://localhost:8000/"
     break;
+  default:
+    conferenceApiPrefix = "http://localhost:8000/"
 }
 
 function parseRoute(route, params) {

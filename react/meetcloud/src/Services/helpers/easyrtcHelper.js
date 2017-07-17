@@ -27,7 +27,7 @@ export function initializeEasyRTC(domainServer) {
 };
 
 export function * getAudioSourceList() {
-  var index = 0;
+  //var index = 0;
   var selectedAudioDevice = null;
   var audioDevices = []
 
@@ -89,10 +89,11 @@ export function * getVideoSourceList() {
         selectedVideoDevice = videoDevices[0];
       }
       //TODO: check if camera is enabled
-      if (videoDevices.length == 0) {
-        let cameraEnabled = false;
+      let cameraEnabled = true;
+      if (videoDevices.length === 0) {
+        cameraEnabled = false;
       }
-      resolve({selectedVideoDevice, videoDevices})
+      resolve({selectedVideoDevice, videoDevices, cameraEnabled})
     });
   });
 }
@@ -130,4 +131,8 @@ export function * getAudioSinkList() {
       }
     })
   });
+}
+
+export function playSound(obj) {
+  obj.play();
 }
