@@ -201,8 +201,12 @@ class Conference extends Component {
 
     if (found != null) {
       // Clear stream source element
-      window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
-      window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), '');
+      if(document.getElementById('u-' + id)){
+          window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
+      }
+      if(document.getElementById('us-' + id)){
+        window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), '');
+      }
       this.setState({
         sharingWithMe: this.state.sharingWithMe.splice(found, 1)
       });
@@ -269,8 +273,8 @@ class Conference extends Component {
 
   streamAcceptorListener = (id, stream) => {
     let newShared;
-    let sharingWithMeAux;
-    let sharingWithMeDictAux;
+    let sharingWithMeAux = [];
+    let sharingWithMeDictAux = [];
 
     // if already sharing, get it
     if (this.state.sharingWithMeDict[id]) {
@@ -283,37 +287,45 @@ class Conference extends Component {
       sharingWithMeAux.push(newShared);
       sharingWithMeDictAux[id] = newShared;
     }
+    this.setState({sharingWithMeDict: sharingWithMeDictAux, sharingWithMe: sharingWithMeAux});
 
     if (stream.streamName === SCREEN_SHARING_STREAM_NAME) {
       newShared.screen = stream;
-      window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream);
+      setTimeout(() =>  window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream), 100);
     } else {
       newShared.stream = stream;
       newShared.hasVideo = window.easyrtc.haveVideoTrack(id);
       newShared.hasAudio = window.easyrtc.haveAudioTrack(id);
-      window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), stream);
-      this.setAudioOutput(document.getElementById('u-' + id));
+      setTimeout(() => {
+        if (document.getElementById('u-' + id)) {
+          window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), stream);
+          this.setAudioOutput(document.getElementById('u-' + id));
+        }
+      }, 100);
     }
     console.log("Stream accepted", newShared);
-    this.setState({sharingWithMeDict: sharingWithMeDictAux, sharingWithMe: sharingWithMeAux});
   }
 
   streamClosedListener = (id, stream, streamName) => {
     console.log("Stream closed: ", streamName);
     if (streamName === SCREEN_SHARING_STREAM_NAME) {
-      window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), '');
+      setTimeout(()=>window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), ''), 100);
       if (this.state.sharingWithMeDict[id]) {
         let sharing = this.state.sharingWithMeDict;
         sharing[id].screen = null;
         this.setState({sharingWithMeDict: sharing});
       }
     } else {
-      window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
-      if (this.state.sharingWithMeDict[id]) {
-        let sharing = this.state.sharingWithMeDict;
-        sharing[id].stream = null;
-        this.setState({sharingWithMeDict: sharing});
-      }
+      setTimeout(()=>{
+        if (document.getElementById('u-' + id)) {
+          window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
+          if (this.state.sharingWithMeDict[id]) {
+            let sharing = this.state.sharingWithMeDict;
+            sharing[id].stream = null;
+            this.setState({sharingWithMeDict: sharing});
+          }
+        }
+      }, 100);
     }
   };
 
@@ -335,7 +347,7 @@ class Conference extends Component {
   }
 
   disconnect = () => {
-    console.log("Not implemented yet")
+    console.log("Not implemented yet");
   }
 
   onConnect = (id) => {
@@ -772,9 +784,11 @@ class Conference extends Component {
         isLoading
       }} = this;
 
+    var pepe = "a"
     return (
       <div>
         {modal}
+        <span id={'b-' + pepe}></span>
         <h2>Conference loaded!</h2>
         <h3>{this.state.domain.friendlyName}</h3>
         <br></br>
@@ -787,6 +801,21 @@ class Conference extends Component {
         <video id="self-video-div" className="selfVideo" muted onClick={(event) => {
           this.openFullScreen(event)
         }}></video>
+        <br></br>
+        <br></br>
+        {this.state.sharingWithMe.map(user => {
+          if (user.hasVideo) {
+            return <video key={'u-' + user.id} className="otherVideo" id={'u-' + user.id} onClick={(event) => {
+              this.openFullScreen(event)
+            }}></video>
+          }
+          if (user.screen) {
+            return <video key={'u-' + user.id} className="otherVideo" id={'us-' + user.id} onClick={(event) => {
+              this.openFullScreen(event)
+            }}></video>
+
+          }
+        })}
       </div>
     )
   }
