@@ -6,6 +6,7 @@ import {authenticateToken} from '../../Services/conference/conferenceApi'
 import * as rtcHelper from '../../Services/helpers/easyrtcHelper'
 import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
+import CameraIconPermission from '../../assets/images/camera_permission.png';
 
 // About screen sharing:
 // Plugin: https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk
@@ -29,7 +30,7 @@ class Conference extends Component {
     super(props);
     this.state = {
       isLoading: true,
-      isShowingModal: false,
+      modal: false,
       modalText: "",
       valid: true,
       error: null,
@@ -63,6 +64,7 @@ class Conference extends Component {
       pendingCallsDict: {},
       firstRoomListener: true
     };
+    this.permissionInterval = this.permissionInterval.bind(this);
   }
 
   // Helper to allow setting audio output of an element
@@ -73,8 +75,8 @@ class Conference extends Component {
     }
   }
 
-  handleClick = () => this.setState({isShowingModal: true})
-  handleClose = () => this.setState({isShowingModal: false})
+  handleClick = () => this.setState({modal: true})
+  handleClose = () => this.setState({modal: false})
 
   addMessage = (msg, source) => {
     this.state.messages.list.push({date: new moment(), msg: msg, source: source});
@@ -336,28 +338,6 @@ class Conference extends Component {
     console.log("Not implemented yet")
   }
 
-  connect = () => {
-    let connectionAvailable = false;
-    if (this.state.selectedAudioDevice) {
-      localStorage.setItem('selectedAudioDeviceId', this.state.selectedAudioDevice);
-    }
-    if (this.state.selectedVideoDevice) {
-      localStorage.setItem('selectedVideoDeviceId', this.state.selectedVideoDevice.deviceId);
-    }
-    if (this.state.selectedAudioOutputDevice) {
-      localStorage.setItem('selectedAudioOutputDeviceId', this.state.selectedAudioOutputDevice.deviceId);
-    }
-    localStorage.setItem('cameraEnabled', this.state.cameraEnabled);
-
-    if (this.state.connected) {
-      this.onconnect(this.state.connected);
-    } else {
-      window.easyrtc.setUsername(this.state.username);
-      window.easyrtc.setCredential({'token': this.state.domain.token});
-      window.easyrtc.connect(WEB_RTC_APP, this.onConnect, this.onConnectError);
-    }
-  }
-
   onConnect = (id) => {
     console.log("Connected", id);
     this.setState({connected: id});
@@ -376,7 +356,7 @@ class Conference extends Component {
       window.easyrtc.initMediaSource(this.mediaSuccess, this.mediaError);
     } else {
       this.disconnect();
-      alert("Browser does not support media, please switch to a real browser like Google Chrome.");
+      alert("Browser does not support media");
     }
   }
 
@@ -385,6 +365,28 @@ class Conference extends Component {
     this.setState({connected: null});
     this.setState({joined: null});
     alert("Failed to connect");
+  }
+
+  connect = () => {
+    let connectionAvailable = false;
+    if (this.state.selectedAudioDevice) {
+      localStorage.setItem('selectedAudioDeviceId', this.state.selectedAudioDevice);
+    }
+    if (this.state.selectedVideoDevice) {
+      localStorage.setItem('selectedVideoDeviceId', this.state.selectedVideoDevice.deviceId);
+    }
+    if (this.state.selectedAudioOutputDevice) {
+      localStorage.setItem('selectedAudioOutputDeviceId', this.state.selectedAudioOutputDevice.deviceId);
+    }
+    localStorage.setItem('cameraEnabled', this.state.cameraEnabled);
+
+    if (this.state.connected) {
+      this.onConnect(this.state.connected);
+    } else {
+      window.easyrtc.setUsername(this.state.username);
+      window.easyrtc.setCredential({'token': this.state.domain.token});
+      window.easyrtc.connect(WEB_RTC_APP, this.onConnect, this.onConnectError);
+    }
   }
 
   onJoin = (roomName) => {
@@ -412,8 +414,7 @@ class Conference extends Component {
   }
 
   mediaSuccess = (obj) => {
-    this.setState({isLoading: false});
-    this.setState({isShowingModal: false});
+    this.removePopup();
     this.setState({mediaSourceWorking: obj});
     window.easyrtc.setVideoObjectSrc(this.selfVideoElement, obj);
     window.easyrtc.enableMicrophone(this.state.mic);
@@ -428,9 +429,29 @@ class Conference extends Component {
       this.setState({members: []});
       this.setState({membersDict: {}});
       this.setState({pendingCallsDict: {}});
-      window.easyrtc.joinRoom(this.state.roomToJoin, {}, this.onjoin, this.onjoinerror);
+      window.easyrtc.joinRoom(this.state.domain.roomToJoin, {}, this.onjoin, this.onjoinerror);
     }
   }
+
+  showPopup = (message, loading = false, modalType = null) => {
+    this.setState({isLoading: loading});
+    this.setState({
+      modal: !loading
+    })
+    if (modalType) {
+      this.setState({
+        modal: {
+          [modalType]: true
+        }
+      });
+    }
+    this.setState({modalText: message});
+  }
+
+  removePopup = () => {
+    console.log("Removing popup")
+    this.setState({isLoading: false, modal: false});
+  };
 
   mediaError = (a, b) => {
     console.log("Failed to get media source first time, trying again: ", a, b);
@@ -441,17 +462,26 @@ class Conference extends Component {
     window.easyrtc.enableVideo(false);
     //try again with only audio
     window.easyrtc.initMediaSource(this.mediaSuccess, () => {
+      debugger;
       console.log("Failed to get media source a second time: ", a, b);
-      this.setState({isLoading: false});
-      this.setState({modalText: "Failed to get media"});
-      this.disconnect()
+      this.disconnect();
+      if (a.includes('MEDIA_ERR')) {
+        if (b.includes('PermissionDeniedError') || b.includes('SecurityError')) {
+          this.showPopup("", false, "permissionError");
+        }
+        if (b.includes('DevicesNotFound')) {
+          this.showPopup("", false, "deviceNotFound");
+        }
+      } else {
+        this.showPopup("Failed to connect, please try again.")
+      }
     });
   }
 
   // In order to change stream sources we need to re-obtain medias
   // and re connect from peers with the new streams
   changeSources = () => {
-    window.easyrtc.leaveRoom(this.state.roomToJoin, function() {
+    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
       this.setState({joined: null});
       this.connect(); //timeout 500ms?
     });
@@ -519,12 +549,38 @@ class Conference extends Component {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     }
+  };
+
+  cancelPermissionChecker = () => {
+    clearInterval(this.state.permissions_interval_checker);
+  };
+
+  permissionInterval = () => {
+    try {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        if (devices.some((device) => device.label !== '')) {
+          this.cancelPermissionChecker();
+          let getAudioGen = rtcHelper.getAudioSourceList();
+          let getVideoGen = rtcHelper.getVideoSourceList();
+          let getOutputGen = rtcHelper.getAudioSinkList();
+          this.connect();
+        }
+      });
+    } catch (err) {
+      this.cancelPermissionChecker()
+    }
   }
 
   // Conference logic
   initConference = () => {
+    console.log("Detect browser: " + rtcHelper.detectBrowser);
+    let browser = rtcHelper.detectBrowser()
+    if (browser == "chrome") {
+      this.permissions_interval_checker = setInterval(this.permissionInterval, 200);
+      this.setState({permissions_interval_checker: this.permissions_interval_checker});
+    }
+
     this.intervalId = setInterval(this.clockInterval, 1000);
-    //let roomToJoin = this.state.domain.name + "." + this.state.domain.room;
     rtcHelper.initializeEasyRTC(this.state.domain.server);
 
     let getAudioGen = rtcHelper.getAudioSourceList();
@@ -627,7 +683,8 @@ class Conference extends Component {
 
   componentWillUnmount() {
     clearInterval(this.intervalId);
-    clearInterval(this.intervalConnectionId);
+    this.cancelPermissionChecker();
+    this.disconnect();
   }
 
   render() {
@@ -635,21 +692,6 @@ class Conference extends Component {
 
     if (!valid) {
       return <Redirect to='/'/>;
-    }
-
-    // Status
-    var status = ""
-    if (this.state.connected && this.state.joined) {
-      status = "Connected";
-    }
-    if (this.state.connected && !this.state.joined) {
-      status = "Connected but not joined.";
-    }
-    if (!this.state.connected) {
-      status = "Not connected";
-    }
-    if (this.state.connected && this.state.joined && !this.state.mediaSourceWorking) {
-      status = "Media is not working, audio and/or video won't be sent and might not be received.";
     }
     // Cost
     let cost = null;
@@ -667,15 +709,62 @@ class Conference extends Component {
     if (this.state.isLoading) {
       modalContent = <ReactSpinner color="white"/>
     }
-    if (this.state.isShowingModal) {
+    if (this.state.modal) {
       modalContent = (
         <ModalDialog onClose={this.props.onClose} className="example-dialog" dismissOnBackgroundClick={false}>
           {this.state.modalText}
         </ModalDialog>
       );
     }
+    if (this.state.modal.permissionError) {
+      let browser = rtcHelper.detectBrowser();
+      let modalContentBrowser = ""
+      switch (browser) {
+        case 'chrome':
+          modalContentBrowser = (
+            <span>Click the
+              <img className="permissionIcon" src={CameraIconPermission}/>
+              icon in the URL bar above to give Meetcloud access to your computer's camera and microphone.
+            </span>
+          );
+          break;
+        case 'firefox':
+          modalContentBrowser = (
+            <span>Se necesitan permisos para utilizar la cámara y el micrófono. Por favor, refresque la pagina y acepte los permisos</span>
+          );
+          break;
+        case 'edge':
+          modalContentBrowser = (
+            <span>Se necesitan permisos para utilizar la cámara y el micrófono. Por favor, refresque la pagina y acepte los permisos</span>
+          );
+          break;
 
-    let modal = (this.state.isShowingModal || this.state.isLoading) && <ModalContainer onClose={this.props.onClose}>
+        case 'safari':
+          modalContentBrowser = (
+            <span>Debe habilitar el plugin TemWebRTCPlugin en la configuracion de seguridad del navegador</span>
+          );
+          break;
+        case 'ie':
+          modalContentBrowser = (
+            <span>Debe habilitar el plugin TemWebRTCPlugin. Luego habilitar los permisos de cámara y micrófono en la configuracion de su navegador</span>
+          );
+          break;
+        default:
+          modalContentBrowser = (
+            <span>Se necesitan permisos para utilizar la cámara y el micrófono. Por favor, refresque la pagina y acepte los permisos</span>
+          );
+          break;
+      }
+
+      modalContent = (
+        <ModalDialog onClose={this.props.onClose} className="example-dialog" dismissOnBackgroundClick={false}>
+          <h3>Meetcloud can't access your camera or microphone.</h3>
+          {modalContentBrowser}
+        </ModalDialog>
+      );
+    }
+
+    let modal = (this.state.modal || this.state.isLoading) && <ModalContainer onClose={this.props.onClose}>
       {modalContent}
     </ModalContainer>
 
@@ -692,7 +781,6 @@ class Conference extends Component {
         <div className="row">
           <div className="col">
             <label>Room: {this.state.domain.room}</label><br/>
-            <label>{status}</label>
           </div>
         </div>
         {cost}

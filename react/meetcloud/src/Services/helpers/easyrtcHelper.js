@@ -136,7 +136,6 @@ export function * getAudioSinkList() {
 }
 
 export function detectBrowser() {
-  debugger;
   if (browser){
     return browser.name;
   }else{
