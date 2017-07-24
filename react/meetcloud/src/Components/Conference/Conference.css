@@ -5,7 +5,10 @@
   cursor: pointer;
   margin-right: 10px;
 }
-
+.Conference{
+  background-color: #444444;
+  height: 100vh;
+}
 .conferenceLogo {
   margin-top: 27px;
   margin-left: 45px;

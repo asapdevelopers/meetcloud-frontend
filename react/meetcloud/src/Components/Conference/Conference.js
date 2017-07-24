@@ -794,7 +794,7 @@ class Conference extends Component {
 
     var pepe = "a"
     return (
-      <div>
+      <div className="Conference">
         {modal}
         <img className="conferenceLogo" src={ConferenceLogo}/>
         <div className="row">
