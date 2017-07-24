@@ -71,7 +71,7 @@ if (typeof window === 'object') {
     });
   }
   // Proxy existing globals
-  getUserMedia = window.navigator && window.navigator.getUserMedia;
+  getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia).bind(navigator);
 }
 
 // Returns the result of getUserMedia as a Promise.
@@ -246,7 +246,7 @@ if (typeof window === 'undefined' || !window.navigator) {
       });
     };
   }
-} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection) {
+} else if (navigator.webkitGetUserMedia && window.webkitRTCPeerConnection && !window.RTCPeerConnection) {
   webrtcUtils.log('This appears to be Chrome');
 
   webrtcDetectedBrowser = 'chrome';
@@ -513,6 +513,7 @@ if (typeof window === 'undefined' || !window.navigator) {
     /Edge\/(\d+).(\d+)$/)) {
   webrtcUtils.log('This appears to be Edge');
   webrtcDetectedBrowser = 'edge';
+
   webrtcDetectedVersion = webrtcUtils.extractVersion(navigator.userAgent,
       /Edge\/(\d+).(\d+)$/, 2);
 
@@ -2122,32 +2123,31 @@ var Easyrtc = function() {
     this.enableVideoReceive(true);
 
     function getSourceList(callback, sourceType) {
-        // CRISTIANO: Added check so it doesn't crash on browsers that do not support it.
-        if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices){
-            navigator.mediaDevices.enumerateDevices().then(
-                function(values) {
-                    var results = [];
-                    for (var i = 0; i < values.length; i++) {
-                        var source = values[i];
-                        if (source.kind === sourceType) {
-                            results.push(source);
-                        }
+      // Fabricio: added this from Cristiano's code
+       if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices){
+        navigator.mediaDevices.enumerateDevices().then(
+             function(values) {
+                var results = [];
+                for (var i = 0; i < values.length; i++) {
+                    var source = values[i];
+                    if (source.kind === sourceType) {
+                        results.push(source);
                     }
-                    callback(results);
                 }
-            ).catch(
-                function(reason) {
-                webrtcUtils.log("Unable to enumerate devices (" + reason + ")");
-                }
-            );
-        }
-        else{
-            console.log("Browser doesn't support enumerate devices");
+                callback(results);
+             }
+          ).catch(
+            function(reason) {
+               webrtcUtils.log("Unable to enumerate devices (" + reason + ")");
+            }
+        );
+    }else{
+      console.log("Browser doesn't support enumerate devices");
             callback([]);
-        }
     }
+  }
 
-    // CODE CHANGE BY HAND: Expose getSourceList from easyrtc to allow getting output devices
+    // Fabricio: Expose getSourceList from easyrtc to allow getting output devices
     this.getAudioSinkList = function(callback){
        getSourceList(callback, "audiooutput");
     };
@@ -2314,10 +2314,10 @@ var Easyrtc = function() {
                 video: {
                     mandatory: {
                         chromeMediaSource: 'screen',
-                        maxWidth: window.screen.width,
-                        maxHeight: window.screen.height,
-                        minWidth: window.screen.width,
-                        minHeight: window.screen.height,
+                        maxWidth: screen.width,
+                        maxHeight: screen.height,
+                        minWidth: screen.width,
+                        minHeight: screen.height,
                         minFrameRate: 1,
                         maxFrameRate: 5},
                     optional: []
@@ -2698,7 +2698,6 @@ var Easyrtc = function() {
     }
 
     function getChromePeerStatistics(peerId, callback, filter) {
-
         if (!peerConns[peerId]) {
             callback(peerId, {"connected": false});
         }
@@ -2847,10 +2846,10 @@ var Easyrtc = function() {
      */
     this.getPeerStatistics = function(easyrtcid, callback, filter) {
         if (webrtcDetectedBrowser === "firefox") {
-            self.getFirefoxPeerStatistics(easyrtcid, callback, filter);
+            getFirefoxPeerStatistics(easyrtcid, callback, filter);
         }
         else {
-            self.getChromePeerStatistics(easyrtcid, callback, filter);
+            getChromePeerStatistics(easyrtcid, callback, filter);
         }
     };
 
@@ -5907,25 +5906,25 @@ var Easyrtc = function() {
         else {
             var sdp = msgData.sdp;
             var pc = peerConns[easyrtcid].pc;
+            var sendAnswer = function() {
+                if (self.debugPrinter) {
+                    self.debugPrinter("sending answer");
+                }
+                function onSignalSuccess() {
+                }
+
+                function onSignalFailure(errorCode, errorText) {
+                    delete peerConns[easyrtcid];
+                    self.showError(errorCode, errorText);
+                }
+
+                sendSignalling(easyrtcid, "answer", sessionDescription,
+                        onSignalSuccess, onSignalFailure);
+                peerConns[easyrtcid].connectionAccepted = true;
+                sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
+            };
 
             var setLocalAndSendMessage1 = function(sessionDescription) {
-                var sendAnswer = function() {
-                   if (self.debugPrinter) {
-                       self.debugPrinter("sending answer");
-                   }
-                   function onSignalSuccess() {
-                   }
-
-                   function onSignalFailure(errorCode, errorText) {
-                       delete peerConns[easyrtcid];
-                       self.showError(errorCode, errorText);
-                   }
-
-                   sendSignalling(easyrtcid, "answer", sessionDescription,
-                           onSignalSuccess, onSignalFailure);
-                   peerConns[easyrtcid].connectionAccepted = true;
-                   sendQueuedCandidates(easyrtcid, onSignalSuccess, onSignalFailure);
-               };
 
                if (sdpLocalFilter) {
                    sessionDescription.sdp = sdpLocalFilter(sessionDescription.sdp);
@@ -6773,7 +6772,6 @@ var Easyrtc = function() {
         var roomData;
         var signallingSuccess, signallingFailure;
         if (self.webSocket) {
-
             msgData.roomJoin[roomName] = newRoomData;
             signallingSuccess = function(msgType, msgData) {
 
@@ -7117,6 +7115,7 @@ var Easyrtc = function() {
      *                   });
      */
     this.connect = function(applicationName, successCallback, errorCallback) {
+
         if (!window.io) {
             self.showError(self.errCodes.DEVELOPER_ERR, "Your HTML has not included the socket.io.js library");
         }

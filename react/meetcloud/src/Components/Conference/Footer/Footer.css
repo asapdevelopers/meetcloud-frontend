@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+
+
+.footer {
+  height: 60px;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  margin: 0px padding;
+  position: absolute;
+  padding: 0 0px;
+}
+
+.footer-line {
+  box-sizing: border-box;
+  height: 2px;
+  margin-bottom: 22px;
+  border-top: 1px solid #FFFFFF;
+  opacity: 0.71;
+  text-align: center;
+  margin: 0 auto;
+}
