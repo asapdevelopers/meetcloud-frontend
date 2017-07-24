@@ -808,6 +808,7 @@ class Conference extends Component {
           <div className="row start">
             <div className="col">
               <div className="box">
+                <span className="videoNameSelf">You</span>
                 <video id="self-video-div" className="selfVideo" muted onClick={(event) => {
                   this.openFullScreen(event)
                 }}></video>
@@ -820,7 +821,7 @@ class Conference extends Component {
             })}
           </div>
         </div>
-        <Footer/>
+        <Footer onCameraClick={this.switchCamera}/>
       </div>
     )
   }

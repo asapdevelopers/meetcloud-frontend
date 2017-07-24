@@ -5,10 +5,12 @@
   cursor: pointer;
   margin-right: 10px;
 }
-.Conference{
+
+.Conference {
   background-color: #444444;
   height: 100vh;
 }
+
 .conferenceLogo {
   margin-top: 27px;
   margin-left: 45px;
@@ -42,4 +44,22 @@
   margin: 0px padding;
   position: absolute;
   padding: 0 0px;
+}
+
+.videoNameSelf {
+  position: absolute;
+  float: left;
+  z-index: 30000;
+  font-size: 20px;
+  bottom: 0px;
+  opacity: 0.6;
+  width: inherit;
+  width: 200px;
+  height: 30px;
+  padding: 10px;
+  color: #F2F2F2;
+  height: 130px;
+  margin-left: 20px;
+  width: 180px;
+  line-height: 220px;
 }

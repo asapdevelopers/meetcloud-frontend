@@ -8,7 +8,6 @@
 .videoName {
   position: absolute;
   float: left;
-  font-weight: 400;
   z-index: 30000;
   font-size: 20px;
   bottom: 0px;

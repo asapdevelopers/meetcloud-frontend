@@ -11,6 +11,10 @@
   padding: 0 0px;
 }
 
+.footer .icons{
+  margin-top: 8px;
+}
+
 .footer-line {
   box-sizing: border-box;
   height: 2px;
