@@ -37,8 +37,8 @@ class CallButton extends Component {
         icon = Call1;
     }
     return (
-      <div className="roundedButton">
-        <img className="buttonIcon" src={icon}/>
+      <div className="roundedButton" onClick={this.props.onClick}>
+        <img alt="" className="buttonIcon" src={icon}/>
       </div>
     )
   }

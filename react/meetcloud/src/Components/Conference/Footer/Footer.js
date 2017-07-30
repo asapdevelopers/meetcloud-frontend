@@ -3,18 +3,12 @@ import CallButton from '../CallButton/CallButton'
 import './Footer.css';
 
 
-class UserVideo extends Component {
-  constructor(props) {
-    super(props);
-    console.log(props)
-  }
-
+class Footer extends Component {
   render() {
     return (
       <div className="footer">
         <div className="footer-line"></div>
         <div className="icons row center-xs">
-
           <CallButton icon="Call1"/>
           <CallButton icon="Call2" onClick={this.props.onCameraClick}/>
           <CallButton icon="Call3"/>
@@ -25,4 +19,4 @@ class UserVideo extends Component {
     )
   }
 }
-export default UserVideo;
+export default Footer;

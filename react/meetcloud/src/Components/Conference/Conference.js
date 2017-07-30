@@ -270,6 +270,26 @@ class Conference extends Component {
     this.setState({streams})
   };
 
+  setFullScreenVideo = (user) => {
+    if (user === undefined) {
+      if (this.state.sharingWithMe.length > 0) {
+        let firstVideo = this.state.sharingWithMe[0];
+        this.setState({selectedUser: firstVideo});
+        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), firstVideo.stream);
+      } else {
+        this.setState({selectedUser: null});
+        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), '');
+      }
+    } else {
+      this.setState({selectedUser: user});
+      if (user === "me") {
+        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userMedia);
+      } else {
+        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), user.stream);
+      }
+    }
+  };
+
   streamAcceptorListener = (id, stream) => {
     let newShared;
     let sharingWithMeAux = [];
@@ -291,7 +311,10 @@ class Conference extends Component {
 
     if (stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
       newShared.screen = stream;
-      setTimeout(() => window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream), 1000);
+      setTimeout(() => {
+        window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream)
+        this.setFullScreenVideo();
+      }, 1000);
     } else {
       newShared.stream = stream;
       newShared.hasVideo = window.easyrtc.haveVideoTrack(id);
@@ -301,6 +324,7 @@ class Conference extends Component {
           window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), stream);
           this.setAudioOutput(document.getElementById('u-' + id));
         }
+        this.setFullScreenVideo();
       }, 1000);
     }
     console.log("Stream accepted", newShared);
@@ -380,7 +404,6 @@ class Conference extends Component {
   }
 
   connect = () => {
-    let connectionAvailable = false;
     if (this.state.selectedAudioDevice) {
       localStorage.setItem('selectedAudioDeviceId', this.state.selectedAudioDevice);
     }
@@ -426,6 +449,7 @@ class Conference extends Component {
   }
 
   mediaSuccess = (obj) => {
+    this.setState({userMedia: obj});
     this.removePopup();
     this.setState({mediaSourceWorking: obj});
     window.easyrtc.setVideoObjectSrc(this.selfVideoElement, obj);
@@ -546,9 +570,7 @@ class Conference extends Component {
   }
 
   switchCamera = () => {
-    this.setState({
-      camera: !this.state.camera
-    });
+    this.setState({camera: !this.state.camera});
     window.easyrtc.enableCamera(this.state.camera);
   }
 
@@ -578,6 +600,21 @@ class Conference extends Component {
           let getAudioGen = rtcHelper.getAudioSourceList();
           let getVideoGen = rtcHelper.getVideoSourceList();
           let getOutputGen = rtcHelper.getAudioSinkList();
+          
+          // Get Audio source list
+          getAudioGen.next().value.then(data => {
+            this.setState({selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices});
+          }).catch(e => alert("Could not get audio devices: " + e));
+      
+          // Get video source list
+          getVideoGen.next().value.then(data => {
+            this.setState({selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled});
+          }).catch(e => alert("Could not get video devices: " + e));
+      
+          // Get output source list
+          getOutputGen.next().value.then(data => {
+            this.setState({audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice});
+          }).catch(e => alert("Could not get output devices: " + e));
           this.connect();
         }
       });
@@ -590,7 +627,7 @@ class Conference extends Component {
   initConference = () => {
     console.log("Detect browser: " + rtcHelper.detectBrowser);
     let browser = rtcHelper.detectBrowser()
-    if (browser == "chrome") {
+    if (browser === "chrome") {
       this.permissions_interval_checker = setInterval(this.permissionInterval, 1000);
       this.setState({permissions_interval_checker: this.permissions_interval_checker});
     }
@@ -707,6 +744,7 @@ class Conference extends Component {
     if (!valid) {
       return <Redirect to='/'/>;
     }
+
     // Cost
     let cost = null;
     if (this.state.joined) {
@@ -719,6 +757,8 @@ class Conference extends Component {
         </div>
       )
     }
+
+    // Modal
     let modalContent = ""
     if (this.state.isLoading) {
       modalContent = <ReactSpinner color="white"/>
@@ -742,7 +782,7 @@ class Conference extends Component {
           case 'chrome':
             modalContentBrowser = (
               <span>Click the
-                <img className="permissionIcon" src={CameraIconPermission}/>
+                <img alt="" className="permissionIcon" src={CameraIconPermission}/>
                 icon in the URL bar above to give Meetcloud access to your computer's camera and microphone.
               </span>
             );
@@ -783,20 +823,26 @@ class Conference extends Component {
         </ModalDialog>
       );
     }
-
     let modal = (this.state.modal || this.state.isLoading) && <ModalContainer onClose={this.props.onClose}>
       {modalContent}
     </ModalContainer>
 
-    const {props: {
-        isLoading
-      }} = this;
+    // Empty room
+    let emptyRoom = ""
+    if (this.state.sharingWithMe.length === 0) {
+      emptyRoom = (
+        <span>Room is empty, waiting...</span>
+      )
+    }
 
-    var pepe = "a"
     return (
       <div className="Conference">
+        <video muted className="videoBackground" id="video-selected"></video>
         {modal}
-        <img className="conferenceLogo" src={ConferenceLogo}/>
+        {this.state.sharingWithMe.length > 0 && (
+          <div className="conferenceHeader"></div>
+        )}
+        <img alt="" className="conferenceLogo" src={ConferenceLogo}/>
         <div className="row">
           <div className="col">
             <label>Domain: {this.state.domain.friendlyName}</label><br/>
@@ -804,19 +850,22 @@ class Conference extends Component {
           </div>
         </div>
         {cost}
+        <div className="emptyRoom">{emptyRoom}</div>
         <div className="videoList">
           <div className="row start">
             <div className="col">
-              <div className="box">
+              <div className="box box-video" onClick={(event) => {
+                this.setFullScreenVideo("me")
+              }}>
                 <span className="videoNameSelf">You</span>
-                <video id="self-video-div" className="selfVideo" muted onClick={(event) => {
-                  this.openFullScreen(event)
-                }}></video>
+                <video id="self-video-div" muted className={this.state.selectedUser === "me"? 'selfVideo selected': 'selfVideo'}></video>
               </div>
             </div>
             {this.state.sharingWithMe.map(user => {
-              return <div className="col">
-                <div className="box"><UserVideo key={user.id} selected={true} user={user}/></div>
+              return <div key={user.id} className="col">
+                <div className="box box-video" onClick={(event) => this.setFullScreenVideo(user)}>
+                  <UserVideo selected={this.state.selectedUser && this.state.selectedUser.id === user.id} user={user}/>
+                </div>
               </div>
             })}
           </div>

@@ -1,11 +1,7 @@
 import React, {Component} from 'react';
 import './UserVideo.css';
 
-import * as rtcHelper from '../../../Services/helpers/easyrtcHelper'
-import {ModalContainer, ModalDialog} from 'react-modal-dialog';
-import ReactSpinner from 'react-spinjs';
-
-class Footer extends Component {
+class UserVideo extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,11 +20,16 @@ class Footer extends Component {
       video = <video key={'us-' + user.id} className="videoContainer" id={'us-' + user.id}></video>
     }
     return (
-      <div className="userVideo">
-      <span className="videoName">{user.username}</span>
+      <div className={this.props.selected
+        ? 'userVideo selected'
+        : 'userVideo'}>
+        <span className="videoName">{user.username}</span>
         {video}
       </div>
     )
   }
 }
-export default Footer;
+UserVideo.propTypes ={
+    selected: React.PropTypes.bool
+}
+export default UserVideo;

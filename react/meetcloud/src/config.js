@@ -1,7 +1,7 @@
 const environments = ['local', 'test', 'prod'];
 const environment = environments[0]
 
-let conferenceApiPrefix = "http://localhost:8000/"
+let conferenceApiPrefix = "http://192.168.106.1:8000/"
 switch (environment) {
   case 'test':
     conferenceApiPrefix = "http://localhost:8000/"

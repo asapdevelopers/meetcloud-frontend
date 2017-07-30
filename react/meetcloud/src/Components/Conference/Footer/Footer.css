@@ -1,6 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
-
-
 .footer {
   height: 60px;
   position: absolute;
@@ -9,9 +7,10 @@
   margin: 0px padding;
   position: absolute;
   padding: 0 0px;
+  background-color: rgba(0, 0, 0, 0.30);
 }
 
-.footer .icons{
+.footer .icons {
   margin-top: 8px;
 }
 
