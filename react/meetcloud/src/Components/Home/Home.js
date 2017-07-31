@@ -58,6 +58,7 @@ class Home extends Component {
   }
 
   connect = (event) => {
+    event.preventDefault();
     authenticateDomain(domain, this.state.roomName).then((response) => {
       response.json().then((data) => {
         this.init(data);
@@ -89,25 +90,27 @@ class Home extends Component {
               </div>
             </div>
             <div className="row center-xs form">
-              <div className="col col-responsive">
-                <div className="row">
-                  <span className="text">Room name</span>
+                <div className="col col-responsive">
+                    <form onSubmit={(event) => this.connect(event)}>
+                      <div className="row">
+                        <span className="text">Room name</span>
+                      </div>
+                      <div className="row">
+                        <input className="inputText" type="text" value={this.state.roomName} onChange={(event) => this.setState({roomName: event.target.value})}></input>
+                      </div>
+                      <div className="row">
+                        <span className="text">Your name</span>
+                      </div>
+                      <div className="row">
+                        <input className="inputText" type="text" value={this.state.userName} onChange={(event) => this.setState({userName: event.target.value})}></input>
+                      </div>
+                      <div className="row center-xs">
+                        <div className="col full">
+                          <button type="submit" className="button">Connect</button>
+                        </div>
+                      </div>
+                    </form>
                 </div>
-                <div className="row">
-                  <input className="inputText" type="text" value={this.state.roomName} onChange={(event) => this.setState({roomName: event.target.value})}></input>
-                </div>
-                <div className="row">
-                  <span className="text">Your name</span>
-                </div>
-                <div className="row">
-                  <input className="inputText" type="text" value={this.state.userName} onChange={(event) => this.setState({userName: event.target.value})}></input>
-                </div>
-                <div className="row center-xs">
-                  <div className="col full">
-                    <button className="button" onClick={(event) => this.connect(event)}>Connect</button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
           <div className="App-footer">

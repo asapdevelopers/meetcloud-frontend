@@ -6,6 +6,9 @@ import Call2 from '../../../assets/images/Call2.png';
 import Call3 from '../../../assets/images/Call3.png';
 import Call4 from '../../../assets/images/Call4.png';
 import Call5 from '../../../assets/images/Call5.png';
+import Money from '../../../assets/images/Money.png';
+import Settings from '../../../assets/images/Settings.png';
+import Chat from '../../../assets/images/Chat.png';
 
 class CallButton extends Component {
   constructor(props) {
@@ -33,6 +36,15 @@ class CallButton extends Component {
       case "Call5":
         icon = Call5;
         break;
+      case "Money":
+        icon = Money;
+        break;
+      case "Settings":
+        icon = Settings;
+        break;
+        case "Chat":
+          icon = Chat;
+          break;
       default:
         icon = Call1;
     }

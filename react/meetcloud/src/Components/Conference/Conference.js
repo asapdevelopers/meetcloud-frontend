@@ -9,6 +9,7 @@ import ReactSpinner from 'react-spinjs';
 import CameraIconPermission from '../../assets/images/camera_permission.png';
 import ConferenceLogo from '../../assets/images/ConferenceLogo.png';
 import Footer from './Footer/Footer';
+import Header from './Header/Header';
 import UserVideo from './UserVideo/UserVideo';
 import * as conferenceConsts from '../../Consts/conference'
 
@@ -600,17 +601,17 @@ class Conference extends Component {
           let getAudioGen = rtcHelper.getAudioSourceList();
           let getVideoGen = rtcHelper.getVideoSourceList();
           let getOutputGen = rtcHelper.getAudioSinkList();
-          
+
           // Get Audio source list
           getAudioGen.next().value.then(data => {
             this.setState({selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices});
           }).catch(e => alert("Could not get audio devices: " + e));
-      
+
           // Get video source list
           getVideoGen.next().value.then(data => {
             this.setState({selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled});
           }).catch(e => alert("Could not get video devices: " + e));
-      
+
           // Get output source list
           getOutputGen.next().value.then(data => {
             this.setState({audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice});
@@ -843,6 +844,7 @@ class Conference extends Component {
           <div className="conferenceHeader"></div>
         )}
         <img alt="" className="conferenceLogo" src={ConferenceLogo}/>
+        <Header/>
         <div className="row">
           <div className="col">
             <label>Domain: {this.state.domain.friendlyName}</label><br/>

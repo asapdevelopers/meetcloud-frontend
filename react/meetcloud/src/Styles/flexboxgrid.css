@@ -217,6 +217,12 @@
   justify-content: center;
   text-align: center;
 }
+.right-xs {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: flex-end;
+  text-align: center;
+}
 
 .end-xs {
   -webkit-box-pack: end;
