@@ -51,7 +51,8 @@ class Conference extends Component {
       sharingWithMe: [],
       sharingWithMeDict: {},
       pendingCallsDict: {},
-      firstRoomListener: true
+      firstRoomListener: true,
+      shareRoom: false
     };
     this.permissionInterval = this.permissionInterval.bind(this);
   }
@@ -359,7 +360,7 @@ class Conference extends Component {
     if (this.state.joined) {
       // room fields might not be instantly available
       let roomCost = window.easyrtc.getRoomField(this.state.joined.name, "roomCost");
-      let joinedAux = {}
+      let joinedAux = {};
       if (roomCost) {
         joinedAux.created = moment(roomCost.createdDate);
         var now = new moment();
@@ -571,8 +572,14 @@ class Conference extends Component {
   }
 
   switchCamera = () => {
-    this.setState({camera: !this.state.camera});
+    this.setState({
+      camera: !this.state.camera
+    });
     window.easyrtc.enableCamera(this.state.camera);
+  }
+
+  shareRoomWithContact = () => {
+    this.setState({shareRoom: true})
   }
 
   openFullScreen = (evt) => {
@@ -817,7 +824,7 @@ class Conference extends Component {
         }
       }
 
-      modalContent = (
+    let modalContent = (
         <ModalDialog onClose={this.props.onClose} className="example-dialog" dismissOnBackgroundClick={false}>
           <h3>Meetcloud can't access your camera or microphone.</h3>
           {modalContentBrowser}
@@ -827,7 +834,22 @@ class Conference extends Component {
     let modal = (this.state.modal || this.state.isLoading) && <ModalContainer onClose={this.props.onClose}>
       {modalContent}
     </ModalContainer>
+    let shareContent = ""
+    if(this.state.shareRoom){
+     shareContent =
+      <ModalDialog onClose={() => this.setState({shareRoom: false})} className="share-dialog" dismissOnBackgroundClick={true}>
+        <div className="share-text">Invite your friends to this room.</div>
+        <span className="share-email">Email : </span>
+        <input className="inputText" type="text"></input>
+        <div className="share-text">
+          <button className="button" type="button">Invite</button>
+        </div>
+      </ModalDialog>
+    }
 
+    let shareRoomModal = (this.state.shareRoom) && <ModalContainer onClose={this.props.onClose}>
+      {shareContent}
+    </ModalContainer>
     // Empty room
     let emptyRoom = ""
     if (this.state.sharingWithMe.length === 0) {
@@ -835,16 +857,19 @@ class Conference extends Component {
         <span>Room is empty, waiting...</span>
       )
     }
-
+    let header = ""
+    if (this.state.joined != null) {
+      header = (<Header durationCall={this.state.joined.duration}/>)
+    }
     return (
       <div className="Conference">
         <video muted className="videoBackground" id="video-selected"></video>
         {modal}
+        {shareRoomModal}
         {this.state.sharingWithMe.length > 0 && (
           <div className="conferenceHeader"></div>
         )}
-        <img alt="" className="conferenceLogo" src={ConferenceLogo}/>
-        <Header/>
+        <img alt="" className="conferenceLogo" src={ConferenceLogo}/> {header}
         <div className="row">
           <div className="col">
             <label>Domain: {this.state.domain.friendlyName}</label><br/>
@@ -860,7 +885,9 @@ class Conference extends Component {
                 this.setFullScreenVideo("me")
               }}>
                 <span className="videoNameSelf">You</span>
-                <video id="self-video-div" muted className={this.state.selectedUser === "me"? 'selfVideo selected': 'selfVideo'}></video>
+                <video id="self-video-div" muted className={this.state.selectedUser === "me"
+                  ? 'selfVideo selected'
+                  : 'selfVideo'}></video>
               </div>
             </div>
             {this.state.sharingWithMe.map(user => {
@@ -872,7 +899,7 @@ class Conference extends Component {
             })}
           </div>
         </div>
-        <Footer onCameraClick={this.switchCamera}/>
+        <Footer onCameraClick={this.switchCamera} onShareClick={this.shareRoomWithContact}/>
       </div>
     )
   }

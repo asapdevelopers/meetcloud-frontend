@@ -97,3 +97,29 @@
   opacity: 0.8;
   cursor: pointer;
 }
+
+.share-dialog {
+	height: 300px !important;
+	width: 500px !important;
+	border: 1px solid #979797 !important;
+	opacity: 0.9 !important;
+	border-radius: 5px !important;
+	background-color: #2B2B2B !important;
+	box-shadow: 0 11px 10px 0 rgba(0,0,0,0.3) !important;
+}
+
+.share-text {
+	height: 54px;
+	color: #67C4F9;
+	font-family: "Open Sans";
+	font-size: 20px;
+	line-height: 27px;
+	text-align: center;
+}
+
+.share-email {
+	color: #FFFFFF;
+	font-family: "Open Sans";
+	font-size: 14px;
+	line-height: 19px;
+}

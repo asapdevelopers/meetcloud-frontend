@@ -196,6 +196,7 @@
   margin-left: 75%;
 }
 
+
 .col-xs-offset-10 {
   margin-left: 83.33333333%;
 }
@@ -217,6 +218,7 @@
   justify-content: center;
   text-align: center;
 }
+
 .right-xs {
   -webkit-box-pack: center;
   -ms-flex-pack: center;

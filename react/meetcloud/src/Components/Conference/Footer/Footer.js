@@ -12,7 +12,7 @@ class Footer extends Component {
           <CallButton icon="Call1"/>
           <CallButton icon="Call2" onClick={this.props.onCameraClick}/>
           <CallButton icon="Call3"/>
-          <CallButton icon="Call4"/>
+          <CallButton icon="Call4" onClick={this.props.onShareClick}/>
           <CallButton icon="Call5"/>
         </div>
       </div>

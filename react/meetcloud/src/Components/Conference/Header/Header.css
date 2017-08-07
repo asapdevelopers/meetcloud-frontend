@@ -24,3 +24,9 @@
   text-align: center;
   margin: 0 auto;
 }
+
+.items {
+  margin-top: 27px !important;
+  margin-right: 40px !important;
+  color: white;
+}
