@@ -84,13 +84,15 @@ class Conference extends Component {
     if (this.state.connected) {
       window.easyrtc.disconnect(); // must call this otherwise manual reconnect is not possible
     }
-    this.setState({connected: null});
-    this.setState({joined: null});
-    this.setState({sharingWithMe: []});
-    this.setState({sharingWithMeDict: {}});
-    this.setState({members: []});
-    this.setState({membersDict: {}});
-    this.setState({pendingCallsDict: {}});
+    this.setState({
+      connected: null,
+      joined: null,
+      sharingWithMe: [],
+      sharingWithMeDict: {},
+      members: [],
+      membersDict: {},
+      pendingCallsDict: {}
+    });
 
     // If we had a stream close it
     if (this.state.mediaSourceWorking) {
@@ -359,14 +361,14 @@ class Conference extends Component {
   clockInterval = () => {
     if (this.state.joined) {
       // room fields might not be instantly available
-      let roomCost = window.easyrtc.getRoomField(this.state.joined.name, "roomCost");
-      let joinedAux = {};
-      if (roomCost) {
-        joinedAux.created = moment(roomCost.createdDate);
+      let data = this.state.conferenceData;
+
+      let joinedAux = this.state.joined;
+      if (data) {
         var now = new moment();
-        joinedAux.duration = new moment().startOf('day').seconds(now.diff(this.state.joined.created, 'seconds')).format('H:mm:ss');
-        joinedAux.cost = roomCost.cost;
-        joinedAux.costPerHour = parseFloat(roomCost.costPerHour);
+        var duration = now.diff(this.state.joined.date);
+        joinedAux.duration = moment.utc(duration).format("HH:mm:ss")
+        joinedAux.cost = moment.duration(duration).asSeconds() * data.costPerHour / 3600;
       }
       this.setState({joined: joinedAux});
     }
@@ -431,7 +433,8 @@ class Conference extends Component {
     let joined = {
       name: roomName,
       date: new moment(),
-      created: null
+      duration: '',
+      cost: 0,
     };
     this.setState({joined});
 
@@ -727,6 +730,9 @@ class Conference extends Component {
       authenticateToken(domain.token).then((response) => {
         if (response.status === 200) {
           response.json().then((data) => {
+            if (data.costPerHour) {
+              data.costPerHour = parseFloat(data.costPerHour);
+            }
             this.setState({conferenceData: data});
             this.initConference();
           }, (error) => alert(error))
@@ -824,7 +830,7 @@ class Conference extends Component {
         }
       }
 
-    let modalContent = (
+      let modalContent = (
         <ModalDialog onClose={this.props.onClose} className="example-dialog" dismissOnBackgroundClick={false}>
           <h3>Meetcloud can't access your camera or microphone.</h3>
           {modalContentBrowser}
@@ -835,11 +841,11 @@ class Conference extends Component {
       {modalContent}
     </ModalContainer>
     let shareContent = ""
-    if(this.state.shareRoom){
-     shareContent =
-      <ModalDialog onClose={() => this.setState({shareRoom: false})} className="share-dialog" dismissOnBackgroundClick={true}>
+    if (this.state.shareRoom) {
+      shareContent = <ModalDialog onClose={() => this.setState({shareRoom: false})} className="share-dialog" dismissOnBackgroundClick={true}>
         <div className="share-text">Invite your friends to this room.</div>
-        <span className="share-email">Email : </span>
+        <span className="share-email">Email :
+        </span>
         <input className="inputText" type="text"></input>
         <div className="share-text">
           <button className="button" type="button">Invite</button>
