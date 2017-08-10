@@ -12,6 +12,7 @@ import Footer from './Footer/Footer';
 import Header from './Header/Header';
 import UserVideo from './UserVideo/UserVideo';
 import * as conferenceConsts from '../../Consts/conference'
+import {inviteToConference} from '../../Services/conference/conferenceApi'
 
 class Conference extends Component {
 
@@ -52,7 +53,8 @@ class Conference extends Component {
       sharingWithMeDict: {},
       pendingCallsDict: {},
       firstRoomListener: true,
-      shareRoom: false
+      shareRoom: false,
+      invitePersonEmail: null
     };
     this.permissionInterval = this.permissionInterval.bind(this);
   }
@@ -717,6 +719,16 @@ class Conference extends Component {
     this.setState({sharingScreen: false});
   };
 
+  invitePersonToConference = (event) => {
+    event.preventDefault();
+    debugger;
+    inviteToConference(this.state.invitePersonEmail, "emptyLink").then((response) => {
+      response.json().then((data) => {
+        alert("OK");
+      })
+    }, (error) => alert(error));
+  };
+
   componentDidMount() {
     this.selfVideoElement = document.getElementById("self-video-div");
     let domain = localStorage.getItem("conference") != null
@@ -839,11 +851,13 @@ class Conference extends Component {
      shareContent =
       <ModalDialog onClose={() => this.setState({shareRoom: false})} className="share-dialog" dismissOnBackgroundClick={true}>
         <div className="share-text">Invite your friends to this room.</div>
-        <span className="share-email">Email : </span>
-        <input className="inputText" type="text"></input>
-        <div className="share-text">
-          <button className="button" type="button">Invite</button>
-        </div>
+        <form onSubmit={(event) => this.invitePersonToConference(event)}>
+          <span className="share-email">Email : </span>
+          <input className="inputText" type="text" value={this.state.invitePersonEmail} onChange={(event) => this.setState({invitePersonEmail: event.target.value})}></input>
+          <div className="share-text">
+            <button className="button" type="submit">Invite</button>
+          </div>
+        </form>
       </ModalDialog>
     }
 

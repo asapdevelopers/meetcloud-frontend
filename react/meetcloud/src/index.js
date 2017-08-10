@@ -11,7 +11,7 @@ ReactDOM.render(
   <Router>
   <div>
     <Route path="/" exact component={Home}/>
-    <Route path="/conference" component={Conference}/>
+    <Route path="/conference/:roomName"  component={Conference}/>
   </div>
 </Router>, document.getElementById('root'));
 
