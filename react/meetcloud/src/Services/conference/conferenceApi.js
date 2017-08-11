@@ -18,3 +18,13 @@ export function authenticateToken(token) {
     }
   });
 }
+
+export function inviteToConference(email, link) {
+  return fetch(config.api.site.inviteToConference, {
+    method: "POST",
+    body: JSON.stringify({email, link}),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+}

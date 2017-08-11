@@ -29,7 +29,8 @@ export const config = {
       }
     },
     site: {
-      backgroundImage: conferenceApiPrefix + 'site/background/'
+      backgroundImage: conferenceApiPrefix + 'site/background/',
+      inviteToConference : conferenceApiPrefix + 'site/inviteToConference/'
     }
   }
 };

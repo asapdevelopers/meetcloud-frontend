@@ -55,6 +55,7 @@ class Home extends Component {
     localStorage['conference'] = JSON.stringify({domain});
     localStorage['username'] = this.state.userName;
     this.setState({redirect: true})
+    this.props.history.push("/conference/" + domain.roomName);
   }
 
   connect = (event) => {
