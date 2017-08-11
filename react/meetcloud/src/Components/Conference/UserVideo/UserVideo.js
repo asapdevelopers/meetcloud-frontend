@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import './UserVideo.css';
 
 class UserVideo extends Component {
@@ -29,7 +30,9 @@ class UserVideo extends Component {
     )
   }
 }
-UserVideo.propTypes ={
-    selected: React.PropTypes.bool
+
+UserVideo.propTypes = {
+    selected: PropTypes.bool
 }
+
 export default UserVideo;

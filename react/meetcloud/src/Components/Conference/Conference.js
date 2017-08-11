@@ -294,26 +294,25 @@ class Conference extends Component {
     }
   };
 
-  streamAcceptorListener = (id, stream) => {
+  streamAcceptorListener = (id, stream, streamName) => {
     let newShared;
-    let sharingWithMeAux = [];
-    let sharingWithMeDictAux = [];
+
+    let {sharingWithMeDict, sharingWithMe, membersDict} = this.state;
 
     // if already sharing, get it
-    if (this.state.sharingWithMeDict[id]) {
-      newShared = this.state.sharingWithMeDict[id];
+    if (sharingWithMeDict[id]) {
+      newShared = sharingWithMeDict[id];
     } else {
       newShared = {
-        username: this.state.membersDict[id].username,
+        username: membersDict[id].username,
         id: id,
-        stream
       }
-      sharingWithMeAux.push(newShared);
-      sharingWithMeDictAux[id] = newShared;
+      sharingWithMe.push(newShared);
+      sharingWithMeDict[id] = newShared;
     }
-    this.setState({sharingWithMeDict: sharingWithMeDictAux, sharingWithMe: sharingWithMeAux});
+    this.setState({sharingWithMeDict, sharingWithMe});
 
-    if (stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
+    if (streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
       newShared.screen = stream;
       setTimeout(() => {
         window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream)
@@ -575,10 +574,10 @@ class Conference extends Component {
   }
 
   switchCamera = () => {
-    this.setState({
-      camera: !this.state.camera
-    });
-    window.easyrtc.enableCamera(this.state.camera);
+    let camera = !this.state.camera;
+    this.setState({camera});
+    window.easyrtc.enableVideo(camera);
+    window.easyrtc.enableCamera(camera);
   }
 
   shareRoomWithContact = () => {
@@ -670,8 +669,8 @@ class Conference extends Component {
     window.easyrtc.setPeerListener((easyrtcid, msgType, msgData, targeting) => this.peerListener(easyrtcid, msgType, msgData, targeting));
     window.easyrtc.setRoomOccupantListener((roomName, occupants) => this.roomOcupantListener(roomName, occupants));
     window.easyrtc.setAcceptChecker((id, cb) => this.acceptCheckerListener(id, cb));
-    window.easyrtc.setStreamAcceptor((id, stream) => this.streamAcceptorListener(id, stream));
-    window.easyrtc.setOnStreamClosed((id, stream, streamName) => this.streamClosedListener(id, stream, streamName));
+    window.easyrtc.setStreamAcceptor(this.streamAcceptorListener);
+    window.easyrtc.setOnStreamClosed(this.streamClosedListener);
 
     //connect
     this.connect();
@@ -905,7 +904,10 @@ class Conference extends Component {
             })}
           </div>
         </div>
-        <Footer onCameraClick={this.switchCamera} onShareClick={this.shareRoomWithContact}/>
+        <Footer onCameraClick={this.switchCamera}
+                onShareClick={this.shareRoomWithContact}
+                cameraEnabled={this.state.camera}
+                micEnabled={this.state.mic}/>
       </div>
     )
   }

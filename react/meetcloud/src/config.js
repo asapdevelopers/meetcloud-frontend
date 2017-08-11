@@ -1,17 +1,17 @@
 const environments = ['local', 'test', 'prod'];
 const environment = environments[0]
 
-let conferenceApiPrefix = "http://192.168.106.1:8000/"
-switch (environment) {
-  case 'test':
-    conferenceApiPrefix = "http://localhost:8000/"
-    break;
-  case 'prod':
-    conferenceApiPrefix = "http://localhost:8000/"
-    break;
-  default:
-    conferenceApiPrefix = "http://localhost:8000/"
-}
+let conferenceApiPrefix = "http://192.168.1.152:8000/"
+// switch (environment) {
+//   case 'test':
+//     conferenceApiPrefix = "http://localhost:8000/"
+//     break;
+//   case 'prod':
+//     conferenceApiPrefix = "http://localhost:8000/"
+//     break;
+//   default:
+//     conferenceApiPrefix = "http://localhost:8000/"
+// }
 
 function parseRoute(route, params) {
   for (let k in params) {

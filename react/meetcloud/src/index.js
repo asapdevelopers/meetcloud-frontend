@@ -8,7 +8,7 @@ import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 ReactDOM.render(
-  <Router>
+<Router>
   <div>
     <Route path="/" exact component={Home}/>
     <Route path="/conference" component={Conference}/>
