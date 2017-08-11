@@ -724,8 +724,7 @@ class Conference extends Component {
 
   invitePersonToConference = (event) => {
     event.preventDefault();
-    debugger;
-    inviteToConference(this.state.invitePersonEmail, "emptyLink").then((response) => {
+    inviteToConference(this.state.invitePersonEmail, window.location.href).then((response) => {
       response.json().then((data) => {
         alert("OK");
       })
