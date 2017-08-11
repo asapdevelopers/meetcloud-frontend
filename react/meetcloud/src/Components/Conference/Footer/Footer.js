@@ -13,11 +13,11 @@ class Footer extends Component {
       <div className="footer">
         <div className="footer-line"></div>
         <div className="icons row center-xs">
-          <CallButton icon="ShareScreen" />
+          <CallButton icon="ShareScreen" onClick={this.props.onShareScreenClick}/>
           <CallButton icon={cameraIcon} onClick={this.props.onCameraClick}/>
-          <CallButton icon={micIcon}/>
+          <CallButton icon={micIcon} onClick={this.props.onMicClick}/>
           <CallButton icon="Invite" onClick={this.props.onShareClick}/>
-          <CallButton icon="HangUp"/>
+          <CallButton icon="HangUp" onClick={this.props.onHangUpClick}/>
         </div>
       </div>
     )

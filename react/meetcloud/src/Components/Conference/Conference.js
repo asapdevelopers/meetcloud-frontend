@@ -307,7 +307,7 @@ class Conference extends Component {
     } else {
       newShared = {
         username: membersDict[id].username,
-        id: id,
+        id: id
       }
       sharingWithMe.push(newShared);
       sharingWithMeDict[id] = newShared;
@@ -435,7 +435,7 @@ class Conference extends Component {
       name: roomName,
       date: new moment(),
       duration: '',
-      cost: 0,
+      cost: 0
     };
     this.setState({joined});
 
@@ -568,18 +568,17 @@ class Conference extends Component {
     });
   };
 
-  switchMic = () => {
-    this.setState({
-      mic: !this.state.mic
-    });
-    window.easyrtc.enableMicrophone(this.state.mic);
-  }
-
   switchCamera = () => {
     let camera = !this.state.camera;
     this.setState({camera});
-    window.easyrtc.enableVideo(camera);
+    // window.easyrtc.enableVideo(camera);
     window.easyrtc.enableCamera(camera);
+  }
+
+  switchMic = () => {
+    let mic = !this.state.mic;
+    this.setState({mic});
+    window.easyrtc.enableMicrophone(mic);
   }
 
   shareRoomWithContact = () => {
@@ -855,7 +854,8 @@ class Conference extends Component {
       shareContent = <ModalDialog onClose={() => this.setState({shareRoom: false})} className="share-dialog" dismissOnBackgroundClick={true}>
         <div className="share-text">Invite your friends to this room.</div>
         <form onSubmit={(event) => this.invitePersonToConference(event)}>
-          <span className="share-email">Email : </span>
+          <span className="share-email">Email :
+          </span>
           <input className="inputText" type="text" value={this.state.invitePersonEmail} onChange={(event) => this.setState({invitePersonEmail: event.target.value})}></input>
           <div className="share-text">
             <button className="button" type="submit">Invite</button>
@@ -916,10 +916,7 @@ class Conference extends Component {
             })}
           </div>
         </div>
-        <Footer onCameraClick={this.switchCamera}
-                onShareClick={this.shareRoomWithContact}
-                cameraEnabled={this.state.camera}
-                micEnabled={this.state.mic}/>
+        <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} cameraEnabled={this.state.camera} micEnabled={this.state.mic}/>
       </div>
     )
   }
