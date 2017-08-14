@@ -9,6 +9,7 @@ import ReactSpinner from 'react-spinjs';
 import CameraIconPermission from '../../assets/images/camera_permission.png';
 import ConferenceLogo from '../../assets/images/ConferenceLogo.png';
 import Footer from './Footer/Footer';
+import Chat from './Chat/Chat';
 import Header from './Header/Header';
 import UserVideo from './UserVideo/UserVideo';
 import * as conferenceConsts from '../../Consts/conference'
@@ -38,10 +39,7 @@ class Conference extends Component {
       videoDevices: [],
       audioOutputDevices: [],
       selectedAudioOutputDevice: null,
-      messages: {
-        message: '',
-        list: []
-      },
+      messages: [],
       mediaSourceWorking: null,
       sharingScreen: false,
       cameraEnabled: localStorage.getItem('cameraEnabled') != null
@@ -54,7 +52,8 @@ class Conference extends Component {
       pendingCallsDict: {},
       firstRoomListener: true,
       shareRoom: false,
-      invitePersonEmail: null
+      invitePersonEmail: null,
+      showChat: false
     };
     this.permissionInterval = this.permissionInterval.bind(this);
   }
@@ -71,8 +70,7 @@ class Conference extends Component {
   handleClose = () => this.setState({modal: false})
 
   addMessage = (msg, source) => {
-    this.state.messages.list.push({date: new moment(), msg: msg, source: source});
-    //$('#messages-list-holder').scrollTop($('#messages-list-holder')[0].scrollHeight);
+    this.setState({messages: [...this.state.messages, {date: new moment(), msg: msg, source: source}]})
   }
 
   invalidConference = () => {
@@ -123,6 +121,14 @@ class Conference extends Component {
 
       rtcHelper.playSound(conferenceConsts.WAKE_UP_AUDIO);
     }
+  }
+
+  openChat = () => {
+    this.setState({showChat: true});
+  }
+
+  closeChat = () => {
+    this.setState({showChat: false});
   }
 
   // Will call a specific target.
@@ -425,6 +431,7 @@ class Conference extends Component {
     } else {
       window.easyrtc.setUsername(this.state.username);
       window.easyrtc.setCredential({'token': this.state.domain.token});
+      console.log("on connect: " + conferenceConsts.WEB_RTC_APP)
       window.easyrtc.connect(conferenceConsts.WEB_RTC_APP, this.onConnect, this.onConnectError);
     }
   }
@@ -533,27 +540,26 @@ class Conference extends Component {
     window.easyrtc.hangupAll();
   };
 
-  sendMessage = () => {
-    if (!this.state.messages.message) {
+  sendMessage = (msg) => {
+    if (!msg) {
       return;
     }
-    let msg = this.state.messages.message;
 
     var suc = (a, b) => {
-      let messages = this.stata.message;
-      messages.message = "";
-      this.setState({messages});
       // Add self message
       this.addMessage(msg, "Me");
     };
 
     var er = (a, b) => {
+      debugger;
       alert("Failed to send message.");
     };
 
     // Broadcast message to everyone in the room.
     // We can use room name (original one)
-
+    console.log("MSG TYPE: " + conferenceConsts.CHAT_MESSAGE_TYPE);
+    console.log("this.state.joined.name: " + this.state.joined.name);
+    console.log("this.state.username: " + this.state.username)
     window.easyrtc.sendPeerMessage({
       targetRoom: this.state.joined.name
     }, conferenceConsts.CHAT_MESSAGE_TYPE, {
@@ -876,7 +882,7 @@ class Conference extends Component {
     }
     let header = ""
     if (this.state.joined != null) {
-      header = (<Header durationCall={this.state.joined.duration}/>)
+      header = (<Header durationCall={this.state.joined.duration} openChat={this.openChat}/>)
     }
     return (
       <div className="Conference">
@@ -917,6 +923,7 @@ class Conference extends Component {
           </div>
         </div>
         <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} cameraEnabled={this.state.camera} micEnabled={this.state.mic}/>
+        <Chat messages={this.state.messages} opened={this.state.showChat} onCloseChat={this.closeChat} onSendMessage={this.sendMessage}/>
       </div>
     )
   }
