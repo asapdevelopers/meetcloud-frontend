@@ -8,9 +8,11 @@ class Header extends Component {
       <div className="Header">
         <div className="icons row right-xs">
           <label className="items">Call duration: {this.props.durationCall}</label>
-          <CallButton className="items" icon="Money"/>
-          <CallButton className="items" icon="Settings"/>
-          <CallButton className="items" icon="Chat"/>
+          <div className="icons-top">
+            <CallButton className="items" icon="Money"/>
+            <CallButton className="items" icon="Settings"/>
+            <CallButton className="items" icon="Chat"/>
+          </div>
         </div>
       </div>
     )

@@ -341,7 +341,7 @@ class Conference extends Component {
       setTimeout(() => window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), ''), 1000);
       if (this.state.sharingWithMeDict[id]) {
         let sharing = this.state.sharingWithMeDict;
-        sharing[id].screen = null;
+        delete sharing[id];
         this.setState({sharingWithMeDict: sharing});
       }
     } else {
@@ -350,7 +350,7 @@ class Conference extends Component {
           window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
           if (this.state.sharingWithMeDict[id]) {
             let sharing = this.state.sharingWithMeDict;
-            sharing[id].stream = null;
+            delete sharing[id];
             this.setState({sharingWithMeDict: sharing});
           }
         }
