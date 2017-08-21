@@ -1,17 +1,18 @@
 const environments = ['local', 'test', 'prod'];
-const environment = environments[0]
+const environment = environments[2]
 
-let conferenceApiPrefix = "http://localhost:8000/"
-// switch (environment) {
-//   case 'test':
-//     conferenceApiPrefix = "http://localhost:8000/"
-//     break;
-//   case 'prod':
-//     conferenceApiPrefix = "http://localhost:8000/"
-//     break;
-//   default:
-//     conferenceApiPrefix = "http://localhost:8000/"
-// }
+let conferenceApiPrefix;
+
+switch (environment) {
+ case 'test':
+   conferenceApiPrefix = "http://localhost:8000/"
+   break;
+ case 'prod':
+   conferenceApiPrefix = "http://meetcloud-django.us-west-2.elasticbeanstalk.com/"
+   break;
+ default:
+   conferenceApiPrefix = "http://localhost:8000/"
+}
 
 function parseRoute(route, params) {
   for (let k in params) {
