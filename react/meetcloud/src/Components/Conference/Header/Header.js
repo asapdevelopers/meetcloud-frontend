@@ -11,7 +11,7 @@ class Header extends Component {
           <div className="icons-top">
             <CallButton className="items" icon="Money"/>
             <CallButton className="items" icon="Settings"/>
-            <CallButton className="items" icon="Chat" onClick={this.props.openChat}/>
+            <CallButton className="items" icon="Chat" onClick={this.props.openChat} alert={this.props.unreadMessages}/>
           </div>
         </div>
       </div>

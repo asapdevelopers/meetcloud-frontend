@@ -8,10 +8,10 @@ import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 ReactDOM.render(
-<Router>
+  <Router>
   <div>
     <Route path="/" exact component={Home}/>
-    <Route path="/conference/:roomName"  component={Conference}/>
+    <Route path="/conference/:roomName" component={Conference}/>
   </div>
 </Router>, document.getElementById('root'));
 

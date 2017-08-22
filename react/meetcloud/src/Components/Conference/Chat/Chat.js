@@ -3,7 +3,7 @@ import './Chat.css';
 import PropTypes from 'prop-types';
 import CloseIcon from 'react-icons/lib/md/close';
 import SendIcon from 'react-icons/lib/md/send';
-import TimeIcon from 'react-icons/lib/md/access-time';
+import Linkify from 'react-linkify'
 
 class Chat extends Component {
 
@@ -28,9 +28,9 @@ class Chat extends Component {
   render() {
     let messages = this.props.messages;
     let chats = "";
-    if (messages.length == 0) {
+    if (messages.length === 0) {
       chats = (
-        <span>No messages</span>
+        <span className="no-messages">No messages</span>
       )
     }
     let chatBox = "";
@@ -44,21 +44,18 @@ class Chat extends Component {
             </div>
           </div>
           {chats}
-
+          <div className="chatContainer">
           <ol className="chat">
 
             {messages.map(message => {
-              if (message.source == "Me") {
+              if (message.source === "Me") {
                 return <li className="self">
                   <div key={message.date} className="msg">
                     <p className="author">
                       Me
-                      <time>
-                        <TimeIcon/>{message.date.format("LT")}
-                      </time>
+                      <time>{message.date.format("LT")}</time>
                     </p>
-                    <p>{message.msg}</p>
-
+                    <p><Linkify>{message.msg}</Linkify></p>
                   </div>
                 </li>
               } else {
@@ -67,15 +64,16 @@ class Chat extends Component {
                     <div className="msg">
                       <p className="author">
                         {message.source}
-                        <time><TimeIcon/> {message.date.format("LT")}</time>
+                        <time>{message.date.format("LT")}</time>
                       </p>
-                      <p>{message.msg}</p>
+                      <p><Linkify>{message.msg}</Linkify></p>
                     </div>
                   </li>
                 )
               }
             })}
           </ol>
+          </div>
           <form onSubmit= {(event) => this.sendMessage(event)}>
             <input className="textarea" type="text" placeholder="Type here!" value={this.state.msg} onChange={(event) => this.setState({msg: event.target.value})}/>
           </form>

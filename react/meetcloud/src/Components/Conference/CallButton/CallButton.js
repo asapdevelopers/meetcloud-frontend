@@ -25,9 +25,14 @@ const ICONS = {
   HangUp
 }
 
-const CallButton = ({onClick, icon}) => {
+const CallButton = ({onClick, icon, alert}) => {
+  let alertIcon = "";
+  if(alert){
+    alertIcon = (<div className="alert"></div>)
+  }
   return (
     <div className="roundedButton" onClick={onClick}>
+      {alertIcon}
       <img alt={icon} className="buttonIcon" src={ICONS[icon]}/>
     </div>
   )

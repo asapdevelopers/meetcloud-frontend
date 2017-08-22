@@ -14,8 +14,11 @@ import Header from './Header/Header';
 import UserVideo from './UserVideo/UserVideo';
 import * as conferenceConsts from '../../Consts/conference'
 import {inviteToConference} from '../../Services/conference/conferenceApi'
+import NotificationSystem from 'react-notification-system';
 
 class Conference extends Component {
+
+  _notificationSystem : null;
 
   constructor(props) {
     super(props);
@@ -40,6 +43,7 @@ class Conference extends Component {
       audioOutputDevices: [],
       selectedAudioOutputDevice: null,
       messages: [],
+      unreadMessages: false,
       mediaSourceWorking: null,
       sharingScreen: false,
       cameraEnabled: localStorage.getItem('cameraEnabled') != null
@@ -69,8 +73,24 @@ class Conference extends Component {
   handleClick = () => this.setState({modal: true})
   handleClose = () => this.setState({modal: false})
 
+  addNotification = (title, message, level) => {
+    this._notificationSystem.addNotification({title, message, level, autoDismiss: 3});
+  };
+
   addMessage = (msg, source) => {
-    this.setState({messages: [...this.state.messages, {date: new moment(), msg: msg, source: source}]})
+    this.setState({
+      messages: [
+        ...this.state.messages, {
+          date: new moment(),
+          msg: msg,
+          source: source
+        }
+      ]
+    })
+    if (!this.state.showChat) {
+      this.setState({unreadMessages: true});
+      this.addNotification(source, msg, "info");
+    }
   }
 
   invalidConference = () => {
@@ -125,6 +145,7 @@ class Conference extends Component {
 
   openChat = () => {
     this.setState({showChat: true});
+    this.setState({unreadMessages: false});
   }
 
   closeChat = () => {
@@ -736,6 +757,7 @@ class Conference extends Component {
   };
 
   componentDidMount() {
+    this._notificationSystem = this.refs.notificationSystem;
     this.selfVideoElement = document.getElementById("self-video-div");
     let domain = localStorage.getItem("conference") != null
       ? JSON.parse(localStorage.getItem("conference")).domain
@@ -870,8 +892,7 @@ class Conference extends Component {
       </ModalDialog>
     }
 
-    let shareRoomModal = (this.state.shareRoom) && <ModalContainer onClose={this.props.onClose}>
-      {shareContent}
+    let shareRoomModal = (this.state.shareRoom) && <ModalContainer onClose={this.props.onClose}>{shareContent}
     </ModalContainer>
     // Empty room
     let emptyRoom = ""
@@ -882,10 +903,11 @@ class Conference extends Component {
     }
     let header = ""
     if (this.state.joined != null) {
-      header = (<Header durationCall={this.state.joined.duration} openChat={this.openChat}/>)
+      header = (<Header durationCall={this.state.joined.duration} unreadMessages={this.state.unreadMessages} openChat={this.openChat}/>)
     }
     return (
       <div className="Conference">
+        <NotificationSystem ref="notificationSystem"/>
         <video muted className="videoBackground" id="video-selected"></video>
         {modal}
         {shareRoomModal}
