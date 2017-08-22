@@ -8,7 +8,7 @@ switch (environment) {
    conferenceApiPrefix = "http://localhost:8000/"
    break;
  case 'prod':
-   conferenceApiPrefix = "http://meetcloud-django.us-west-2.elasticbeanstalk.com/"
+   conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/"
    break;
  default:
    conferenceApiPrefix = "http://localhost:8000/"
