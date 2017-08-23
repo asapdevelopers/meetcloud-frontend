@@ -751,7 +751,9 @@ class Conference extends Component {
     event.preventDefault();
     inviteToConference(this.state.invitePersonEmail, window.location.href).then((response) => {
       response.json().then((data) => {
-        alert("OK");
+        this.addNotification("Invitation", "Your invitation was sent", "success");
+        this.setState({shareRoom: false});
+        this.setState({invitePersonEmail: ''});
       })
     }, (error) => alert(error));
   };
