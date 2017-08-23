@@ -2,16 +2,39 @@ import React, {Component} from 'react';
 import './Chat.css';
 import PropTypes from 'prop-types';
 import CloseIcon from 'react-icons/lib/md/close';
-import SendIcon from 'react-icons/lib/md/send';
-import Linkify from 'react-linkify'
+import MdTagFaces from 'react-icons/lib/md/tag-faces';
+import {Picker, Emoji} from 'emoji-mart';
+import Linkify from 'linkifyjs/react';
+import {emojify} from 'react-emojione';
 
 class Chat extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      msg: ""
+      msg: "",
+      showEmojis: false,
+      emojiOptions: {
+        convertShortnames: true,
+        convertUnicode: true,
+        convertAscii: true,
+        style: {
+          height: 26,
+          margin: 4
+        }
+      }
     };
+  }
+
+  addEmoji = (event) => {
+    this.setState({
+      msg: this.state.msg + event.colons
+    });
+    this.setState({showEmojis: false});
+  }
+
+  formatMesasge = (msg) => {
+    return "a";
   }
 
   sendMessage = (event) => {
@@ -34,6 +57,13 @@ class Chat extends Component {
       )
     }
     let chatBox = "";
+    let emojiPicker = "";
+    if (this.state.showEmojis) {
+      emojiPicker = (<Picker style={{
+        position: 'absolute',
+        bottom: '60px'
+      }} perLine={9} emojiSize={27} title='Pick your emoji…' emoji='point_up' set='emojione' onClick={this.addEmoji}/>);
+    }
     if (this.props.opened) {
       chatBox = (
         <div className="chat-box">
@@ -45,39 +75,45 @@ class Chat extends Component {
           </div>
           {chats}
           <div className="chatContainer">
-          <ol className="chat">
-
-            {messages.map(message => {
-              if (message.source === "Me") {
-                return <li className="self">
-                  <div key={message.date} className="msg">
-                    <p className="author">
-                      Me
-                      <time>{message.date.format("LT")}</time>
-                    </p>
-                    <p><Linkify>{message.msg}</Linkify></p>
-                  </div>
-                </li>
-              } else {
-                return (
-                  <li className="other">
-                    <div className="msg">
+            <ol className="chat">
+              {messages.map(message => {
+                if (message.source === "Me") {
+                  return <li className="self">
+                    <div key={message.date} className="msg">
                       <p className="author">
-                        {message.source}
+                        Me
                         <time>{message.date.format("LT")}</time>
                       </p>
-                      <p><Linkify>{message.msg}</Linkify></p>
+                      <p>
+                        <Linkify>{emojify(message.msg, this.state.emojiOptions)}</Linkify>
+                      </p>
                     </div>
                   </li>
-                )
-              }
-            })}
-          </ol>
+                } else {
+                  return (
+                    <li className="other">
+                      <div className="msg">
+                        <p className="author">
+                          {message.source}
+                          <time>{message.date.format("LT")}</time>
+                        </p>
+                        <p>
+                          <Linkify>{emojify(message.msg)}</Linkify>
+                        </p>
+                      </div>
+                    </li>
+                  )
+                }
+              })}
+            </ol>
           </div>
+          {emojiPicker}
           <form onSubmit= {(event) => this.sendMessage(event)}>
-            <input className="textarea" type="text" placeholder="Type here!" value={this.state.msg} onChange={(event) => this.setState({msg: event.target.value})}/>
+            <input className="textarea" type="text" placeholder="Type here!" value={this.state.msg} onChange={(event) => this.setState({msg: event.target.value})} onFocus={() => this.setState({showEmojis: false})}/>
           </form>
-          <div className="icon-send" onClick={this.sendMessage}><SendIcon/>
+          <div className="icon-send" onClick={() => this.setState({
+            showEmojis: !this.state.showEmojis
+          })}><MdTagFaces/>
           </div>
         </div>
       )
