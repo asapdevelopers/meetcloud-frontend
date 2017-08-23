@@ -3,7 +3,7 @@ import './Chat.css';
 import PropTypes from 'prop-types';
 import CloseIcon from 'react-icons/lib/md/close';
 import MdTagFaces from 'react-icons/lib/md/tag-faces';
-import {Picker, Emoji} from 'emoji-mart';
+import {Picker} from 'emoji-mart';
 import Linkify from 'linkifyjs/react';
 import {emojify} from 'react-emojione';
 

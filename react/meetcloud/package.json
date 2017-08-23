@@ -16,10 +16,12 @@
     "react-modal-dialog": "^4.0.7",
     "react-moment": "^0.6.0",
     "react-notification-system": "^0.2.15",
+    "react-number-format": "^2.0.3",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
     "react-scripts": "1.0.10",
-    "react-spinjs": "^3.0.0"
+    "react-spinjs": "^3.0.0",
+    "react-tooltip": "^3.3.0"
   },
   "scripts": {
     "start": "react-scripts start",

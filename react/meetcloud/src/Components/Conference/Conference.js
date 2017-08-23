@@ -796,19 +796,6 @@ class Conference extends Component {
       return <Redirect to='/'/>;
     }
 
-    // Cost
-    let cost = null;
-    if (this.state.joined) {
-      cost = (
-        <div className="row">
-          <div className="col">
-            <label>Call duration: {this.state.joined.duration}</label><br/>
-            <label>Cost: $ {this.state.joined.cost}</label>
-          </div>
-        </div>
-      )
-    }
-
     // Modal
     let modalContent = ""
     if (this.state.isLoading) {
@@ -903,7 +890,7 @@ class Conference extends Component {
     }
     let header = ""
     if (this.state.joined != null) {
-      header = (<Header durationCall={this.state.joined.duration} unreadMessages={this.state.unreadMessages} openChat={this.openChat}/>)
+      header = (<Header durationCall={this.state.joined.duration} unreadMessages={this.state.unreadMessages} openChat={this.openChat} cost={this.state.joined.cost}/>)
     }
     return (
       <div className="Conference">
@@ -915,13 +902,6 @@ class Conference extends Component {
           <div className="conferenceHeader"></div>
         )}
         <img alt="" className="conferenceLogo" src={ConferenceLogo}/> {header}
-        <div className="row">
-          <div className="col">
-            <label>Domain: {this.state.domain.friendlyName}</label><br/>
-            <label>Room: {this.state.domain.roomName}</label><br/>
-          </div>
-        </div>
-        {cost}
         <div className="emptyRoom">{emptyRoom}</div>
         <div className="videoList">
           <div className="row start">
