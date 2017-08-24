@@ -12,8 +12,12 @@ class Home extends Component {
   constructor(props) {
     super(props);
     let roomName = "";
-    if ((this.props.match.url.match(/\//g) || []).length === 1) {
-      roomName = this.props.match.url.substring(1, this.props.match.url.length);
+    // if ((this.props.match.url.match(/\//g) || []).length === 1) {
+    //   roomName = this.props.match.url.substring(1, this.props.match.url.length);
+    // }
+
+    if (props.match.params.roomName) {
+      roomName = props.match.params.roomName;
     }
 
     let background = localStorage['background'] !== undefined
