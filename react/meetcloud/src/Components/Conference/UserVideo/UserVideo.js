@@ -15,15 +15,17 @@ class UserVideo extends Component {
     let video = "";
     let user = this.state.user;
     if (user.hasVideo) {
-      video = <video key={'u-' + user.id} className="videoContainer" id={'u-' + user.id}></video>
+      video = <video className={this.props.selected
+        ? 'videoContainer selected'
+        : 'videoContainer'} key={'u-' + user.id} id={'u-' + user.id}></video>
     }
     if (user.screen) {
-      video = <video key={'us-' + user.id} className="videoContainer" id={'us-' + user.id}></video>
+      video = <video className={this.props.selected
+        ? 'videoContainer selected'
+        : 'videoContainer'} key={'us-' + user.id} id={'us-' + user.id}></video>
     }
     return (
-      <div className={this.props.selected
-        ? 'userVideo selected'
-        : 'userVideo'}>
+      <div >
         <span className="videoName">{user.username}</span>
         {video}
       </div>
@@ -32,7 +34,7 @@ class UserVideo extends Component {
 }
 
 UserVideo.propTypes = {
-    selected: PropTypes.bool
+  selected: PropTypes.bool
 }
 
 export default UserVideo;

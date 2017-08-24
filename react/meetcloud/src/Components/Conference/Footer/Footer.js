@@ -6,14 +6,15 @@ import PropTypes from 'prop-types';
 
 class Footer extends Component {
   render() {
-    const {cameraEnabled, micEnabled} = this.props;
+    const {cameraEnabled, micEnabled, shareScreenEnabled} = this.props;
     let cameraIcon = cameraEnabled? 'Camera': 'CameraDisabled';
     let micIcon = micEnabled? 'Mic': 'MicDisabled';
+    let ssIcon = shareScreenEnabled? 'ShareScreen': 'ShareScreenDisabled';
     return (
       <div className="footer">
         <div className="footer-line"></div>
         <div className="icons row center-xs">
-          <CallButton icon="ShareScreen" onClick={this.props.onShareScreenClick}/>
+          <CallButton icon={ssIcon} onClick={this.props.onShareScreenClick}/>
           <CallButton icon={cameraIcon} onClick={this.props.onCameraClick}/>
           <CallButton icon={micIcon} onClick={this.props.onMicClick}/>
           <CallButton icon="Invite" onClick={this.props.onShareClick}/>

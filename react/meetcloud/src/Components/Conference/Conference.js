@@ -316,9 +316,17 @@ class Conference extends Component {
     } else {
       this.setState({selectedUser: user});
       if (user === "me") {
-        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userMedia);
+        if (this.state.userScreen !== undefined) {
+          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userScreen);
+        } else {
+          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userMedia);
+        }
       } else {
-        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), user.stream);
+        if (user.screen !== undefined) {
+          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), user.screen);
+        } else {
+          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), user.stream);
+        }
       }
     }
   };
@@ -340,12 +348,11 @@ class Conference extends Component {
       sharingWithMeDict[id] = newShared;
     }
     this.setState({sharingWithMeDict, sharingWithMe});
-
     if (streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
       newShared.screen = stream;
       setTimeout(() => {
-        window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream)
-        this.setFullScreenVideo();
+        window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream);
+        this.setFullScreenVideo(newShared);
       }, 1000);
     } else {
       newShared.stream = stream;
@@ -356,7 +363,7 @@ class Conference extends Component {
           window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), stream);
           this.setAudioOutput(document.getElementById('u-' + id));
         }
-        this.setFullScreenVideo();
+        this.setFullScreenVideo(newShared);
       }, 1000);
     }
     console.log("Stream accepted", newShared);
@@ -598,7 +605,6 @@ class Conference extends Component {
   switchCamera = () => {
     let camera = !this.state.camera;
     this.setState({camera});
-    // window.easyrtc.enableVideo(camera);
     window.easyrtc.enableCamera(camera);
   }
 
@@ -709,43 +715,59 @@ class Conference extends Component {
   // #1: <script src="https://cdn.WebRTC-Experiment.com/getScreenId.js"></script> in order to add a helper js
   // #2: Users must download chrome extension: https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk
 
-  shareScreen = () => {
-
-    window.getScreenId((error, sourceId, screen_constraints) => {
-      console.log(error);
-      console.log(sourceId);
-
-      if (error || !sourceId) {
-        alert("Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk")
-      } else {
-
-        navigator.getUserMedia(screen_constraints, (stream) => {
-
-          // register screen stream and send it to all existing peers.
-          window.easyrtc.register3rdPartyLocalMediaStream(stream, conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-          this.setState({sharingScreen: true});
-
-          stream.oninactive = function() {
-            if (stream.oninactive) {
-              stream.oninactive = undefined;
-              this.stopShareScreen();
-            }
-          };
-
-          for (let i = 0; i < this.state.sharingWithMe.length; i++) {
-            window.easyrtc.addStreamToCall(this.state.sharingWithMe[i].id, conferenceConsts.SCREEN_SHARING_STREAM_NAME, function() {
-              console.log("Share screen accepted.");
-            });
-          }
-        }, (error) => console.error(error));
-      }
-    });
-  }
-
   stopShareScreen = () => {
     window.easyrtc.closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
     this.setState({sharingScreen: false});
+    this.setState({userScreen: null});
+    this.switchCamera();
+    if (this.state.userMedia) {
+      window.easyrtc.setVideoObjectSrc(this.selfVideoElement, this.state.userMedia);
+    }
+    this.setFullScreenVideo();
+    console.log("Fabricio")
+    console.log(this.state.userMedia)
+    this.sendLocalStream(this.state.userMedia.streamName);
   };
+
+  sendLocalStream = (streamName) => {
+    for (let i = 0; i < this.state.sharingWithMe.length; i++) {
+      window.easyrtc.addStreamToCall(this.state.sharingWithMe[i].id, streamName, function() {
+        console.log("Stream accepted: " + streamName);
+      });
+    }
+  }
+
+  shareScreen = () => {
+    if (this.state.sharingScreen) {
+      this.stopShareScreen();
+    } else {
+      window.getScreenId((error, sourceId, screen_constraints) => {
+        if (error || !sourceId) {
+          alert("Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk")
+        } else {
+          var _ = this;
+          navigator.getUserMedia(screen_constraints, (stream) => {
+
+            // register screen stream and send it to all existing peers.
+            window.easyrtc.register3rdPartyLocalMediaStream(stream, conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+            this.setState({sharingScreen: true});
+            this.setState({camera: false});
+            this.setState({userScreen: stream});
+            window.easyrtc.setVideoObjectSrc(this.selfVideoElement, stream);
+            //window.easyrtc.enableCamera(false);
+
+            stream.oninactive = () => {
+              if (stream.oninactive) {
+                stream.oninactive = undefined;
+                _.stopShareScreen();
+              }
+            };
+            _.sendLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+          }, (error) => console.error(error));
+        }
+      });
+    }
+  }
 
   invitePersonToConference = (event) => {
     event.preventDefault();
@@ -765,6 +787,7 @@ class Conference extends Component {
       ? JSON.parse(localStorage.getItem("conference")).domain
       : null;
     this.setState({domain});
+
     if (domain) {
       authenticateToken(domain.token).then((response) => {
         if (response.status === 200) {
@@ -926,7 +949,7 @@ class Conference extends Component {
             })}
           </div>
         </div>
-        <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} cameraEnabled={this.state.camera} micEnabled={this.state.mic}/>
+        <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} onShareScreenClick={this.shareScreen} shareScreenEnabled={this.state.sharingScreen} cameraEnabled={this.state.camera} micEnabled={this.state.mic}/>
         <Chat messages={this.state.messages} opened={this.state.showChat} onCloseChat={this.closeChat} onSendMessage={this.sendMessage}/>
       </div>
     )
