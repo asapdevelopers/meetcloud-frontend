@@ -579,7 +579,6 @@ class Conference extends Component {
     };
 
     var er = (a, b) => {
-      debugger;
       alert("Failed to send message.");
     };
 
@@ -811,6 +810,10 @@ class Conference extends Component {
   componentWillUnmount() {
     clearInterval(this.intervalId);
     this.cancelPermissionChecker();
+    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
+      this.setState({joined: null});
+    });
+    window.easyrtc.hangupAll();
     this.disconnect();
   }
 
