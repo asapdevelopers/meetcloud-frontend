@@ -5,14 +5,26 @@ import './Styles/flexboxgrid.css';
 import Home from './Components/Home/Home';
 import Conference from './Components/Conference/Conference';
 import registerServiceWorker from './registerServiceWorker';
-import {BrowserRouter as Router, Route} from 'react-router-dom'
+// redux
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+// react router deps
+import { Route, BrowserRouter } from 'react-router-dom';
+// pages
+import HomePage from './pages/home/homePage';
 
-ReactDOM.render(
-  <Router>
-  <div>
-    <Route path="/" exact component={Home}/>
-    <Route path="/conference/:roomName" component={Conference}/>
-  </div>
-</Router>, document.getElementById('root'));
+
+const router = (
+    <Provider store={store}>
+        <BrowserRouter>
+          <div>
+            <Route path="/" exact component={HomePage}/>
+            <Route path="/conference/:roomName" component={Conference}/>
+          </div>
+        </BrowserRouter>
+    </Provider>
+);
+
+ReactDOM.render(router, document.getElementById('root'));
 
 registerServiceWorker();

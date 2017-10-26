@@ -1,5 +1,6 @@
 import {config} from '../../config.js'
 
+
 export function authenticateDomain(domain, room) {
   return fetch(config.api.conference.authenticateDomain, {
     method: "POST",

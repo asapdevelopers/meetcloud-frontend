@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import moment from 'moment'
 import './Conference.css';
-import {Redirect} from 'react-router-dom'
-import {authenticateToken} from '../../Services/conference/conferenceApi'
+import { Redirect } from 'react-router-dom'
+import { authenticateToken } from '../../Services/conference/conferenceApi'
 import * as rtcHelper from '../../Services/helpers/easyrtcHelper'
-import {ModalContainer, ModalDialog} from 'react-modal-dialog';
+import { ModalContainer, ModalDialog } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
 import CameraIconPermission from '../../assets/images/camera_permission.png';
 import ConferenceLogo from '../../assets/images/ConferenceLogo.png';
@@ -13,12 +13,12 @@ import Chat from './Chat/Chat';
 import Header from './Header/Header';
 import UserVideo from './UserVideo/UserVideo';
 import * as conferenceConsts from '../../Consts/conference'
-import {inviteToConference} from '../../Services/conference/conferenceApi'
+import { inviteToConference } from '../../Services/conference/conferenceApi'
 import NotificationSystem from 'react-notification-system';
 
 class Conference extends Component {
 
-  _notificationSystem : null;
+  _notificationSystem: null;
 
   constructor(props) {
     super(props);
@@ -70,11 +70,11 @@ class Conference extends Component {
     }
   }
 
-  handleClick = () => this.setState({modal: true})
-  handleClose = () => this.setState({modal: false})
+  handleClick = () => this.setState({ modal: true })
+  handleClose = () => this.setState({ modal: false })
 
   addNotification = (title, message, level) => {
-    this._notificationSystem.addNotification({title, message, level, autoDismiss: 3});
+    this._notificationSystem.addNotification({ title, message, level, autoDismiss: 3 });
   };
 
   addMessage = (msg, source) => {
@@ -88,14 +88,14 @@ class Conference extends Component {
       ]
     })
     if (!this.state.showChat) {
-      this.setState({unreadMessages: true});
+      this.setState({ unreadMessages: true });
       this.addNotification(source, msg, "info");
     }
   }
 
   invalidConference = () => {
     alert("Invalid conference");
-    this.setState({valid: false});
+    this.setState({ valid: false });
   }
 
   // listeners
@@ -117,12 +117,12 @@ class Conference extends Component {
     // If we had a stream close it
     if (this.state.mediaSourceWorking) {
       window.easyrtc.closeLocalStream(this.state.mediaSourceWorking.streamName);
-      this.setState({mediaSourceWorking: null});
+      this.setState({ mediaSourceWorking: null });
     }
     // same with screen sharing
     if (this.state.sharingScreen) {
       window.easyrtc.closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-      this.setState({sharingScreen: false});
+      this.setState({ sharingScreen: false });
     }
     window.easyrtc.setVideoObjectSrc(this.selfVideoElement, ""); // Clear video src
     window.easyrtc._roomApiFields = undefined; //Clear this since easyrtc doesn't and causes some error log due to invalid room
@@ -144,12 +144,12 @@ class Conference extends Component {
   }
 
   openChat = () => {
-    this.setState({showChat: true});
-    this.setState({unreadMessages: false});
+    this.setState({ showChat: true });
+    this.setState({ unreadMessages: false });
   }
 
   closeChat = () => {
-    this.setState({showChat: false});
+    this.setState({ showChat: false });
   }
 
   // Will call a specific target.
@@ -158,14 +158,14 @@ class Conference extends Component {
   callOnSuccess = (otherCaller, mediaType) => {
     let pendingDict = this.state.pendingCallsDict;
     delete pendingDict[this.state.target];
-    this.setState({pendingCallsDict: pendingDict});
+    this.setState({ pendingCallsDict: pendingDict });
   };
 
   callOnError = (errorCode, errMessage) => {
     console.log("Error calling: ", this.state.target, errorCode, errMessage);
     let pendingDict = this.state.pendingCallsDict;
     delete pendingDict[this.state.target];
-    this.setState({pendingCallsDict: pendingDict});
+    this.setState({ pendingCallsDict: pendingDict });
     // re try
     setTimeout(() => {
       this.setState({
@@ -175,14 +175,14 @@ class Conference extends Component {
     }, 3000);
   };
 
-  callOnAcc = (wasAccepted, otherUser) => {};
+  callOnAcc = (wasAccepted, otherUser) => { };
 
   callOne = (target, a) => {
     let attempt = a !== undefined
       ? a
       : 0;
     // only call if not already sharing with me
-    this.setState({target, attempt});
+    this.setState({ target, attempt });
     if (this.state.sharingWithMeDict[target] || attempt > 5) {
       return;
     }
@@ -199,7 +199,7 @@ class Conference extends Component {
 
     let pend = this.state.pendingCallsDict;
     pend[target] = new Date().getTime();
-    this.setState({pendingCallsDict: pend});
+    this.setState({ pendingCallsDict: pend });
     console.log("Call one called");
     let streams = [];
 
@@ -214,7 +214,7 @@ class Conference extends Component {
     if (this.state.sharingScreen) {
       streams.push(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
     }
-    this.setState({streams})
+    this.setState({ streams })
     window.easyrtc.call(target, this.callOnSuccess, this.callOnError, this.callOnAcc, streams);
   };
 
@@ -242,7 +242,7 @@ class Conference extends Component {
       let pendingDict = this.state.pendingCallsDict;
       delete sharingDict[id];
       delete pendingDict[id];
-      this.setState({sharingWithMeDict: sharingDict, pendingCallsDict: pendingDict});
+      this.setState({ sharingWithMeDict: sharingDict, pendingCallsDict: pendingDict });
     }
   }
 
@@ -273,9 +273,9 @@ class Conference extends Component {
         rtcHelper.playSound(conferenceConsts.LEFT_AUDIO);
       }
     }
-    this.setState({firstRoomListener: false}); // Need this flag so the first room call we don't call other users, avoiding call loops.
-    this.setState({members: membersAux});
-    this.setState({membersDict: membersDictAux});
+    this.setState({ firstRoomListener: false }); // Need this flag so the first room call we don't call other users, avoiding call loops.
+    this.setState({ members: membersAux });
+    this.setState({ membersDict: membersDictAux });
 
     // Make sure all users sharing with me still exist
     // otherwise kill their streams
@@ -300,21 +300,21 @@ class Conference extends Component {
     }
     // accept with our streams
     cb(true, streams);
-    this.setState({streams})
+    this.setState({ streams })
   };
 
   setFullScreenVideo = (user) => {
     if (user === undefined) {
       if (this.state.sharingWithMe.length > 0) {
         let firstVideo = this.state.sharingWithMe[0];
-        this.setState({selectedUser: firstVideo});
+        this.setState({ selectedUser: firstVideo });
         window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), firstVideo.stream);
       } else {
-        this.setState({selectedUser: null});
+        this.setState({ selectedUser: null });
         window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), '');
       }
     } else {
-      this.setState({selectedUser: user});
+      this.setState({ selectedUser: user });
       if (user === "me") {
         if (this.state.userScreen !== undefined) {
           window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userScreen);
@@ -334,7 +334,7 @@ class Conference extends Component {
   streamAcceptorListener = (id, stream, streamName) => {
     let newShared;
 
-    let {sharingWithMeDict, sharingWithMe, membersDict} = this.state;
+    let { sharingWithMeDict, sharingWithMe, membersDict } = this.state;
 
     // if already sharing, get it
     if (sharingWithMeDict[id]) {
@@ -347,7 +347,7 @@ class Conference extends Component {
       sharingWithMe.push(newShared);
       sharingWithMeDict[id] = newShared;
     }
-    this.setState({sharingWithMeDict, sharingWithMe});
+    this.setState({ sharingWithMeDict, sharingWithMe });
     if (streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
       newShared.screen = stream;
       setTimeout(() => {
@@ -376,7 +376,7 @@ class Conference extends Component {
       if (this.state.sharingWithMeDict[id]) {
         let sharing = this.state.sharingWithMeDict;
         delete sharing[id];
-        this.setState({sharingWithMeDict: sharing});
+        this.setState({ sharingWithMeDict: sharing });
       }
     } else {
       setTimeout(() => {
@@ -385,7 +385,7 @@ class Conference extends Component {
           if (this.state.sharingWithMeDict[id]) {
             let sharing = this.state.sharingWithMeDict;
             delete sharing[id];
-            this.setState({sharingWithMeDict: sharing});
+            this.setState({ sharingWithMeDict: sharing });
           }
         }
       }, 1000);
@@ -405,7 +405,7 @@ class Conference extends Component {
         joinedAux.duration = moment.utc(duration).format("HH:mm:ss")
         joinedAux.cost = moment.duration(duration).asSeconds() * data.costPerHour / 3600;
       }
-      this.setState({joined: joinedAux});
+      this.setState({ joined: joinedAux });
     }
   }
 
@@ -415,11 +415,11 @@ class Conference extends Component {
 
   onConnect = (id) => {
     console.log("Connected", id);
-    this.setState({connected: id});
+    this.setState({ connected: id });
     // init media
     if (window.easyrtc.supportsGetUserMedia && window.easyrtc.supportsGetUserMedia()) {
       window.easyrtc.enableVideo(this.state.cameraEnabled);
-      this.setState({camera: this.state.cameraEnabled});
+      this.setState({ camera: this.state.cameraEnabled });
 
       // Select sources
       if (this.state.selectedAudioDevice) {
@@ -437,8 +437,8 @@ class Conference extends Component {
 
   onConnectError = (e) => {
     window.easyrtc.disconnect(); // so it doesn't try automatically after and re connecting is possible
-    this.setState({connected: null});
-    this.setState({joined: null});
+    this.setState({ connected: null });
+    this.setState({ joined: null });
     alert("Failed to connect");
   }
 
@@ -458,8 +458,8 @@ class Conference extends Component {
       this.onConnect(this.state.connected);
     } else {
       window.easyrtc.setUsername(this.state.username);
-      window.easyrtc.setCredential({'token': this.state.domain.token});
-      console.log("on connect: " + conferenceConsts.WEB_RTC_APP)
+      window.easyrtc.setCredential({ 'token': this.state.domain.token });
+      console.log("on connect: " + conferenceConsts.WEB_RTC_APP);
       window.easyrtc.connect(conferenceConsts.WEB_RTC_APP, this.onConnect, this.onConnectError);
     }
   }
@@ -472,27 +472,27 @@ class Conference extends Component {
       duration: '',
       cost: 0
     };
-    this.setState({joined});
+    this.setState({ joined });
 
     window.easyrtc.sendPeerMessage({
       targetRoom: roomName
     }, conferenceConsts.CHAT_MESSAGE_TYPE, {
-      msg: "Has joined.",
-      source: this.state.username
-    }, () => {}, () => {})
+        msg: "Has joined.",
+        source: this.state.username
+      }, () => { }, () => { })
   }
 
   onJoinError = (errorCode, errorText, roomName) => {
     console.error("failed to join room", errorText);
     console.log("failed to join room: " + errorText)
-    this.setState({joined: null});
+    this.setState({ joined: null });
     this.disconnect();
   }
 
   mediaSuccess = (obj) => {
-    this.setState({userMedia: obj});
+    this.setState({ userMedia: obj });
     this.removePopup();
-    this.setState({mediaSourceWorking: obj});
+    this.setState({ mediaSourceWorking: obj });
     window.easyrtc.setVideoObjectSrc(this.selfVideoElement, obj);
 
     window.easyrtc.enableMicrophone(this.state.mic);
@@ -501,18 +501,18 @@ class Conference extends Component {
     // join after we have media, if we are not already joined
     if (!this.state.joined) {
       console.log("going to join room");
-      this.setState({firstRoomListener: true});
-      this.setState({sharingWithMe: []});
-      this.setState({sharingWithMeDict: {}});
-      this.setState({members: []});
-      this.setState({membersDict: {}});
-      this.setState({pendingCallsDict: {}});
+      this.setState({ firstRoomListener: true });
+      this.setState({ sharingWithMe: [] });
+      this.setState({ sharingWithMeDict: {} });
+      this.setState({ members: [] });
+      this.setState({ membersDict: {} });
+      this.setState({ pendingCallsDict: {} });
       window.easyrtc.joinRoom(this.state.domain.roomToJoin, {}, this.onJoin, this.onJoinError);
     }
   }
 
   showPopup = (message, loading = false, modalType = null) => {
-    this.setState({isLoading: loading});
+    this.setState({ isLoading: loading });
     this.setState({
       modal: !loading
     })
@@ -523,17 +523,17 @@ class Conference extends Component {
         }
       });
     }
-    this.setState({modalText: message});
+    this.setState({ modalText: message });
   }
 
   removePopup = () => {
     console.log("Removing popup")
-    this.setState({isLoading: false, modal: false});
+    this.setState({ isLoading: false, modal: false });
   };
 
   mediaError = (a, b) => {
     console.log("Failed to get media source first time, trying again: ", a, b);
-    this.setState({mediaSourceWorking: null});
+    this.setState({ mediaSourceWorking: null });
 
     // On media error attempt to disable all media features
     // so we can still receive connections
@@ -561,8 +561,8 @@ class Conference extends Component {
   // In order to change stream sources we need to re-obtain medias
   // and re connect from peers with the new streams
   changeSources = () => {
-    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
-      this.setState({joined: null});
+    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function () {
+      this.setState({ joined: null });
       this.connect(); //timeout 500ms?
     });
     window.easyrtc.hangupAll();
@@ -590,31 +590,31 @@ class Conference extends Component {
     window.easyrtc.sendPeerMessage({
       targetRoom: this.state.joined.name
     }, conferenceConsts.CHAT_MESSAGE_TYPE, {
-      msg: msg,
-      source: this.state.username
-    }, suc, er);
+        msg: msg,
+        source: this.state.username
+      }, suc, er);
   }
 
   sendWakeUp = (target) => {
-    window.easyrtc.sendPeerMessage(target, conferenceConsts.WAKE_UP_MESSAGE_TYPE, {}, () => {}, () => {
+    window.easyrtc.sendPeerMessage(target, conferenceConsts.WAKE_UP_MESSAGE_TYPE, {}, () => { }, () => {
       alert("Failed to sendWakeUp")
     });
   };
 
   switchCamera = () => {
     let camera = !this.state.camera;
-    this.setState({camera});
+    this.setState({ camera });
     window.easyrtc.enableCamera(camera);
   }
 
   switchMic = () => {
     let mic = !this.state.mic;
-    this.setState({mic});
+    this.setState({ mic });
     window.easyrtc.enableMicrophone(mic);
   }
 
   shareRoomWithContact = () => {
-    this.setState({shareRoom: true})
+    this.setState({ shareRoom: true })
   }
 
   openFullScreen = (evt) => {
@@ -646,17 +646,17 @@ class Conference extends Component {
 
           // Get Audio source list
           getAudioGen.next().value.then(data => {
-            this.setState({selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices});
+            this.setState({ selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices });
           }).catch(e => alert("Could not get audio devices: " + e));
 
           // Get video source list
           getVideoGen.next().value.then(data => {
-            this.setState({selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled});
+            this.setState({ selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled });
           }).catch(e => alert("Could not get video devices: " + e));
 
           // Get output source list
           getOutputGen.next().value.then(data => {
-            this.setState({audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice});
+            this.setState({ audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice });
           }).catch(e => alert("Could not get output devices: " + e));
           this.connect();
         }
@@ -672,7 +672,7 @@ class Conference extends Component {
     let browser = rtcHelper.detectBrowser()
     if (browser === "chrome") {
       this.permissions_interval_checker = setInterval(this.permissionInterval, 1000);
-      this.setState({permissions_interval_checker: this.permissions_interval_checker});
+      this.setState({ permissions_interval_checker: this.permissions_interval_checker });
     }
 
     this.intervalId = setInterval(this.clockInterval, 1000);
@@ -684,17 +684,17 @@ class Conference extends Component {
 
     // Get Audio source list
     getAudioGen.next().value.then(data => {
-      this.setState({selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices});
+      this.setState({ selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices });
     }).catch(e => alert("Could not get audio devices: " + e));
 
     // Get video source list
     getVideoGen.next().value.then(data => {
-      this.setState({selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled});
+      this.setState({ selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled });
     }).catch(e => alert("Could not get video devices: " + e));
 
     // Get output source list
     getOutputGen.next().value.then(data => {
-      this.setState({audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice});
+      this.setState({ audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice });
     }).catch(e => alert("Could not get output devices: " + e));
 
     // listeners
@@ -716,8 +716,8 @@ class Conference extends Component {
 
   stopShareScreen = () => {
     window.easyrtc.closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-    this.setState({sharingScreen: false});
-    this.setState({userScreen: null});
+    this.setState({ sharingScreen: false });
+    this.setState({ userScreen: null });
     this.switchCamera();
     if (this.state.userMedia) {
       window.easyrtc.setVideoObjectSrc(this.selfVideoElement, this.state.userMedia);
@@ -730,7 +730,7 @@ class Conference extends Component {
 
   sendLocalStream = (streamName) => {
     for (let i = 0; i < this.state.sharingWithMe.length; i++) {
-      window.easyrtc.addStreamToCall(this.state.sharingWithMe[i].id, streamName, function() {
+      window.easyrtc.addStreamToCall(this.state.sharingWithMe[i].id, streamName, function () {
         console.log("Stream accepted: " + streamName);
       });
     }
@@ -749,9 +749,9 @@ class Conference extends Component {
 
             // register screen stream and send it to all existing peers.
             window.easyrtc.register3rdPartyLocalMediaStream(stream, conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-            this.setState({sharingScreen: true});
-            this.setState({camera: false});
-            this.setState({userScreen: stream});
+            this.setState({ sharingScreen: true });
+            this.setState({ camera: false });
+            this.setState({ userScreen: stream });
             window.easyrtc.setVideoObjectSrc(this.selfVideoElement, stream);
             //window.easyrtc.enableCamera(false);
 
@@ -773,8 +773,8 @@ class Conference extends Component {
     inviteToConference(this.state.invitePersonEmail, window.location.href).then((response) => {
       response.json().then((data) => {
         this.addNotification("Invitation", "Your invitation was sent", "success");
-        this.setState({shareRoom: false});
-        this.setState({invitePersonEmail: ''});
+        this.setState({ shareRoom: false });
+        this.setState({ invitePersonEmail: '' });
       })
     }, (error) => alert(error));
   };
@@ -785,7 +785,7 @@ class Conference extends Component {
     let domain = localStorage.getItem("conference") != null
       ? JSON.parse(localStorage.getItem("conference")).domain
       : null;
-    this.setState({domain});
+    this.setState({ domain });
 
     if (domain) {
       authenticateToken(domain.token).then((response) => {
@@ -794,7 +794,7 @@ class Conference extends Component {
             if (data.costPerHour) {
               data.costPerHour = parseFloat(data.costPerHour);
             }
-            this.setState({conferenceData: data});
+            this.setState({ conferenceData: data });
             this.initConference();
           }, (error) => alert(error))
         } else {
@@ -810,24 +810,24 @@ class Conference extends Component {
   componentWillUnmount() {
     clearInterval(this.intervalId);
     this.cancelPermissionChecker();
-    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
-      this.setState({joined: null});
+    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function () {
+      this.setState({ joined: null });
     });
     window.easyrtc.hangupAll();
     this.disconnect();
   }
 
   render() {
-    const {valid} = this.state;
+    const { valid } = this.state;
 
     if (!valid) {
-      return <Redirect to='/'/>;
+      return <Redirect to='/' />;
     }
 
     // Modal
     let modalContent = ""
     if (this.state.isLoading) {
-      modalContent = <ReactSpinner color="white"/>
+      modalContent = <ReactSpinner color="white" />
     }
     if (this.state.modal) {
       modalContent = (
@@ -848,7 +848,7 @@ class Conference extends Component {
           case 'chrome':
             modalContentBrowser = (
               <span>Click the
-                <img alt="" className="permissionIcon" src={CameraIconPermission}/>
+                <img alt="" className="permissionIcon" src={CameraIconPermission} />
                 icon in the URL bar above to give Meetcloud access to your computer's camera and microphone.
               </span>
             );
@@ -894,12 +894,12 @@ class Conference extends Component {
     </ModalContainer>
     let shareContent = ""
     if (this.state.shareRoom) {
-      shareContent = <ModalDialog onClose={() => this.setState({shareRoom: false})} className="share-dialog" dismissOnBackgroundClick={true}>
+      shareContent = <ModalDialog onClose={() => this.setState({ shareRoom: false })} className="share-dialog" dismissOnBackgroundClick={true}>
         <div className="share-text">Invite your friends to this room.</div>
         <form onSubmit={(event) => this.invitePersonToConference(event)}>
           <span className="share-email">Email :
           </span>
-          <input className="inputText" type="text" value={this.state.invitePersonEmail} onChange={(event) => this.setState({invitePersonEmail: event.target.value})}></input>
+          <input className="inputText" type="text" value={this.state.invitePersonEmail} onChange={(event) => this.setState({ invitePersonEmail: event.target.value })}></input>
           <div className="share-text">
             <button className="button" type="submit">Invite</button>
           </div>
@@ -918,18 +918,18 @@ class Conference extends Component {
     }
     let header = ""
     if (this.state.joined != null) {
-      header = (<Header durationCall={this.state.joined.duration} unreadMessages={this.state.unreadMessages} openChat={this.openChat} cost={this.state.joined.cost}/>)
+      header = (<Header durationCall={this.state.joined.duration} unreadMessages={this.state.unreadMessages} openChat={this.openChat} cost={this.state.joined.cost} />)
     }
     return (
       <div className="Conference">
-        <NotificationSystem ref="notificationSystem"/>
+        <NotificationSystem ref="notificationSystem" />
         <video muted className="videoBackground" id="video-selected"></video>
         {modal}
         {shareRoomModal}
         {this.state.sharingWithMe.length > 0 && (
           <div className="conferenceHeader"></div>
         )}
-        <img alt="" className="conferenceLogo" src={ConferenceLogo}/> {header}
+        <img alt="" className="conferenceLogo" src={ConferenceLogo} /> {header}
         <div className="emptyRoom">{emptyRoom}</div>
         <div className="videoList">
           <div className="row start">
@@ -946,14 +946,14 @@ class Conference extends Component {
             {this.state.sharingWithMe.map(user => {
               return <div key={user.id} className="col">
                 <div className="box box-video" onClick={(event) => this.setFullScreenVideo(user)}>
-                  <UserVideo selected={this.state.selectedUser && this.state.selectedUser.id === user.id} user={user}/>
+                  <UserVideo selected={this.state.selectedUser && this.state.selectedUser.id === user.id} user={user} />
                 </div>
               </div>
             })}
           </div>
         </div>
-        <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} onShareScreenClick={this.shareScreen} shareScreenEnabled={this.state.sharingScreen} cameraEnabled={this.state.camera} micEnabled={this.state.mic}/>
-        <Chat messages={this.state.messages} opened={this.state.showChat} onCloseChat={this.closeChat} onSendMessage={this.sendMessage}/>
+        <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} onShareScreenClick={this.shareScreen} shareScreenEnabled={this.state.sharingScreen} cameraEnabled={this.state.camera} micEnabled={this.state.mic} />
+        <Chat messages={this.state.messages} opened={this.state.showChat} onCloseChat={this.closeChat} onSendMessage={this.sendMessage} />
       </div>
     )
   }
