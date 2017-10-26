@@ -57,7 +57,8 @@ class Conference extends Component {
       firstRoomListener: true,
       shareRoom: false,
       invitePersonEmail: null,
-      showChat: false
+      showChat: false,
+      redirectHome: false
     };
     this.permissionInterval = this.permissionInterval.bind(this);
   }
@@ -93,9 +94,11 @@ class Conference extends Component {
     }
   }
 
-  invalidConference = () => {
-    alert("Invalid conference");
-    this.setState({ valid: false });
+  invalidConference = (error) => {
+    console.log('Invalid conference');
+    if (error)
+      console.log(error);
+    this.setState({valid: false, redirectHome: true, room: this.props.match.params.roomName});
   }
 
   // listeners
@@ -787,20 +790,23 @@ class Conference extends Component {
       : null;
     this.setState({ domain });
 
+    const roomName = this.props.match.params.roomName;
+    let errData = {roomName, error: ''};
+
     if (domain) {
       authenticateToken(domain.token).then((response) => {
-        if (response.status === 200) {
-          response.json().then((data) => {
-            if (data.costPerHour) {
-              data.costPerHour = parseFloat(data.costPerHour);
+        response.json().then((data) => {
+            if (response.status === 200) {
+              if (data.costPerHour) {
+                data.costPerHour = parseFloat(data.costPerHour);
+              }
+              this.setState({conferenceData: data});
+              this.initConference();
+            } else{
+              this.invalidConference(data)
             }
-            this.setState({ conferenceData: data });
-            this.initConference();
-          }, (error) => alert(error))
-        } else {
-          this.invalidConference()
-        }
-      }, (error) => this.invalidConference());
+        }, () => this.invalidConference());
+      }, this.invalidConference)
     } else {
       // No information
       this.invalidConference();
@@ -818,10 +824,10 @@ class Conference extends Component {
   }
 
   render() {
-    const { valid } = this.state;
+    const {redirectHome, room} = this.state;
 
-    if (!valid) {
-      return <Redirect to='/' />;
+    if (redirectHome) {
+      return <Redirect to={ '/home/' + room } />;
     }
 
     // Modal
