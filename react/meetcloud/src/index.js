@@ -9,9 +9,9 @@ import registerServiceWorker from "./registerServiceWorker";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 // react router deps
-import { Route, BrowserRouter } from "react-router-dom";
+import { Route, BrowserRouter, Redirect } from "react-router-dom";
 // pages
-import HomePage from "./pages/home/homePage";
+import HomePage from "./pages/home/HomePage";
 
 const None = props => <Redirect to={{ pathname: "/home" }} />;
 

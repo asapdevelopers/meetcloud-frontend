@@ -1,13 +1,16 @@
 import React, { Component } from "react";
 import logo from "../../assets/logo.png";
-import "./Home.css";
+import "./HomePage.css";
 import { getBackgroundImage } from "../../Services/helpers/general";
 import { authenticateDomain } from "../../Services/conference/conferenceApi";
+// Actions
+import * as AuthActions from "../../store/actions/auth";
+import * as SettingsActions from "../../store/actions/settings";
 // Redux
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
 //Router
-import { withRouter, Redirect } from 'react-router-dom';
+import { withRouter, Redirect } from "react-router-dom";
 
 const domain = window.location.hostname;
 
@@ -183,14 +186,16 @@ class HomePage extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-    auth: state.auth,
-    settings: state.settings
+const mapStateToProps = state => ({
+  auth: state.auth,
+  settings: state.settings
 });
 
 const mapDispatchToProps = dispatch => ({
-    authActions: bindActionCreators(AuthActions, dispatch),
-    settingsActions: bindActionCreators(SettingsActions, dispatch)
+  authActions: bindActionCreators(AuthActions, dispatch),
+  settingsActions: bindActionCreators(SettingsActions, dispatch)
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(HomePage));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(HomePage)
+);

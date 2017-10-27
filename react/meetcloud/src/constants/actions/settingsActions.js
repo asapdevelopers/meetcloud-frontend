@@ -1,0 +1,2 @@
+// Change language
+export const SETTINGS_CHANGE_LANGUAGE = 'SETTINGS_CHANGE_LANGUAGE';

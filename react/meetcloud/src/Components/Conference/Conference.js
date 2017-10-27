@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import moment from 'moment'
+import moment from 'moment';
 import './Conference.css';
-import { Redirect } from 'react-router-dom'
-import { authenticateToken } from '../../Services/conference/conferenceApi'
-import * as rtcHelper from '../../Services/helpers/easyrtcHelper'
-import { ModalContainer, ModalDialog } from 'react-modal-dialog';
+import { Redirect } from 'react-router-dom';
+import { authenticateToken } from '../../Services/conference/conferenceApi';
+import * as rtcHelper from '../../Services/helpers/easyrtcHelper';
+import { Modal } from 'react-modal';
 import ReactSpinner from 'react-spinjs';
 import CameraIconPermission from '../../assets/images/camera_permission.png';
 import ConferenceLogo from '../../assets/images/ConferenceLogo.png';
@@ -12,13 +12,13 @@ import Footer from './Footer/Footer';
 import Chat from './Chat/Chat';
 import Header from './Header/Header';
 import UserVideo from './UserVideo/UserVideo';
-import * as conferenceConsts from '../../Consts/conference'
+import * as conferenceConsts from '../../constants/conference'
 import { inviteToConference } from '../../Services/conference/conferenceApi'
 import NotificationSystem from 'react-notification-system';
 
 class Conference extends Component {
 
-  _notificationSystem: null;
+  _notificationSystem=null;
 
   constructor(props) {
     super(props);
@@ -835,13 +835,13 @@ class Conference extends Component {
     if (this.state.isLoading) {
       modalContent = <ReactSpinner color="white" />
     }
-    if (this.state.modal) {
-      modalContent = (
-        <ModalDialog onClose={this.props.onClose} className="example-dialog" dismissOnBackgroundClick={false}>
-          {this.state.modalText}
-        </ModalDialog>
-      );
-    }
+
+    modalContent = (
+      <Modal isOpen={this.state.modal} className="example-dialog">
+        {this.state.modalText}
+      </Modal>
+    );
+
     let modalContentBrowser = "";
     if (this.state.modal.deviceNotFound || this.state.modal.permissionError) {
       if (this.state.modal.deviceNotFound) {
@@ -889,18 +889,18 @@ class Conference extends Component {
       }
 
       let modalContent = (
-        <ModalDialog onClose={this.props.onClose} className="example-dialog" dismissOnBackgroundClick={false}>
+        <Modal isOpen={this.state.modal} className="example-dialog">
           <h3>Meetcloud can't access your camera or microphone.</h3>
           {modalContentBrowser}
-        </ModalDialog>
+        </Modal>
       );
     }
-    let modal = (this.state.modal || this.state.isLoading) && <ModalContainer onClose={this.props.onClose}>
+    let modal = (this.state.modal || this.state.isLoading) && <Modal>
       {modalContent}
-    </ModalContainer>
+    </Modal>
     let shareContent = ""
     if (this.state.shareRoom) {
-      shareContent = <ModalDialog onClose={() => this.setState({ shareRoom: false })} className="share-dialog" dismissOnBackgroundClick={true}>
+      shareContent = <Modal className="share-dialog">
         <div className="share-text">Invite your friends to this room.</div>
         <form onSubmit={(event) => this.invitePersonToConference(event)}>
           <span className="share-email">Email :
@@ -910,11 +910,11 @@ class Conference extends Component {
             <button className="button" type="submit">Invite</button>
           </div>
         </form>
-      </ModalDialog>
+      </Modal>
     }
 
-    let shareRoomModal = (this.state.shareRoom) && <ModalContainer onClose={this.props.onClose}>{shareContent}
-    </ModalContainer>
+    let shareRoomModal = (this.state.shareRoom) && <Modal>{shareContent}
+    </Modal>
     // Empty room
     let emptyRoom = ""
     if (this.state.sharingWithMe.length === 0) {

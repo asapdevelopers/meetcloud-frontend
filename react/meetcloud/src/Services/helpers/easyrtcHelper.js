@@ -1,15 +1,15 @@
-import * as conferenceConsts from '../../Consts/conference';
+import * as conferenceConsts from '../../constants/conference';
 
 const browser = require('detect-browser');
 
 // private functions
-function callEverybodyElse(roomName, otherPeople) {
+function callEveryoneElse(roomName, otherPeople) {
     // so we're only called once.
-    window.easyrtc.setRoomOccupantListener(null); 
+    window.easyrtc.setRoomOccupantListener(null);
 
     var list = [];
     var connectCount = 0;
-    for(var easyrtcid in otherPeople) {
+    for(let easyrtcid in otherPeople) {
         list.push(easyrtcid);
     }
     //
@@ -19,17 +19,17 @@ function callEverybodyElse(roomName, otherPeople) {
     function establishConnection(position) {
         function callSuccess() {
             connectCount++;
-            if( connectCount < maxCALLERS && position > 0) {
+            if( connectCount < conferenceConsts.MAX_CALLERS && position > 0) {
                 establishConnection(position-1);
             }
         }
         function callFailure(errorCode, errorText) {
-            easyrtc.showError(errorCode, errorText);
-            if( connectCount < maxCALLERS && position > 0) {
+            window.easyrtc.showError(errorCode, errorText);
+            if( connectCount < conferenceConsts.MAX_CALLERS && position > 0) {
                 establishConnection(position-1);
             }
         }
-        window-easyrtc.call(list[position], callSuccess, callFailure);
+        window.easyrtc.call(list[position], callSuccess, callFailure);
 
     }
     if( list.length > 0) {
@@ -42,7 +42,7 @@ function callEverybodyElse(roomName, otherPeople) {
 export function establishConnection(roomName, onJoinSuccess, onJoinError, onConnectSuccess, onConnectError) {
     window.easyrtc.setRoomOccupantListener(callEveryoneElse);
     window.easyrtc.joinRoom(roomName, {}, onJoinSuccess, onJoinError);
-    window.easyrtc.connect(conferenceConsts.WEB_RTC_APP, onConnectSuccess, onConnectionError);
+    window.easyrtc.connect(conferenceConsts.WEB_RTC_APP, onConnectSuccess, onConnectError);
 }
 
 // Initialize

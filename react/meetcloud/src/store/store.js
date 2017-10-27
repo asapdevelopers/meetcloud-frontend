@@ -10,7 +10,7 @@ import ProfileSaga from './sagas/profileSaga';
 // import root reducer
 import rootReducer from './reducers/index';
 // i18n
-import {loadi18n} from "../i18n";
+//import {loadi18n} from "../i18n";
 
 // create middlewares
 const history = createHistory();

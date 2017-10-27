@@ -22,7 +22,7 @@ function* upload({ payload: { id, file } }) {
     var data = new FormData()
     data.append('file', file)
     const options = {
-        method: 'POST',        
+        method: 'POST',
         headers: {},
         body: data
     };

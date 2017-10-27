@@ -15,7 +15,7 @@ function* authorize({ payload: { email, password } }) {
         yield put({ type: authActions.AUTH_REQUEST_SUCCESS, payload: { token, user, expiration } });
         localStorage.setItem('auth', JSON.stringify({ token, user, expiration }));
     } catch (error) {
-        let message = handleError(error.status);        
+        let message = handleError(error.status);
         yield put({ type: authActions.AUTH_REQUEST_FAILURE, payload: message });
         localStorage.removeItem('token');
     }
