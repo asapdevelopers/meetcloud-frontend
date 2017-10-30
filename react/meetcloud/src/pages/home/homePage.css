@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400");
-.App {
+.HomePage .App {
   font-family: 'Open Sans', sans-serif;
   font-weight: 300;
   text-align: center;
@@ -8,48 +8,29 @@
   justify-content: space-between;
   height: 100vh; }
 
-.App-logo {
+.HomePage .App-logo {
   margin-top: 56px;
   width: 265px;
   margin-left: 74px; }
 
-.App-header {
+.HomePage .App-header {
   padding: 20px;
   color: white; }
 
-.App-body {
+.HomePage .App-body {
   margin-top: 70px; }
 
-.App-footer {
-  height: 130px;
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  margin: 0px padding;
-  position: absolute;
-  padding: 0 0px;
-  background-color: rgba(0, 0, 0, 0.4); }
-
-.line {
-  box-sizing: border-box;
-  height: 1px;
-  margin-bottom: 22px;
-  border-top: 1px solid #FFFFFF;
-  opacity: 0.71;
-  text-align: center;
-  margin: 0 auto; }
-
-.App-intro {
+.HomePage .App-intro {
   font-size: large; }
 
-.background {
+.HomePage .background {
   width: 100%;
   height: 100%; }
 
-.form {
+.HomePage .form {
   margin-top: 75px; }
 
-.text {
+.HomePage .text {
   color: #FFFFFF;
   font-size: 14px;
   line-height: 19px;
@@ -57,7 +38,7 @@
   margin-top: 15px;
   font-family: 'Open Sans', sans-serif; }
 
-.inputText {
+.HomePage .inputText {
   height: 40px;
   width: 95%;
   border-radius: 8px;
@@ -70,10 +51,10 @@
   border: none;
   padding: 0 10px; }
 
-.full {
+.HomePage .full {
   width: 100%; }
 
-.button {
+.HomePage .button {
   cursor: pointer;
   height: 40px;
   width: 190px;
@@ -89,10 +70,10 @@
   font-family: 'Open Sans';
   font-weight: 300; }
 
-.contactUs {
+.HomePage .contactUs {
   margin-top: 20px; }
 
-.contactUs span {
+.HomePage .contactUs span {
   color: #FFFFFF;
   font-size: 14px;
   font-weight: 300;
@@ -100,31 +81,29 @@
   text-align: start; }
 
 @media (min-width: 300px) {
-  .col-responsive {
+  .HomePage .col-responsive {
     width: 85%; }
-  .button {
-    width: 60%; }
-  .App-footer {
-    display: none; } }
+  .HomePage .button {
+    width: 60%; } }
 
 @media (max-width: 700px) {
-  .App-footer {
+  .HomePage .App-footer {
     display: none; } }
 
 @media (min-width: 600px) {
-  .col-responsive {
+  .HomePage .col-responsive {
     width: 80%; }
-  .button {
+  .HomePage .button {
     width: 50%; } }
 
 @media (min-width: 800px) {
-  .col-responsive {
+  .HomePage .col-responsive {
     width: 60%; }
-  .button {
+  .HomePage .button {
     width: 40%; } }
 
 @media (min-width: 900px) {
-  .col-responsive {
+  .HomePage .col-responsive {
     width: 25%; }
-  .button {
+  .HomePage .button {
     width: 40%; } }

@@ -1,8 +1,8 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
-import * as videoActions from '../../constants/actions/videoActions';
-import { fetchJSON, handleError } from './utils';
-import { api } from '../../configuration';
-
+import { call, put, takeLatest } from "redux-saga/effects";
+import * as videoActions from "../../constants/actions/videoActions";
+import { fetchJSON, handleError } from "./utils";
+import { api } from "../../configuration";
+/*
 function* list() {
     const options = {
         method: 'GET',
@@ -18,7 +18,7 @@ function* list() {
     }
 }
 
-function* upload({ payload: { id, file } }) {
+function* upload({ payload: { id } }) {
     var data = new FormData()
     data.append('file', file)
     const options = {
@@ -35,13 +35,8 @@ function* upload({ payload: { id, file } }) {
         let message = handleError(error.status);
         yield put({ type: videoActions.VIDEO_UPLOAD_FAILURE, payload: message });
     }
-}
+}*/
 
-function* VideosSaga() {
-    yield [
-        takeLatest(videoActions.VIDEO_GET_LIST, list),
-        takeLatest(videoActions.VIDEO_UPLOAD, upload)
-    ]
-}
+function* VideosSaga() {}
 
 export default VideosSaga;

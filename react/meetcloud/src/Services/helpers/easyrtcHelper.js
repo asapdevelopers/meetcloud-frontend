@@ -4,6 +4,7 @@ const browser = require("detect-browser");
 
 // private functions
 function callEveryoneElse(roomName, otherPeople) {
+  console.log("Calling others");
   // so we're only called once.
   window.easyrtc.setRoomOccupantListener(null);
 
@@ -40,6 +41,7 @@ function callEveryoneElse(roomName, otherPeople) {
 // 2. Establish the connection with the EasyRTC server
 export function createConnection(
   roomName,
+  selfVideo,
   onJoinSuccess,
   onJoinError,
   onConnectSuccess,
@@ -49,11 +51,24 @@ export function createConnection(
   window.easyrtc.setRoomOccupantListener(callEveryoneElse);
   // Before connecting we have to `joinRoom` to avoid entering to the default room
   window.easyrtc.joinRoom(roomName, {}, onJoinSuccess, onJoinError);
-  // Create the easyrtc onnection
-  window.easyrtc.connect(
-    conferenceConsts.WEB_RTC_APP,
-    onConnectSuccess,
-    onConnectError
+  // We get access to the local media stream
+  window.easyrtc.initMediaSource(
+    () => {
+      // Create the easyrtc onnection
+      window.easyrtc.setVideoObjectSrc(
+        selfVideo,
+        window.easyrtc.getLocalStream()
+      );
+      window.easyrtc.connect(
+        conferenceConsts.WEB_RTC_APP,
+        onConnectSuccess,
+        onConnectError
+      );
+    },
+    msg => {
+      //error
+      console.log("EasyRTC: Init media source:", msg);
+    }
   );
 }
 
@@ -61,9 +76,9 @@ export function createConnection(
 export function initializeEasyRTC(domainServer) {
   // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
   window.easyrtc.setSocketUrl(domainServer, {
-        transports: ['websocket'],
-        reconnection: false
-    });
+    transports: ["websocket"],
+    reconnection: false
+  });
   window.easyrtc.enableDebug(conferenceConsts.DEBUG);
   window.easyrtc.setOnError(function(e) {
     // Prevent anoying pop up.

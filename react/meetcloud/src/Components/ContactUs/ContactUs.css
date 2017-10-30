@@ -1,0 +1,18 @@
+.App-footer {
+  height: 130px;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  margin: 0px padding;
+  position: absolute;
+  padding: 0 0px;
+  background-color: rgba(0, 0, 0, 0.4); }
+
+.line {
+  box-sizing: border-box;
+  height: 1px;
+  margin-bottom: 22px;
+  border-top: 1px solid #FFFFFF;
+  opacity: 0.71;
+  text-align: center;
+  margin: 0 auto; }

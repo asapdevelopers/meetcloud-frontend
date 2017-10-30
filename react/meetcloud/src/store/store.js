@@ -26,6 +26,11 @@ if (localStorage.auth) {
     authData = JSON.parse(localStorage.auth);
 }
 
+let domainData = {};
+if (localStorage.conference) {
+    domainData = JSON.parse(localStorage.conference);
+}
+
 const defaultState = {
     auth: {
         token: authData.token,
@@ -35,7 +40,7 @@ const defaultState = {
     },
     conference: {
         peers:[],
-        domain:{}
+        domain:domainData
     }
 };
 

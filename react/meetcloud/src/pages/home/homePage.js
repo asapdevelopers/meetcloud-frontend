@@ -12,6 +12,8 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 //Router
 import { withRouter, Redirect } from "react-router-dom";
+// Components
+import ContactUs from '../../Components/ContactUs/ContactUs';
 
 const domain = window.location.hostname;
 
@@ -34,7 +36,7 @@ class HomePage extends Component {
       userName: "",
       backgroundImage: background,
       redirect: false,
-      showModal:true
+      showModal: true
     };
   }
 
@@ -89,7 +91,7 @@ class HomePage extends Component {
     };
 
     return (
-      <div className="background" style={sectionStyle}>
+      <div className="HomePage background" style={sectionStyle}>
         <div className="App">
           <div className="App-header">
             <div className="row">
@@ -137,48 +139,7 @@ class HomePage extends Component {
               </div>
             </div>
           </div>
-          <div className="App-footer">
-            <div className="line" />
-            <div className="row contactUs">
-              <div className="col-xs-1" />
-              <div className="col-xs-2">
-                <span>CONTACT US</span>
-              </div>
-              <div className="col-xs-3">
-                <div className="row">
-                  <span>Sillicon Valley</span>
-                </div>
-                <div className="row">
-                  <span>1701 N. California Blvd. Walnut Creek, CA 94596</span>
-                </div>
-                <div className="row">
-                  <span>Tel: (+415) 967 3920</span>
-                </div>
-              </div>
-              <div className="col-xs-3">
-                <div className="row">
-                  <span>Montevideo, Uruguay</span>
-                </div>
-                <div className="row">
-                  <span>Av. 8 de octubre 2323, Apt. 1205</span>
-                </div>
-                <div className="row">
-                  <span>Tel: (+598) 2408 1699</span>
-                </div>
-              </div>
-              <div className="col-xs-3">
-                <div className="row">
-                  <span>Santiago, Chile</span>
-                </div>
-                <div className="row">
-                  <span>Los Abedules 3085, Of. 201, Vitacura</span>
-                </div>
-                <div className="row">
-                  <span>Tel: (+56) 9 9643 0806</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ContactUs />
         </div>
       </div>
     );
@@ -188,7 +149,7 @@ class HomePage extends Component {
 const mapStateToProps = state => ({
   auth: state.auth,
   settings: state.settings,
-  confernece:state.conference
+  confernece: state.conference
 });
 
 const mapDispatchToProps = dispatch => ({
