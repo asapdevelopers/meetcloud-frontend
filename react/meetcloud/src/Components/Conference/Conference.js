@@ -1,24 +1,23 @@
-import React, { Component } from 'react';
-import moment from 'moment';
-import './Conference.css';
-import { Redirect } from 'react-router-dom';
-import { authenticateToken } from '../../Services/conference/conferenceApi';
-import * as rtcHelper from '../../Services/helpers/easyrtcHelper';
-import { Modal } from 'react-modal';
-import ReactSpinner from 'react-spinjs';
-import CameraIconPermission from '../../assets/images/camera_permission.png';
-import ConferenceLogo from '../../assets/images/ConferenceLogo.png';
-import Footer from './Footer/Footer';
-import Chat from './Chat/Chat';
-import Header from './Header/Header';
-import UserVideo from './UserVideo/UserVideo';
-import * as conferenceConsts from '../../constants/conference'
-import { inviteToConference } from '../../Services/conference/conferenceApi'
-import NotificationSystem from 'react-notification-system';
+import React, { Component } from "react";
+import moment from "moment";
+import "./Conference.css";
+import { Redirect } from "react-router-dom";
+import { authenticateToken } from "../../Services/conference/conferenceApi";
+import * as rtcHelper from "../../Services/helpers/easyrtcHelper";
+import Modal from "react-modal";
+import MDSpinner from "react-md-spinner";
+import CameraIconPermission from "../../assets/images/camera_permission.png";
+import ConferenceLogo from "../../assets/images/ConferenceLogo.png";
+import Footer from "./Footer/Footer";
+import Chat from "./Chat/Chat";
+import Header from "./Header/Header";
+import UserVideo from "./UserVideo/UserVideo";
+import * as conferenceConsts from "../../constants/conference";
+import { inviteToConference } from "../../Services/conference/conferenceApi";
+import NotificationSystem from "react-notification-system";
 
 class Conference extends Component {
-
-  _notificationSystem=null;
+  _notificationSystem = null;
 
   constructor(props) {
     super(props);
@@ -29,7 +28,7 @@ class Conference extends Component {
       valid: true,
       error: null,
       username: localStorage.getItem("username"),
-      room: '',
+      room: "",
       domain: {},
       conferenceData: {},
       connected: null,
@@ -46,9 +45,10 @@ class Conference extends Component {
       unreadMessages: false,
       mediaSourceWorking: null,
       sharingScreen: false,
-      cameraEnabled: localStorage.getItem('cameraEnabled') != null
-        ? localStorage.getItem('cameraEnabled')
-        : true, // Global camera setting, can be only changed while disconnected
+      cameraEnabled:
+        localStorage.getItem("cameraEnabled") != null
+          ? localStorage.getItem("cameraEnabled")
+          : true, // Global camera setting, can be only changed while disconnected
       camera: true, // Turn on/off cam
       mic: true, // turn on/off mic
       sharingWithMe: [],
@@ -65,41 +65,50 @@ class Conference extends Component {
 
   // Helper to allow setting audio output of an element
   // Currently only supported by chrome
-  setAudioOutput = (element) => {
+  setAudioOutput = element => {
     if (element.setSinkId && this.state.selectedAudioOutputDevice) {
       element.setSinkId(this.state.selectedAudioOutputDevice.deviceId);
     }
-  }
+  };
 
-  handleClick = () => this.setState({ modal: true })
-  handleClose = () => this.setState({ modal: false })
+  handleClick = () => this.setState({ modal: true });
+  handleClose = () => this.setState({ modal: false });
 
   addNotification = (title, message, level) => {
-    this._notificationSystem.addNotification({ title, message, level, autoDismiss: 3 });
+    this._notificationSystem.addNotification({
+      title,
+      message,
+      level,
+      autoDismiss: 3
+    });
   };
 
   addMessage = (msg, source) => {
     this.setState({
       messages: [
-        ...this.state.messages, {
+        ...this.state.messages,
+        {
           date: new moment(),
           msg: msg,
           source: source
         }
       ]
-    })
+    });
     if (!this.state.showChat) {
       this.setState({ unreadMessages: true });
       this.addNotification(source, msg, "info");
     }
-  }
+  };
 
-  invalidConference = (error) => {
-    console.log('Invalid conference');
-    if (error)
-      console.log(error);
-    this.setState({valid: false, redirectHome: true, room: this.props.match.params.roomName});
-  }
+  invalidConference = error => {
+    console.log("Invalid conference");
+    if (error) console.log(error);
+    this.setState({
+      valid: false,
+      redirectHome: true,
+      room: this.props.match.params.roomName
+    });
+  };
 
   // listeners
   disconnectListener = () => {
@@ -124,12 +133,14 @@ class Conference extends Component {
     }
     // same with screen sharing
     if (this.state.sharingScreen) {
-      window.easyrtc.closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+      window.easyrtc.closeLocalStream(
+        conferenceConsts.SCREEN_SHARING_STREAM_NAME
+      );
       this.setState({ sharingScreen: false });
     }
     window.easyrtc.setVideoObjectSrc(this.selfVideoElement, ""); // Clear video src
     window.easyrtc._roomApiFields = undefined; //Clear this since easyrtc doesn't and causes some error log due to invalid room
-  }
+  };
 
   peerListener = (easyrtcid, msgType, msgData, targeting) => {
     console.log("setPeerListener");
@@ -138,22 +149,20 @@ class Conference extends Component {
       rtcHelper.playSound(conferenceConsts.NEW_MESSAGE_AUDIO);
     } else if (msgType === conferenceConsts.WAKE_UP_MESSAGE_TYPE) {
       let exists = this.state.membersDict[easyrtcid];
-      alert((exists
-        ? exists.username
-        : 'Unknown') + " sent you a wake up!")
+      alert((exists ? exists.username : "Unknown") + " sent you a wake up!");
 
       rtcHelper.playSound(conferenceConsts.WAKE_UP_AUDIO);
     }
-  }
+  };
 
   openChat = () => {
     this.setState({ showChat: true });
     this.setState({ unreadMessages: false });
-  }
+  };
 
   closeChat = () => {
     this.setState({ showChat: false });
-  }
+  };
 
   // Will call a specific target.
   // It is interesting to note that when calling a target, the target also calls back
@@ -173,17 +182,15 @@ class Conference extends Component {
     setTimeout(() => {
       this.setState({
         attempt: this.state.attempt + 1
-      })
-      this.callOne(this.state.target, this.state.attempt)
+      });
+      this.callOne(this.state.target, this.state.attempt);
     }, 3000);
   };
 
-  callOnAcc = (wasAccepted, otherUser) => { };
+  callOnAcc = (wasAccepted, otherUser) => {};
 
   callOne = (target, a) => {
-    let attempt = a !== undefined
-      ? a
-      : 0;
+    let attempt = a !== undefined ? a : 0;
     // only call if not already sharing with me
     this.setState({ target, attempt });
     if (this.state.sharingWithMeDict[target] || attempt > 5) {
@@ -191,11 +198,14 @@ class Conference extends Component {
     }
 
     // If call pending and not expired, also do not call. 5 seconds expiration
-    if (this.state.pendingCallsDict[target] && (new Date().getTime() - this.state.pendingCallsDict[target]) < 5000) {
+    if (
+      this.state.pendingCallsDict[target] &&
+      new Date().getTime() - this.state.pendingCallsDict[target] < 5000
+    ) {
       // If pending call and not expired, set a re-try with a timeout.
       // it won't have effect if the call is established before the timeout
       setTimeout(() => {
-        this.callOne(target, attempt + 1)
+        this.callOne(target, attempt + 1);
       }, 3000);
       return;
     }
@@ -217,11 +227,17 @@ class Conference extends Component {
     if (this.state.sharingScreen) {
       streams.push(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
     }
-    this.setState({ streams })
-    window.easyrtc.call(target, this.callOnSuccess, this.callOnError, this.callOnAcc, streams);
+    this.setState({ streams });
+    window.easyrtc.call(
+      target,
+      this.callOnSuccess,
+      this.callOnError,
+      this.callOnAcc,
+      streams
+    );
   };
 
-  killUser = (id) => {
+  killUser = id => {
     let found = null;
     for (let i = 0; i < this.state.sharingWithMe.length; i++) {
       if (this.state.sharingWithMe[i].id === id) {
@@ -232,11 +248,17 @@ class Conference extends Component {
 
     if (found != null) {
       // Clear stream source element
-      if (document.getElementById('u-' + id)) {
-        window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
+      if (document.getElementById("u-" + id)) {
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("u-" + id),
+          ""
+        );
       }
-      if (document.getElementById('us-' + id)) {
-        window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), '');
+      if (document.getElementById("us-" + id)) {
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("us-" + id),
+          ""
+        );
       }
       this.setState({
         sharingWithMe: this.state.sharingWithMe.splice(found, 1)
@@ -245,15 +267,18 @@ class Conference extends Component {
       let pendingDict = this.state.pendingCallsDict;
       delete sharingDict[id];
       delete pendingDict[id];
-      this.setState({ sharingWithMeDict: sharingDict, pendingCallsDict: pendingDict });
+      this.setState({
+        sharingWithMeDict: sharingDict,
+        pendingCallsDict: pendingDict
+      });
     }
-  }
+  };
 
   roomOcupantListener = (roomName, occupants) => {
-    console.log('setRoomOccupantListener');
+    console.log("setRoomOccupantListener");
     var before = this.state.members.length;
 
-    let membersAux = []
+    let membersAux = [];
     let membersDictAux = occupants;
 
     for (let k in occupants) {
@@ -287,7 +312,7 @@ class Conference extends Component {
         this.killUser(k);
       }
     }
-  }
+  };
 
   acceptCheckerListener = (id, cb) => {
     let streams = [];
@@ -303,32 +328,50 @@ class Conference extends Component {
     }
     // accept with our streams
     cb(true, streams);
-    this.setState({ streams })
+    this.setState({ streams });
   };
 
-  setFullScreenVideo = (user) => {
+  setFullScreenVideo = user => {
     if (user === undefined) {
       if (this.state.sharingWithMe.length > 0) {
         let firstVideo = this.state.sharingWithMe[0];
         this.setState({ selectedUser: firstVideo });
-        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), firstVideo.stream);
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("video-selected"),
+          firstVideo.stream
+        );
       } else {
         this.setState({ selectedUser: null });
-        window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), '');
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("video-selected"),
+          ""
+        );
       }
     } else {
       this.setState({ selectedUser: user });
       if (user === "me") {
         if (this.state.userScreen !== undefined) {
-          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userScreen);
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("video-selected"),
+            this.state.userScreen
+          );
         } else {
-          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), this.state.userMedia);
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("video-selected"),
+            this.state.userMedia
+          );
         }
       } else {
         if (user.screen !== undefined) {
-          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), user.screen);
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("video-selected"),
+            user.screen
+          );
         } else {
-          window.easyrtc.setVideoObjectSrc(document.getElementById("video-selected"), user.stream);
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("video-selected"),
+            user.stream
+          );
         }
       }
     }
@@ -346,7 +389,7 @@ class Conference extends Component {
       newShared = {
         username: membersDict[id].username,
         id: id
-      }
+      };
       sharingWithMe.push(newShared);
       sharingWithMeDict[id] = newShared;
     }
@@ -354,7 +397,10 @@ class Conference extends Component {
     if (streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
       newShared.screen = stream;
       setTimeout(() => {
-        window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), stream);
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("us-" + id),
+          stream
+        );
         this.setFullScreenVideo(newShared);
       }, 1000);
     } else {
@@ -362,20 +408,30 @@ class Conference extends Component {
       newShared.hasVideo = window.easyrtc.haveVideoTrack(id);
       newShared.hasAudio = window.easyrtc.haveAudioTrack(id);
       setTimeout(() => {
-        if (document.getElementById('u-' + id)) {
-          window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), stream);
-          this.setAudioOutput(document.getElementById('u-' + id));
+        if (document.getElementById("u-" + id)) {
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("u-" + id),
+            stream
+          );
+          this.setAudioOutput(document.getElementById("u-" + id));
         }
         this.setFullScreenVideo(newShared);
       }, 1000);
     }
     console.log("Stream accepted", newShared);
-  }
+  };
 
   streamClosedListener = (id, stream, streamName) => {
     console.log("Stream closed: ", streamName);
     if (streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
-      setTimeout(() => window.easyrtc.setVideoObjectSrc(document.getElementById('us-' + id), ''), 1000);
+      setTimeout(
+        () =>
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("us-" + id),
+            ""
+          ),
+        1000
+      );
       if (this.state.sharingWithMeDict[id]) {
         let sharing = this.state.sharingWithMeDict;
         delete sharing[id];
@@ -383,8 +439,11 @@ class Conference extends Component {
       }
     } else {
       setTimeout(() => {
-        if (document.getElementById('u-' + id)) {
-          window.easyrtc.setVideoObjectSrc(document.getElementById('u-' + id), '');
+        if (document.getElementById("u-" + id)) {
+          window.easyrtc.setVideoObjectSrc(
+            document.getElementById("u-" + id),
+            ""
+          );
           if (this.state.sharingWithMeDict[id]) {
             let sharing = this.state.sharingWithMeDict;
             delete sharing[id];
@@ -405,22 +464,26 @@ class Conference extends Component {
       if (data) {
         var now = new moment();
         var duration = now.diff(this.state.joined.date);
-        joinedAux.duration = moment.utc(duration).format("HH:mm:ss")
-        joinedAux.cost = moment.duration(duration).asSeconds() * data.costPerHour / 3600;
+        joinedAux.duration = moment.utc(duration).format("HH:mm:ss");
+        joinedAux.cost =
+          moment.duration(duration).asSeconds() * data.costPerHour / 3600;
       }
       this.setState({ joined: joinedAux });
     }
-  }
+  };
 
   disconnect = () => {
     window.easyrtc.disconnect();
-  }
+  };
 
-  onConnect = (id) => {
+  onConnect = id => {
     console.log("Connected", id);
     this.setState({ connected: id });
     // init media
-    if (window.easyrtc.supportsGetUserMedia && window.easyrtc.supportsGetUserMedia()) {
+    if (
+      window.easyrtc.supportsGetUserMedia &&
+      window.easyrtc.supportsGetUserMedia()
+    ) {
       window.easyrtc.enableVideo(this.state.cameraEnabled);
       this.setState({ camera: this.state.cameraEnabled });
 
@@ -436,63 +499,82 @@ class Conference extends Component {
       this.disconnect();
       alert("Browser does not support media");
     }
-  }
+  };
 
-  onConnectError = (e) => {
+  onConnectError = e => {
     window.easyrtc.disconnect(); // so it doesn't try automatically after and re connecting is possible
     this.setState({ connected: null });
     this.setState({ joined: null });
     alert("Failed to connect");
-  }
+  };
 
   connect = () => {
     if (this.state.selectedAudioDevice) {
-      localStorage.setItem('selectedAudioDeviceId', this.state.selectedAudioDevice);
+      localStorage.setItem(
+        "selectedAudioDeviceId",
+        this.state.selectedAudioDevice
+      );
     }
     if (this.state.selectedVideoDevice) {
-      localStorage.setItem('selectedVideoDeviceId', this.state.selectedVideoDevice.deviceId);
+      localStorage.setItem(
+        "selectedVideoDeviceId",
+        this.state.selectedVideoDevice.deviceId
+      );
     }
     if (this.state.selectedAudioOutputDevice) {
-      localStorage.setItem('selectedAudioOutputDeviceId', this.state.selectedAudioOutputDevice.deviceId);
+      localStorage.setItem(
+        "selectedAudioOutputDeviceId",
+        this.state.selectedAudioOutputDevice.deviceId
+      );
     }
-    localStorage.setItem('cameraEnabled', this.state.cameraEnabled);
+    localStorage.setItem("cameraEnabled", this.state.cameraEnabled);
 
     if (this.state.connected) {
       this.onConnect(this.state.connected);
     } else {
       window.easyrtc.setUsername(this.state.username);
-      window.easyrtc.setCredential({ 'token': this.state.domain.token });
+      window.easyrtc.setCredential({ token: this.state.domain.token });
       console.log("on connect: " + conferenceConsts.WEB_RTC_APP);
-      window.easyrtc.connect(conferenceConsts.WEB_RTC_APP, this.onConnect, this.onConnectError);
+      window.easyrtc.connect(
+        conferenceConsts.WEB_RTC_APP,
+        this.onConnect,
+        this.onConnectError
+      );
     }
-  }
+  };
 
-  onJoin = (roomName) => {
+  onJoin = roomName => {
     console.log("Room joined", roomName);
     let joined = {
       name: roomName,
       date: new moment(),
-      duration: '',
+      duration: "",
       cost: 0
     };
     this.setState({ joined });
 
-    window.easyrtc.sendPeerMessage({
-      targetRoom: roomName
-    }, conferenceConsts.CHAT_MESSAGE_TYPE, {
+    window.easyrtc.sendPeerMessage(
+      {
+        targetRoom: roomName
+      },
+      conferenceConsts.CHAT_MESSAGE_TYPE,
+      {
         msg: "Has joined.",
         source: this.state.username
-      }, () => { }, () => { })
-  }
+      },
+      () => {},
+      () => {}
+    );
+  };
 
   onJoinError = (errorCode, errorText, roomName) => {
     console.error("failed to join room", errorText);
-    console.log("failed to join room: " + errorText)
+    console.log("failed to join room: " + errorText);
     this.setState({ joined: null });
     this.disconnect();
-  }
+  };
 
-  mediaSuccess = (obj) => {
+  mediaSuccess = obj => {
     this.setState({ userMedia: obj });
     this.removePopup();
     this.setState({ mediaSourceWorking: obj });
@@ -510,15 +592,20 @@ class Conference extends Component {
       this.setState({ members: [] });
       this.setState({ membersDict: {} });
       this.setState({ pendingCallsDict: {} });
-      window.easyrtc.joinRoom(this.state.domain.roomToJoin, {}, this.onJoin, this.onJoinError);
+      window.easyrtc.joinRoom(
+        this.state.domain.roomToJoin,
+        {},
+        this.onJoin,
+        this.onJoinError
+      );
     }
-  }
+  };
 
   showPopup = (message, loading = false, modalType = null) => {
     this.setState({ isLoading: loading });
     this.setState({
       modal: !loading
-    })
+    });
     if (modalType) {
       this.setState({
         modal: {
@@ -527,10 +614,10 @@ class Conference extends Component {
       });
     }
     this.setState({ modalText: message });
-  }
+  };
 
   removePopup = () => {
-    console.log("Removing popup")
+    console.log("Removing popup");
     this.setState({ isLoading: false, modal: false });
   };
 
@@ -545,33 +632,36 @@ class Conference extends Component {
     window.easyrtc.initMediaSource(this.mediaSuccess, () => {
       console.log("Failed to get media source a second time: ", a, b);
       this.disconnect();
-      if (a.includes('MEDIA_ERR')) {
-        if (b.includes('PermissionDeniedError') || b.includes('SecurityError')) {
+      if (a.includes("MEDIA_ERR")) {
+        if (
+          b.includes("PermissionDeniedError") ||
+          b.includes("SecurityError")
+        ) {
           this.showPopup("", false, "permissionError");
         }
-        if (b.includes('DevicesNotFoundError')) {
+        if (b.includes("DevicesNotFoundError")) {
           this.showPopup("", false, "deviceNotFound");
         }
-        if (b.includes('NotFoundError')) {
+        if (b.includes("NotFoundError")) {
           this.showPopup("", false, "deviceNotFound");
         }
       } else {
-        this.showPopup("Failed to connect, please try again.")
+        this.showPopup("Failed to connect, please try again.");
       }
     });
-  }
+  };
 
   // In order to change stream sources we need to re-obtain medias
   // and re connect from peers with the new streams
   changeSources = () => {
-    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function () {
+    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
       this.setState({ joined: null });
       this.connect(); //timeout 500ms?
     });
     window.easyrtc.hangupAll();
   };
 
-  sendMessage = (msg) => {
+  sendMessage = msg => {
     if (!msg) {
       return;
     }
@@ -589,38 +679,50 @@ class Conference extends Component {
     // We can use room name (original one)
     console.log("MSG TYPE: " + conferenceConsts.CHAT_MESSAGE_TYPE);
     console.log("this.state.joined.name: " + this.state.joined.name);
-    console.log("this.state.username: " + this.state.username)
-    window.easyrtc.sendPeerMessage({
-      targetRoom: this.state.joined.name
-    }, conferenceConsts.CHAT_MESSAGE_TYPE, {
+    console.log("this.state.username: " + this.state.username);
+    window.easyrtc.sendPeerMessage(
+      {
+        targetRoom: this.state.joined.name
+      },
+      conferenceConsts.CHAT_MESSAGE_TYPE,
+      {
         msg: msg,
         source: this.state.username
-      }, suc, er);
-  }
+      },
+      suc,
+      er
+    );
+  };
 
-  sendWakeUp = (target) => {
-    window.easyrtc.sendPeerMessage(target, conferenceConsts.WAKE_UP_MESSAGE_TYPE, {}, () => { }, () => {
-      alert("Failed to sendWakeUp")
-    });
+  sendWakeUp = target => {
+    window.easyrtc.sendPeerMessage(
+      target,
+      conferenceConsts.WAKE_UP_MESSAGE_TYPE,
+      {},
+      () => {},
+      () => {
+        alert("Failed to sendWakeUp");
+      }
+    );
   };
 
   switchCamera = () => {
     let camera = !this.state.camera;
     this.setState({ camera });
     window.easyrtc.enableCamera(camera);
-  }
+  };
 
   switchMic = () => {
     let mic = !this.state.mic;
     this.setState({ mic });
     window.easyrtc.enableMicrophone(mic);
-  }
+  };
 
   shareRoomWithContact = () => {
-    this.setState({ shareRoom: true })
-  }
+    this.setState({ shareRoom: true });
+  };
 
-  openFullScreen = (evt) => {
+  openFullScreen = evt => {
     let elem = evt.currentTarget;
 
     if (elem.requestFullscreen) {
@@ -640,42 +742,66 @@ class Conference extends Component {
 
   permissionInterval = () => {
     try {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        if (devices.some((device) => device.label !== '')) {
+      navigator.mediaDevices.enumerateDevices().then(devices => {
+        if (devices.some(device => device.label !== "")) {
           this.cancelPermissionChecker();
           let getAudioGen = rtcHelper.getAudioSourceList();
           let getVideoGen = rtcHelper.getVideoSourceList();
           let getOutputGen = rtcHelper.getAudioSinkList();
 
           // Get Audio source list
-          getAudioGen.next().value.then(data => {
-            this.setState({ selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices });
-          }).catch(e => alert("Could not get audio devices: " + e));
+          getAudioGen
+            .next()
+            .value.then(data => {
+              this.setState({
+                selectedAudioDevice: data.selectedAudioDevice,
+                audioDevices: data.audioDevices
+              });
+            })
+            .catch(e => alert("Could not get audio devices: " + e));
 
           // Get video source list
-          getVideoGen.next().value.then(data => {
-            this.setState({ selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled });
-          }).catch(e => alert("Could not get video devices: " + e));
+          getVideoGen
+            .next()
+            .value.then(data => {
+              this.setState({
+                selectedVideoDevice: data.selectedVideoDevice,
+                videoDevices: data.videoDevices,
+                cameraEnabled: data.cameraEnabled
+              });
+            })
+            .catch(e => alert("Could not get video devices: " + e));
 
           // Get output source list
-          getOutputGen.next().value.then(data => {
-            this.setState({ audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice });
-          }).catch(e => alert("Could not get output devices: " + e));
+          getOutputGen
+            .next()
+            .value.then(data => {
+              this.setState({
+                audioOutputDevices: data.audioOutputDevices,
+                selectedAudioOutputDevice: data.selectedAudioOutputDevice
+              });
+            })
+            .catch(e => alert("Could not get output devices: " + e));
           this.connect();
         }
       });
     } catch (err) {
-      this.cancelPermissionChecker()
+      this.cancelPermissionChecker();
     }
-  }
+  };
 
   // Conference logic
   initConference = () => {
     console.log("Detect browser: " + rtcHelper.detectBrowser);
-    let browser = rtcHelper.detectBrowser()
+    let browser = rtcHelper.detectBrowser();
     if (browser === "chrome") {
-      this.permissions_interval_checker = setInterval(this.permissionInterval, 1000);
-      this.setState({ permissions_interval_checker: this.permissions_interval_checker });
+      this.permissions_interval_checker = setInterval(
+        this.permissionInterval,
+        1000
+      );
+      this.setState({
+        permissions_interval_checker: this.permissions_interval_checker
+      });
     }
 
     this.intervalId = setInterval(this.clockInterval, 1000);
@@ -686,31 +812,56 @@ class Conference extends Component {
     let getOutputGen = rtcHelper.getAudioSinkList();
 
     // Get Audio source list
-    getAudioGen.next().value.then(data => {
-      this.setState({ selectedAudioDevice: data.selectedAudioDevice, audioDevices: data.audioDevices });
-    }).catch(e => alert("Could not get audio devices: " + e));
+    getAudioGen
+      .next()
+      .value.then(data => {
+        this.setState({
+          selectedAudioDevice: data.selectedAudioDevice,
+          audioDevices: data.audioDevices
+        });
+      })
+      .catch(e => alert("Could not get audio devices: " + e));
 
     // Get video source list
-    getVideoGen.next().value.then(data => {
-      this.setState({ selectedVideoDevice: data.selectedVideoDevice, videoDevices: data.videoDevices, cameraEnabled: data.cameraEnabled });
-    }).catch(e => alert("Could not get video devices: " + e));
+    getVideoGen
+      .next()
+      .value.then(data => {
+        this.setState({
+          selectedVideoDevice: data.selectedVideoDevice,
+          videoDevices: data.videoDevices,
+          cameraEnabled: data.cameraEnabled
+        });
+      })
+      .catch(e => alert("Could not get video devices: " + e));
 
     // Get output source list
-    getOutputGen.next().value.then(data => {
-      this.setState({ audioOutputDevices: data.audioOutputDevices, selectedAudioOutputDevice: data.selectedAudioOutputDevice });
-    }).catch(e => alert("Could not get output devices: " + e));
+    getOutputGen
+      .next()
+      .value.then(data => {
+        this.setState({
+          audioOutputDevices: data.audioOutputDevices,
+          selectedAudioOutputDevice: data.selectedAudioOutputDevice
+        });
+      })
+      .catch(e => alert("Could not get output devices: " + e));
 
     // listeners
     window.easyrtc.setDisconnectListener(() => this.disconnectListener);
-    window.easyrtc.setPeerListener((easyrtcid, msgType, msgData, targeting) => this.peerListener(easyrtcid, msgType, msgData, targeting));
-    window.easyrtc.setRoomOccupantListener((roomName, occupants) => this.roomOcupantListener(roomName, occupants));
-    window.easyrtc.setAcceptChecker((id, cb) => this.acceptCheckerListener(id, cb));
+    window.easyrtc.setPeerListener((easyrtcid, msgType, msgData, targeting) =>
+      this.peerListener(easyrtcid, msgType, msgData, targeting)
+    );
+    window.easyrtc.setRoomOccupantListener((roomName, occupants) =>
+      this.roomOcupantListener(roomName, occupants)
+    );
+    window.easyrtc.setAcceptChecker((id, cb) =>
+      this.acceptCheckerListener(id, cb)
+    );
     window.easyrtc.setStreamAcceptor(this.streamAcceptorListener);
     window.easyrtc.setOnStreamClosed(this.streamClosedListener);
 
     //connect
     this.connect();
-  }
+  };
 
   // Share screen features
   // --- Screen sharing tests ---
@@ -718,26 +869,35 @@ class Conference extends Component {
   // #2: Users must download chrome extension: https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk
 
   stopShareScreen = () => {
-    window.easyrtc.closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+    window.easyrtc.closeLocalStream(
+      conferenceConsts.SCREEN_SHARING_STREAM_NAME
+    );
     this.setState({ sharingScreen: false });
     this.setState({ userScreen: null });
     this.switchCamera();
     if (this.state.userMedia) {
-      window.easyrtc.setVideoObjectSrc(this.selfVideoElement, this.state.userMedia);
+      window.easyrtc.setVideoObjectSrc(
+        this.selfVideoElement,
+        this.state.userMedia
+      );
     }
     this.setFullScreenVideo();
-    console.log("Fabricio")
-    console.log(this.state.userMedia)
+    console.log("Fabricio");
+    console.log(this.state.userMedia);
     this.sendLocalStream(this.state.userMedia.streamName);
   };
 
-  sendLocalStream = (streamName) => {
+  sendLocalStream = streamName => {
     for (let i = 0; i < this.state.sharingWithMe.length; i++) {
-      window.easyrtc.addStreamToCall(this.state.sharingWithMe[i].id, streamName, function () {
-        console.log("Stream accepted: " + streamName);
-      });
+      window.easyrtc.addStreamToCall(
+        this.state.sharingWithMe[i].id,
+        streamName,
+        function() {
+          console.log("Stream accepted: " + streamName);
+        }
+      );
     }
-  }
+  };
 
   shareScreen = () => {
     if (this.state.sharingScreen) {
@@ -745,68 +905,87 @@ class Conference extends Component {
     } else {
       window.getScreenId((error, sourceId, screen_constraints) => {
         if (error || !sourceId) {
-          alert("Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk")
+          alert(
+            "Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk"
+          );
         } else {
           var _ = this;
-          navigator.getUserMedia(screen_constraints, (stream) => {
+          navigator.getUserMedia(
+            screen_constraints,
+            stream => {
+              // register screen stream and send it to all existing peers.
+              window.easyrtc.register3rdPartyLocalMediaStream(
+                stream,
+                conferenceConsts.SCREEN_SHARING_STREAM_NAME
+              );
+              this.setState({ sharingScreen: true });
+              this.setState({ camera: false });
+              this.setState({ userScreen: stream });
+              window.easyrtc.setVideoObjectSrc(this.selfVideoElement, stream);
+              //window.easyrtc.enableCamera(false);
 
-            // register screen stream and send it to all existing peers.
-            window.easyrtc.register3rdPartyLocalMediaStream(stream, conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-            this.setState({ sharingScreen: true });
-            this.setState({ camera: false });
-            this.setState({ userScreen: stream });
-            window.easyrtc.setVideoObjectSrc(this.selfVideoElement, stream);
-            //window.easyrtc.enableCamera(false);
-
-            stream.oninactive = () => {
-              if (stream.oninactive) {
-                stream.oninactive = undefined;
-                _.stopShareScreen();
-              }
-            };
-            _.sendLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-          }, (error) => console.error(error));
+              stream.oninactive = () => {
+                if (stream.oninactive) {
+                  stream.oninactive = undefined;
+                  _.stopShareScreen();
+                }
+              };
+              _.sendLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+            },
+            error => console.error(error)
+          );
         }
       });
     }
-  }
+  };
 
-  invitePersonToConference = (event) => {
+  invitePersonToConference = event => {
     event.preventDefault();
-    inviteToConference(this.state.invitePersonEmail, window.location.href).then((response) => {
-      response.json().then((data) => {
-        this.addNotification("Invitation", "Your invitation was sent", "success");
-        this.setState({ shareRoom: false });
-        this.setState({ invitePersonEmail: '' });
-      })
-    }, (error) => alert(error));
+    inviteToConference(this.state.invitePersonEmail, window.location.href).then(
+      response => {
+        response.json().then(data => {
+          this.addNotification(
+            "Invitation",
+            "Your invitation was sent",
+            "success"
+          );
+          this.setState({ shareRoom: false });
+          this.setState({ invitePersonEmail: "" });
+        });
+      },
+      error => alert(error)
+    );
   };
 
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
     this.selfVideoElement = document.getElementById("self-video-div");
-    let domain = localStorage.getItem("conference") != null
-      ? JSON.parse(localStorage.getItem("conference")).domain
-      : null;
+    let domain =
+      localStorage.getItem("conference") != null
+        ? JSON.parse(localStorage.getItem("conference")).domain
+        : null;
     this.setState({ domain });
 
     const roomName = this.props.match.params.roomName;
-    let errData = {roomName, error: ''};
+    let errData = { roomName, error: "" };
 
     if (domain) {
-      authenticateToken(domain.token).then((response) => {
-        response.json().then((data) => {
+      authenticateToken(domain.token).then(response => {
+        response.json().then(
+          data => {
             if (response.status === 200) {
               if (data.costPerHour) {
                 data.costPerHour = parseFloat(data.costPerHour);
               }
-              this.setState({conferenceData: data});
+              this.setState({ conferenceData: data });
               this.initConference();
-            } else{
-              this.invalidConference(data)
+            } else {
+              this.invalidConference(data);
             }
-        }, () => this.invalidConference());
-      }, this.invalidConference)
+          },
+          () => this.invalidConference()
+        );
+      }, this.invalidConference);
     } else {
       // No information
       this.invalidConference();
@@ -816,7 +995,7 @@ class Conference extends Component {
   componentWillUnmount() {
     clearInterval(this.intervalId);
     this.cancelPermissionChecker();
-    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function () {
+    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
       this.setState({ joined: null });
     });
     window.easyrtc.hangupAll();
@@ -824,144 +1003,211 @@ class Conference extends Component {
   }
 
   render() {
-    const {redirectHome, room} = this.state;
+    const { redirectHome, room } = this.state;
 
     if (redirectHome) {
-      return <Redirect to={ '/home/' + room } />;
+      return <Redirect to={"/home/" + room} />;
     }
 
     // Modal
-    let modalContent = ""
+    let modalContent = "";
     if (this.state.isLoading) {
-      modalContent = <ReactSpinner color="white" />
+      modalContent = <MDSpinner />;
+    } else {
+      modalContent = this.state.modalText;
     }
-
-    modalContent = (
-      <Modal isOpen={this.state.modal} className="example-dialog">
-        {this.state.modalText}
-      </Modal>
-    );
 
     let modalContentBrowser = "";
     if (this.state.modal.deviceNotFound || this.state.modal.permissionError) {
       if (this.state.modal.deviceNotFound) {
-        modalContentBrowser = "Your computer does not have camera or microphone";
+        modalContentBrowser =
+          "Your computer does not have camera or microphone";
       }
       if (this.state.modal.permissionError) {
         let browser = rtcHelper.detectBrowser();
 
         switch (browser) {
-          case 'chrome':
+          case "chrome":
             modalContentBrowser = (
-              <span>Click the
-                <img alt="" className="permissionIcon" src={CameraIconPermission} />
-                icon in the URL bar above to give Meetcloud access to your computer's camera and microphone.
+              <span>
+                Click the
+                <img
+                  alt=""
+                  className="permissionIcon"
+                  src={CameraIconPermission}
+                />
+                icon in the URL bar above to give Meetcloud access to your
+                computer's camera and microphone.
               </span>
             );
             break;
-          case 'firefox':
+          case "firefox":
             modalContentBrowser = (
-              <span>Se necesitan permisos para utilizar la cámara y el micrófono. Por favor, refresque la pagina y acepte los permisos</span>
+              <span>
+                Se necesitan permisos para utilizar la cámara y el micrófono.
+                Por favor, refresque la pagina y acepte los permisos
+              </span>
             );
             break;
-          case 'edge':
+          case "edge":
             modalContentBrowser = (
-              <span>Se necesitan permisos para utilizar la cámara y el micrófono. Por favor, refresque la pagina y acepte los permisos</span>
+              <span>
+                Se necesitan permisos para utilizar la cámara y el micrófono.
+                Por favor, refresque la pagina y acepte los permisos
+              </span>
             );
             break;
 
-          case 'safari':
+          case "safari":
             modalContentBrowser = (
-              <span>Debe habilitar el plugin TemWebRTCPlugin en la configuracion de seguridad del navegador</span>
+              <span>
+                Debe habilitar el plugin TemWebRTCPlugin en la configuracion de
+                seguridad del navegador
+              </span>
             );
             break;
-          case 'ie':
+          case "ie":
             modalContentBrowser = (
-              <span>Debe habilitar el plugin TemWebRTCPlugin. Luego habilitar los permisos de cámara y micrófono en la configuracion de su navegador</span>
+              <span>
+                Debe habilitar el plugin TemWebRTCPlugin. Luego habilitar los
+                permisos de cámara y micrófono en la configuracion de su
+                navegador
+              </span>
             );
             break;
           default:
             modalContentBrowser = (
-              <span>Se necesitan permisos para utilizar la cámara y el micrófono. Por favor, refresque la pagina y acepte los permisos</span>
+              <span>
+                Se necesitan permisos para utilizar la cámara y el micrófono.
+                Por favor, refresque la pagina y acepte los permisos
+              </span>
             );
             break;
         }
       }
 
       let modalContent = (
-        <Modal isOpen={this.state.modal} className="example-dialog">
+        <div>
           <h3>Meetcloud can't access your camera or microphone.</h3>
-          {modalContentBrowser}
+          <div>{modalContentBrowser}</div>
+        </div>
+      );
+    }
+    let modal = (this.state.modal || this.state.isLoading) && (
+      <div>{modalContent}</div>
+    );
+    let shareContent = "";
+    if (this.state.shareRoom) {
+      shareContent = (
+        <Modal className="share-dialog">
+          <div className="share-text">Invite your friends to this room.</div>
+          <form onSubmit={event => this.invitePersonToConference(event)}>
+            <span className="share-email">Email :</span>
+            <input
+              className="inputText"
+              type="text"
+              value={this.state.invitePersonEmail}
+              onChange={event =>
+                this.setState({ invitePersonEmail: event.target.value })}
+            />
+            <div className="share-text">
+              <button className="button" type="submit">
+                Invite
+              </button>
+            </div>
+          </form>
         </Modal>
       );
     }
-    let modal = (this.state.modal || this.state.isLoading) && <Modal>
-      {modalContent}
-    </Modal>
-    let shareContent = ""
-    if (this.state.shareRoom) {
-      shareContent = <Modal className="share-dialog">
-        <div className="share-text">Invite your friends to this room.</div>
-        <form onSubmit={(event) => this.invitePersonToConference(event)}>
-          <span className="share-email">Email :
-          </span>
-          <input className="inputText" type="text" value={this.state.invitePersonEmail} onChange={(event) => this.setState({ invitePersonEmail: event.target.value })}></input>
-          <div className="share-text">
-            <button className="button" type="submit">Invite</button>
-          </div>
-        </form>
-      </Modal>
-    }
 
-    let shareRoomModal = (this.state.shareRoom) && <Modal>{shareContent}
-    </Modal>
+    let shareRoomModal = this.state.shareRoom && { shareContent };
     // Empty room
-    let emptyRoom = ""
+    let emptyRoom = "";
     if (this.state.sharingWithMe.length === 0) {
-      emptyRoom = (
-        <span>Room is empty, waiting...</span>
-      )
+      emptyRoom = <span>Room is empty, waiting...</span>;
     }
-    let header = ""
+    let header = "";
     if (this.state.joined != null) {
-      header = (<Header durationCall={this.state.joined.duration} unreadMessages={this.state.unreadMessages} openChat={this.openChat} cost={this.state.joined.cost} />)
+      header = (
+        <Header
+          durationCall={this.state.joined.duration}
+          unreadMessages={this.state.unreadMessages}
+          openChat={this.openChat}
+          cost={this.state.joined.cost}
+        />
+      );
     }
     return (
       <div className="Conference">
         <NotificationSystem ref="notificationSystem" />
-        <video muted className="videoBackground" id="video-selected"></video>
-        {modal}
+        <video muted className="videoBackground" id="video-selected" />
+        <Modal isOpen={this.state.modal || this.state.isLoading}>
+          {modalContent}
+        </Modal>
         {shareRoomModal}
         {this.state.sharingWithMe.length > 0 && (
-          <div className="conferenceHeader"></div>
+          <div className="conferenceHeader" />
         )}
         <img alt="" className="conferenceLogo" src={ConferenceLogo} /> {header}
         <div className="emptyRoom">{emptyRoom}</div>
         <div className="videoList">
           <div className="row start">
             <div className="col">
-              <div className="box box-video" onClick={(event) => {
-                this.setFullScreenVideo("me")
-              }}>
+              <div
+                className="box box-video"
+                onClick={event => {
+                  this.setFullScreenVideo("me");
+                }}
+              >
                 <span className="videoNameSelf">You</span>
-                <video id="self-video-div" muted className={this.state.selectedUser === "me"
-                  ? 'selfVideo selected'
-                  : 'selfVideo'}></video>
+                <video
+                  id="self-video-div"
+                  muted
+                  className={
+                    this.state.selectedUser === "me"
+                      ? "selfVideo selected"
+                      : "selfVideo"
+                  }
+                />
               </div>
             </div>
             {this.state.sharingWithMe.map(user => {
-              return <div key={user.id} className="col">
-                <div className="box box-video" onClick={(event) => this.setFullScreenVideo(user)}>
-                  <UserVideo selected={this.state.selectedUser && this.state.selectedUser.id === user.id} user={user} />
+              return (
+                <div key={user.id} className="col">
+                  <div
+                    className="box box-video"
+                    onClick={event => this.setFullScreenVideo(user)}
+                  >
+                    <UserVideo
+                      selected={
+                        this.state.selectedUser &&
+                        this.state.selectedUser.id === user.id
+                      }
+                      user={user}
+                    />
+                  </div>
                 </div>
-              </div>
+              );
             })}
           </div>
         </div>
-        <Footer onCameraClick={this.switchCamera} onMicClick={this.switchMic} onShareClick={this.shareRoomWithContact} onShareScreenClick={this.shareScreen} shareScreenEnabled={this.state.sharingScreen} cameraEnabled={this.state.camera} micEnabled={this.state.mic} />
-        <Chat messages={this.state.messages} opened={this.state.showChat} onCloseChat={this.closeChat} onSendMessage={this.sendMessage} />
+        <Footer
+          onCameraClick={this.switchCamera}
+          onMicClick={this.switchMic}
+          onShareClick={this.shareRoomWithContact}
+          onShareScreenClick={this.shareScreen}
+          shareScreenEnabled={this.state.sharingScreen}
+          cameraEnabled={this.state.camera}
+          micEnabled={this.state.mic}
+        />
+        <Chat
+          messages={this.state.messages}
+          opened={this.state.showChat}
+          onCloseChat={this.closeChat}
+          onSendMessage={this.sendMessage}
+        />
       </div>
-    )
+    );
   }
 }
 export default Conference;

@@ -12,6 +12,7 @@ import { store } from "./store/store";
 import { Route, BrowserRouter, Redirect } from "react-router-dom";
 // pages
 import HomePage from "./pages/home/HomePage";
+import ConferencePage from "./pages/conference/ConferencePage";
 
 const None = props => <Redirect to={{ pathname: "/home" }} />;
 
@@ -21,7 +22,7 @@ const router = (
       <div>
         <Route path="/" exact component={None} />
         <Route path="/home/:roomName?" component={HomePage} />
-        <Route path="/conference/:roomName" component={Conference} />
+        <Route path="/conference/:roomName" component={ConferencePage} />
       </div>
     </BrowserRouter>
   </Provider>

@@ -34,7 +34,8 @@ const defaultState = {
         error: null
     },
     conference: {
-        peers:[]
+        peers:[],
+        domain:{}
     }
 };
 

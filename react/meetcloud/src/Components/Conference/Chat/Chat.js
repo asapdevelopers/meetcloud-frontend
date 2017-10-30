@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import CloseIcon from 'react-icons/lib/md/close';
 import MdTagFaces from 'react-icons/lib/md/tag-faces';
 import {Picker} from 'emoji-mart';
-import Linkify from 'linkifyjs/react';
+//import Linkify from 'linkifyjs/react';
 import {emojify} from 'react-emojione';
 
 class Chat extends Component {
@@ -85,7 +85,8 @@ class Chat extends Component {
                         <time>{message.date.format("LT")}</time>
                       </p>
                       <p>
-                        <Linkify>{emojify(message.msg, this.state.emojiOptions)}</Linkify>
+                        {/*<Linkify>*/}
+                        {emojify(message.msg, this.state.emojiOptions)}
                       </p>
                     </div>
                   </li>
@@ -98,7 +99,8 @@ class Chat extends Component {
                           <time>{message.date.format("LT")}</time>
                         </p>
                         <p>
-                          <Linkify>{emojify(message.msg)}</Linkify>
+                          {/*<Linkify>*/}
+                          {emojify(message.msg)}
                         </p>
                       </div>
                     </li>

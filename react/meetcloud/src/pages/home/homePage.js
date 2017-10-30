@@ -6,6 +6,7 @@ import { authenticateDomain } from "../../Services/conference/conferenceApi";
 // Actions
 import * as AuthActions from "../../store/actions/auth";
 import * as SettingsActions from "../../store/actions/settings";
+import * as ConferenceActions from "../../store/actions/conferene";
 // Redux
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -32,7 +33,8 @@ class HomePage extends Component {
       roomName: roomName,
       userName: "",
       backgroundImage: background,
-      redirect: false
+      redirect: false,
+      showModal:true
     };
   }
 
@@ -61,6 +63,7 @@ class HomePage extends Component {
     };
     localStorage["conference"] = JSON.stringify({ domain });
     localStorage["username"] = this.state.userName;
+    this.props.conferenceActions.addConferenceData(domain);
     this.setState({ redirect: true });
     this.props.history.push("/conference/" + domain.roomName);
   };
@@ -79,10 +82,6 @@ class HomePage extends Component {
 
   render() {
     const { redirect } = this.state;
-
-    if (redirect) {
-      return <Redirect to="/conference" />;
-    }
 
     var sectionStyle = {
       background: `url("${this.state.backgroundImage}") no-repeat center`,
@@ -188,11 +187,13 @@ class HomePage extends Component {
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  settings: state.settings
+  settings: state.settings,
+  confernece:state.conference
 });
 
 const mapDispatchToProps = dispatch => ({
   authActions: bindActionCreators(AuthActions, dispatch),
+  conferenceActions: bindActionCreators(ConferenceActions, dispatch),
   settingsActions: bindActionCreators(SettingsActions, dispatch)
 });
 
