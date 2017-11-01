@@ -4,6 +4,7 @@ const browser = require("detect-browser");
 
 // private functions
 function callEveryoneElse(roomName, otherPeople) {
+  debugger;
   console.log("Calling others");
   // so we're only called once.
   window.easyrtc.setRoomOccupantListener(null);
@@ -45,10 +46,16 @@ export function createConnection(
   onJoinSuccess,
   onJoinError,
   onConnectSuccess,
-  onConnectError
+  onConnectError,
+  username,
+  token
 ) {
-  // What to do when a new lister arrives
+  // To call everyone else
   window.easyrtc.setRoomOccupantListener(callEveryoneElse);
+  // When losing connect
+  window.easyrtc.setDisconnectListener(function() {
+    console.log("LOST-CONNECTION", "Lost connection to signaling server");
+  });
   // Before connecting we have to `joinRoom` to avoid entering to the default room
   window.easyrtc.joinRoom(roomName, {}, onJoinSuccess, onJoinError);
   // We get access to the local media stream
@@ -59,11 +66,16 @@ export function createConnection(
         selfVideo,
         window.easyrtc.getLocalStream()
       );
+      window.easyrtc.setUsername(localStorage["username"]);
+      window.easyrtc.setCredential({ token });
       window.easyrtc.connect(
         conferenceConsts.WEB_RTC_APP,
         onConnectSuccess,
         onConnectError
       );
+      window.easyrtc.setOnHangup(function(easyrtcid, slot) {
+        debugger;
+      });
     },
     msg => {
       //error

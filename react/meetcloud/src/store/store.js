@@ -40,7 +40,7 @@ const defaultState = {
     },
     conference: {
         peers:[],
-        domain:domainData
+        domain:domainData.domain
     }
 };
 
@@ -53,5 +53,3 @@ export const store = createStore(rootReducer, defaultState, enhancer);
 
 // Run saga middleware
 sagaMiddleware.run(AuthSaga);
-sagaMiddleware.run(VideosSaga);
-sagaMiddleware.run(ProfileSaga);

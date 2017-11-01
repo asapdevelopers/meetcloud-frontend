@@ -23,25 +23,24 @@ class ConferencePage extends Component {
     };
   }
 
-  onJoinSucess = () => {
-    debugger;
+  onJoinSucess = (easyrtcid, roomOwner) => {
     console.log("join sucess");
   };
-  onJoinError = () => {
+  onJoinError = (error) => {
     debugger;
     console.log("join error");
   };
 
   onConnectSucess = () => {
-    debugger;
     console.log("connect succees");
   };
-  onConnectError = () => {
+  onConnectError = (error, a, b, c) => {
     debugger;
     console.log("connect error");
   };
 
   componentDidMount() {
+    debugger;
     RTCHelper.initializeEasyRTC(this.props.conference.domain.server);
     RTCHelper.createConnection(
       this.props.conference.domain.roomToJoin,
@@ -49,7 +48,9 @@ class ConferencePage extends Component {
       this.onJoinSucess,
       this.onJoinError,
       this.onConnectSucess,
-      this.onConnectError
+      this.onConnectError,
+      localStorage["username"],
+      this.props.conference.domain.token
     );
   }
 

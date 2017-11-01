@@ -13,7 +13,7 @@ import { connect } from "react-redux";
 //Router
 import { withRouter, Redirect } from "react-router-dom";
 // Components
-import ContactUs from '../../Components/ContactUs/ContactUs';
+import ContactUs from "../../Components/ContactUs/ContactUs";
 
 const domain = window.location.hostname;
 
