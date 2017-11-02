@@ -3,7 +3,7 @@ export const WEB_RTC_APP = 'app';
 export const CHAT_MESSAGE_TYPE = 'chatMessage';
 export const WAKE_UP_MESSAGE_TYPE = 'wakeUpMessage';
 export const SCREEN_SHARING_STREAM_NAME = 'ssharing';
-export const DEBUG = true;
+export const DEBUG = false; //TODO
 export const MAX_CALLERS = 10;
 
 // audios

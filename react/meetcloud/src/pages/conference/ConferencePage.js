@@ -5,6 +5,8 @@ import "./ConferencePage.css";
 import { getBackgroundImage } from "../../Services/helpers/general";
 import { authenticateDomain } from "../../Services/conference/conferenceApi";
 import * as RTCHelper from "../../Services/helpers/easyrtcHelper";
+// Components
+import UserVideo from "../../Components/Conference/UserVideo/UserVideo";
 // Actions
 import * as AuthActions from "../../store/actions/auth";
 import * as SettingsActions from "../../store/actions/settings";
@@ -26,7 +28,7 @@ class ConferencePage extends Component {
   onJoinSucess = (easyrtcid, roomOwner) => {
     console.log("join sucess");
   };
-  onJoinError = (error) => {
+  onJoinError = error => {
     debugger;
     console.log("join error");
   };
@@ -34,13 +36,13 @@ class ConferencePage extends Component {
   onConnectSucess = () => {
     console.log("connect succees");
   };
+
   onConnectError = (error, a, b, c) => {
     debugger;
     console.log("connect error");
   };
 
   componentDidMount() {
-    debugger;
     RTCHelper.initializeEasyRTC(this.props.conference.domain.server);
     RTCHelper.createConnection(
       this.props.conference.domain.roomToJoin,
@@ -55,9 +57,10 @@ class ConferencePage extends Component {
   }
 
   render() {
+    const { peers } = this.props.conference;
     return (
       <div className="ConferencePage">
-        Conference
+        Mi camara
         <video
           id="self-video-div"
           muted
@@ -67,6 +70,12 @@ class ConferencePage extends Component {
               : "selfVideo"
           }
         />
+        <video id="caller1" style={{visibility:'hidden'}} />
+        <video id="caller2" style={{visibility:'hidden'}} />
+        <video id="caller3" style={{visibility:'hidden'}} />
+        {peers.map(p => {
+          return <UserVideo key={p.easyrtcid} user={p} />;
+        })}
       </div>
     );
   }
