@@ -1,9 +1,11 @@
 import { store } from "../../store/store";
 import * as conferenceConsts from "../../constants/conference";
 import * as conferenceActions from "../../constants/actions/conferenceActions";
+const browser = require("detect-browser");
 
 const maxCALLERS = conferenceConsts.MAX_CALLERS;
 var connectCount = 0;
+var globalRoomName = "";
 
 function getIdOfBox(boxNum) {
   return "box" + boxNum;
@@ -11,12 +13,7 @@ function getIdOfBox(boxNum) {
 
 function callEverybodyElse(roomName, otherPeople) {
   window.easyrtc.setRoomOccupantListener(null); // so we're only called once.
-
-  /*store.dispatch({
-    type: conferenceActions.CONFERENCE_PEERS_UPDATE_LIST,
-    payload: otherPeople
-  });*/
-
+  debugger;
   var list = [];
   var connectCount = 0;
   for (var easyrtcid in otherPeople) {
@@ -49,10 +46,6 @@ function callEverybodyElse(roomName, otherPeople) {
   }
 }
 
-function loginSuccess() {
-  //expandThumb(0);  // expand the mirror image initially.
-}
-
 function messageListener(easyrtcid, msgType, content) {
   for (var i = 0; i < maxCALLERS; i++) {
     if (window.easyrtc.getIthCaller(i) == easyrtcid) {
@@ -60,10 +53,11 @@ function messageListener(easyrtcid, msgType, content) {
   }
 }
 
+// Event that add a new stream to the call
 window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
   store.dispatch({
     type: conferenceActions.CONFERENCE_PEERS_ADD_PEER,
-    payload: {callerEasyrtcid, stream}
+    payload: { callerEasyrtcid, stream }
   });
   setTimeout(() => {
     debugger;
@@ -77,9 +71,8 @@ window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
   }, 100);
 });
 
+// Evenet that removes an stream from the call
 window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
-  /*debugger;
-  window.easyrtc.setVideoObjectSrc(document.getElementById("box1"), "");*/
   var video =
     document.getElementById("u-" + callerEasyrtcid) ||
     document.getElementById("us-" + callerEasyrtcid);
@@ -89,75 +82,218 @@ window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
   }
 });
 
-export function appInit(domainServer) {
-  // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
-  window.easyrtc.setSocketUrl(domainServer, {
-    transports: ["websocket"],
-    reconnection: false
-  });
-  window.easyrtc.enableDebug(true);
-  window.easyrtc.setOnError(function(e) {
-    // Prevent anoying pop up.
-    console.log("error from easyrtc:", e);
-  });
-  window.easyrtc.setRoomOccupantListener(callEverybodyElse);
-  //window.easyrtc.easyApp("app", "box0", ["box1", "box2", "box3"], loginSuccess);
-  window.easyrtc.setAutoInitUserMedia(true);
-
-  // Enable audio and video medias. This can only be changed before connecting so careful.
-  // These are used for calling and should be disabled if the media doesn't work otherwise connection
-  // will be slower and won't properly work
-  window.easyrtc.enableAudio(true);
-  window.easyrtc.enableVideo(true);
-  window.easyrtc.enableDataChannels(true);
-  window.easyrtc.enableVideoReceive(true);
-  window.easyrtc.enableAudioReceive(true);
-
-  // Some defaults. The simply turn on/off
-  window.easyrtc.enableCamera(true);
-  window.easyrtc.enableMicrophone(true);
-
-  window.easyrtc.setPeerListener(messageListener);
-  window.easyrtc.setDisconnectListener(function() {
-    window.easyrtc.showError(
-      "LOST-CONNECTION",
-      "Lost connection to signaling server"
-    );
-  });
-
-  window.easyrtc.initMediaSource(
-    () => {
-      // success callback
-      var selfVideo = document.getElementById("self-video-div");
-      window.easyrtc.setVideoObjectSrc(
-        selfVideo,
-        window.easyrtc.getLocalStream()
-      );
-      window.easyrtc.connect(
-        "Company_Chat_Line",
-        () => console.log("success"),
-        (e, e1) => console.log(e, e1)
-      );
-    },
-    (e1, e2) => console.log(e1, e2)
+// Media got successfully
+function mediaSuccess(rommName) {
+  //this.removePopup();
+  var selfVideo = document.getElementById("self-video-div");
+  window.easyrtc.setVideoObjectSrc(selfVideo, window.easyrtc.getLocalStream());
+  window.easyrtc.connect(
+    globalRoomName,
+    () => console.log("success"),
+    (e, e1) => console.log(e, e1)
   );
-  /*window.easyrtc.setOnCall(function(easyrtcid, slot) {
-    console.log("getConnection count=" + window.easyrtc.getConnectionCount());
-    boxUsed[slot + 1] = true;
-    if (activeBox == 0) {
-      // first connection
-    }
-  });
+  window.easyrtc.enableMicrophone(true);
+  window.easyrtc.enableCamera(true);
+}
 
-  window.easyrtc.setOnHangup(function(easyrtcid, slot) {
-    boxUsed[slot + 1] = false;
-
-    setTimeout(function() {
-      document.getElementById(getIdOfBox(slot + 1)).style.visibility = "hidden";
-
-      if (window.easyrtc.getConnectionCount() == 0) {
-        // no more connections
+// Media error
+function mediaError() {
+  mediaError = (a, b) => {
+    console.log("Failed to get media source first time, trying again: ", a, b);
+    // On media error attempt to disable all media features
+    // so we can still receive connections
+    window.easyrtc.enableVideo(false);
+    //try again with only audio
+    window.easyrtc.initMediaSource(mediaSuccess, () => {
+      console.log("Failed to get media source a second time: ", a, b);
+      window.easyrtc.disconnect();
+      //TODO: create a redux action to show the popup
+      if (a.includes("MEDIA_ERR")) {
+        if (
+          b.includes("PermissionDeniedError") ||
+          b.includes("SecurityError")
+        ) {
+          this.showPopup("", false, "permissionError");
+        }
+        if (b.includes("DevicesNotFoundError")) {
+          this.showPopup("", false, "deviceNotFound");
+        }
+        if (b.includes("NotFoundError")) {
+          this.showPopup("", false, "deviceNotFound");
+        }
+      } else {
+        this.showPopup("Failed to connect, please try again.");
       }
-    }, 20);
-  });*/
+    });
+  };
+}
+
+// Init method
+export function appInit(domainServer, roomName, username) {
+  if (
+    window.easyrtc.supportsGetUserMedia &&
+    window.easyrtc.supportsGetUserMedia()
+  ) {
+    globalRoomName = roomName;
+    // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
+    window.easyrtc.setSocketUrl(domainServer, {
+      transports: ["websocket"],
+      reconnection: false
+    });
+    window.easyrtc.enableDebug(conferenceConsts.DEBUG);
+    window.easyrtc.setOnError(function(e) {
+      console.log("error from easyrtc:", e);
+    });
+    window.easyrtc.setRoomOccupantListener(callEverybodyElse);
+    //window.easyrtc.setAutoInitUserMedia(true);
+
+    // Enable audio and video medias. This can only be changed before connecting so careful.
+    // These are used for calling and should be disabled if the media doesn't work otherwise connection
+    // will be slower and won't properly work
+    window.easyrtc.enableAudio(true);
+    window.easyrtc.enableVideo(true);
+    window.easyrtc.enableDataChannels(true);
+    window.easyrtc.enableVideoReceive(true);
+    window.easyrtc.enableAudioReceive(true);
+    window.easyrtc.setUsername(username);
+
+    // Some defaults. The simply turn on/off
+    window.easyrtc.enableCamera(true);
+    window.easyrtc.enableMicrophone(true);
+
+    window.easyrtc.setPeerListener(messageListener);
+    window.easyrtc.setDisconnectListener(function() {
+      window.easyrtc.showError(
+        "LOST-CONNECTION",
+        "Lost connection to signaling server"
+      );
+    });
+
+    window.easyrtc.initMediaSource(mediaSuccess, mediaError);
+  } else {
+    console.log("Browser does not support WebRTC");
+  }
+}
+
+// Media methods
+export function* getAudioSourceList() {
+  //var index = 0;
+  var selectedAudioDevice = null;
+  var audioDevices = [];
+
+  yield new Promise(resolve => {
+    window.easyrtc.getAudioSourceList(function(audioList) {
+      let savedAudioDeviceId = localStorage.getItem("selectedAudioDeviceId");
+
+      for (var i = 0; i < audioList.length; i++) {
+        let a = audioList[i];
+        // Copy object because we can't modify the original one
+        a = {
+          deviceId: a.deviceId,
+          label: a.label
+        };
+        if (!a.label) {
+          a.label = "Mic " + (i + 1);
+        }
+        if (savedAudioDeviceId === a.deviceId) {
+          selectedAudioDevice = a;
+        }
+        audioDevices.push(a);
+      }
+      if (audioDevices.length > 0 && !selectedAudioDevice) {
+        selectedAudioDevice = audioDevices[0];
+      }
+      resolve({ selectedAudioDevice, audioDevices });
+    });
+  });
+}
+
+export function* getVideoSourceList() {
+  var selectedVideoDevice = null;
+  var videoDevices = [];
+
+  yield new Promise(resolve => {
+    window.easyrtc.getVideoSourceList(function(videoList) {
+      let savedVideoDeviceId = localStorage.getItem("selectedVideoDeviceId");
+
+      for (var i = 0; i < videoList.length; i++) {
+        let a = videoList[i];
+        // Copy object because we can't modify the original one
+        a = {
+          deviceId: a.deviceId,
+          label: a.label
+        };
+
+        if (!a.label) {
+          a.label = "Cam " + (i + 1);
+        }
+
+        if (savedVideoDeviceId === a.deviceId) {
+          selectedVideoDevice = a;
+        }
+
+        videoDevices.push(a);
+      }
+      if (videoDevices.length > 0 && !selectedVideoDevice) {
+        selectedVideoDevice = videoDevices[0];
+      }
+      //TODO: check if camera is enabled
+      let cameraEnabled = true;
+      if (videoDevices.length === 0) {
+        cameraEnabled = false;
+      }
+      resolve({ selectedVideoDevice, videoDevices, cameraEnabled });
+    });
+  });
+}
+
+export function* getAudioSinkList() {
+  var audioOutputDevices = [];
+  var selectedAudioOutputDevice = null;
+
+  yield new Promise(resolve => {
+    window.easyrtc.getAudioSinkList(function(outputList) {
+      audioOutputDevices = [];
+
+      let savedAudioOutputDeviceId = localStorage.getItem(
+        "selectedAudioOutputDeviceId"
+      );
+
+      for (var i = 0; i < outputList.length; i++) {
+        let a = outputList[i];
+        // Copy object because we can't modify the original one
+        a = {
+          deviceId: a.deviceId,
+          label: a.label
+        };
+
+        if (!a.label) {
+          a.label = "Audio Out " + (i + 1);
+        }
+
+        if (savedAudioOutputDeviceId === a.deviceId) {
+          selectedAudioOutputDevice = a;
+        }
+
+        audioOutputDevices.push(a);
+      }
+      if (audioOutputDevices.length > 0 && !selectedAudioOutputDevice) {
+        selectedAudioOutputDevice = audioOutputDevices[0];
+      }
+    });
+  });
+}
+
+// Detect browser methods
+export function detectBrowser() {
+  if (browser) {
+    return browser.name;
+  } else {
+    return "other";
+  }
+}
+
+// Play sounds
+export function playSound(obj) {
+  obj.play();
 }

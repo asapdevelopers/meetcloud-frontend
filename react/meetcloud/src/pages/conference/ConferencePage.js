@@ -4,10 +4,9 @@ import logo from "../../assets/logo.png";
 import "./ConferencePage.css";
 import { getBackgroundImage } from "../../Services/helpers/general";
 import { authenticateDomain } from "../../Services/conference/conferenceApi";
-import * as RTCHelper from "../../Services/helpers/easyrtcHelper";
 import * as RTCHelper2 from "../../Services/helpers/easyapp";
 // Components
-import UserVideo from "../../Components/Conference/UserVideo/UserVideo";
+import Conference from "../../Components/Conference/Conference";
 // Actions
 import * as AuthActions from "../../store/actions/auth";
 import * as SettingsActions from "../../store/actions/settings";
@@ -22,58 +21,21 @@ class ConferencePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      roomName: "",
       selectedUser: null
     };
   }
 
-  onJoinSucess = (easyrtcid, roomOwner) => {
-    console.log("join sucess");
-  };
-  onJoinError = error => {
-    debugger;
-    console.log("join error");
-  };
-
-  onConnectSucess = () => {
-    console.log("connect succees");
-  };
-
-  onConnectError = (error, a, b, c) => {
-    debugger;
-    console.log("connect error");
-  };
-
   componentDidMount() {
-    /*RTCHelper.initializeEasyRTC(this.props.conference.domain.server);
-    RTCHelper.createConnection(
-      this.props.conference.domain.roomToJoin,
-      document.getElementById("self-video-div"),
-      this.onJoinSucess,
-      this.onJoinError,
-      this.onConnectSucess,
-      this.onConnectError,
-      localStorage["username"],
-      this.props.conference.domain.token
-    );*/
-    RTCHelper2.appInit(this.props.conference.domain.server);
+    this.setState({roomName: this.props.match.params.roomName});
   }
 
   render() {
-    const { peers } = this.props.conference;
+    const { conference } = this.props;
+    const { roomName } = this.state;
     return (
-      <div className="ConferencePage">
-        {<video
-          id="self-video-div"
-          muted
-          className={
-            this.state.selectedUser === "me"
-              ? "selfVideo selected"
-              : "selfVideo"
-          }
-        />}
-        {peers.map(p => {
-          return <UserVideo key={p.callerEasyrtcid} user={p} />;
-        })}
+      <div className="conferencePage">
+        <Conference conference={conference} peers={conference.peers} roomName={roomName}/>
       </div>
     );
   }
