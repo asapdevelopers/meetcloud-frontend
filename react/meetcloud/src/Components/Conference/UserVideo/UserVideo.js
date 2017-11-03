@@ -10,8 +10,8 @@ class UserVideo extends Component {
       video = (
         <video
           className={selected ? "videoContainer selected" : "videoContainer"}
-          key={"u-" + user.easyrtcid}
-          id={"u-" + user.easyrtcid}
+          key={"u-" + user.callerEasyrtcid}
+          id={"u-" + user.callerEasyrtcid}
         />
       );
     }
@@ -19,8 +19,8 @@ class UserVideo extends Component {
       video = (
         <video
           className={selected ? "videoContainer selected" : "videoContainer"}
-          key={"us-" + user.easyrtcid}
-          id={"us-" + user.easyrtcid}
+          key={"us-" + user.callerEasyrtcid}
+          id={"us-" + user.callerEasyrtcid}
         />
       );
     }

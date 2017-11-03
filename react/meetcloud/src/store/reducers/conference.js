@@ -6,6 +6,21 @@ function conferenceReducer(state = [], { type, payload }) {
       let peers = Object.values(payload);
       return { ...state, peers };
     }
+    case conferenceActions.CONFERENCE_PEERS_ADD_PEER: {
+      debugger;
+      return {
+        ...state,
+        peers: [
+          ...state.peers,
+          {
+            callerEasyrtcid: payload.callerEasyrtcid,
+            stream: payload.stream,
+            hasVideo:true,
+            hasAudio:true
+          }
+        ]
+      };
+    }
     case conferenceActions.CONFERENCE_PEERS_UPDATE_PEER_SETTINGS: {
       let index = state.peers.findIndex(x => x.easyrtcid === payload);
       if (index !== -1) {
@@ -16,8 +31,8 @@ function conferenceReducer(state = [], { type, payload }) {
             ...state.peers.slice(0, index),
             {
               ...state.peers[index],
-              hasVideo: true,//window.easyrtc.haveVideoTrack(payload),
-              hasAudio: true//window.easyrtc.haveAudioTrack(payload)
+              hasVideo: true, //window.easyrtc.haveVideoTrack(payload),
+              hasAudio: true //window.easyrtc.haveAudioTrack(payload)
             },
             ...state.peers.slice(index + 1)
           ]

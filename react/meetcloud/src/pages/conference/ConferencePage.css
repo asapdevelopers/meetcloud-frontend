@@ -3,7 +3,11 @@
   height: 150px;
   margin-left: 20px;
   cursor: pointer;
-  margin-right: 10px; }
+  margin-right: 10px;
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  /* Safari and Chrome */
+  -moz-transform: rotateY(180deg); }
 
 .emptyRoom {
   display: flex;

@@ -5,6 +5,7 @@ import "./ConferencePage.css";
 import { getBackgroundImage } from "../../Services/helpers/general";
 import { authenticateDomain } from "../../Services/conference/conferenceApi";
 import * as RTCHelper from "../../Services/helpers/easyrtcHelper";
+import * as RTCHelper2 from "../../Services/helpers/easyapp";
 // Components
 import UserVideo from "../../Components/Conference/UserVideo/UserVideo";
 // Actions
@@ -43,7 +44,7 @@ class ConferencePage extends Component {
   };
 
   componentDidMount() {
-    RTCHelper.initializeEasyRTC(this.props.conference.domain.server);
+    /*RTCHelper.initializeEasyRTC(this.props.conference.domain.server);
     RTCHelper.createConnection(
       this.props.conference.domain.roomToJoin,
       document.getElementById("self-video-div"),
@@ -53,15 +54,15 @@ class ConferencePage extends Component {
       this.onConnectError,
       localStorage["username"],
       this.props.conference.domain.token
-    );
+    );*/
+    RTCHelper2.appInit(this.props.conference.domain.server);
   }
 
   render() {
     const { peers } = this.props.conference;
     return (
       <div className="ConferencePage">
-        Mi camara
-        <video
+        {<video
           id="self-video-div"
           muted
           className={
@@ -69,12 +70,9 @@ class ConferencePage extends Component {
               ? "selfVideo selected"
               : "selfVideo"
           }
-        />
-        <video id="caller1" style={{visibility:'hidden'}} />
-        <video id="caller2" style={{visibility:'hidden'}} />
-        <video id="caller3" style={{visibility:'hidden'}} />
+        />}
         {peers.map(p => {
-          return <UserVideo key={p.easyrtcid} user={p} />;
+          return <UserVideo key={p.callerEasyrtcid} user={p} />;
         })}
       </div>
     );
