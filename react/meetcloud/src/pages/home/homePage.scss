@@ -39,51 +39,6 @@
     margin-top: 75px;
   }
 
-  .text {
-    color: #FFFFFF;
-    font-size: 14px;
-    line-height: 19px;
-    margin-bottom: 5px;
-    margin-top: 15px;
-    font-family: 'Open Sans', sans-serif;
-  }
-
-  .inputText {
-    height: 40px;
-    width: 95%;
-    border-radius: 8px;
-    background-color: #FFFFFF;
-    color: #4A4A4A;
-    font-family: "Open Sans";
-    font-size: 14px;
-    line-height: 19px;
-    outline: none;
-    border: none;
-    padding: 0 10px;
-  }
-
-  .full {
-    width: 100%;
-  }
-
-  .button {
-    cursor: pointer;
-    height: 40px;
-    width: 190px;
-    border: 1px solid #1B75BB;
-    border-radius: 8px;
-    background-color: #67C4F9;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-    color: #FFFFFF;
-    font-size: 14px;
-    line-height: 19px;
-    text-align: center;
-    margin-top: 15px;
-    font-family: 'Open Sans';
-    font-weight: 300;
-
-  }
-
   .contactUs {
     margin-top: 20px;
   }
@@ -94,48 +49,5 @@
     font-weight: 300;
     line-height: 19px;
     text-align: start;
-  }
-
-  // Responsive
-  @media (min-width: 300px) {
-    .col-responsive {
-      width: 85%;
-    }
-    .button {
-      width: 60%;
-    }
-  }
-
-  @media (max-width: 700px) {
-    .App-footer {
-      display: none;
-    }
-  }
-
-  @media (min-width: 600px) {
-    .col-responsive {
-      width: 80%;
-    }
-    .button {
-      width: 50%;
-    }
-  }
-
-  @media (min-width: 800px) {
-    .col-responsive {
-      width: 60%;
-    }
-    .button {
-      width: 40%;
-    }
-  }
-
-  @media (min-width: 900px) {
-    .col-responsive {
-      width: 25%;
-    }
-    .button {
-      width: 40%;
-    }
   }
 }

@@ -12,7 +12,17 @@ export const updatePeers = peerList => ({
   payload: peerList
 });
 
-export const updatePeerSettings = id => ({
-  type: conferenceActions.CONFERENCE_PEERS_UPDATE_PEER_SETTINGS,
-  payload: id
+export const updateOtherPeople = list => ({
+  type: conferenceActions.CONFERENCE_UPDATE_OTHER_PEOPLE,
+  payload: list
 });
+
+
+// media
+export const switchCamera = () => ({
+  type:conferenceActions.CONFERENCE_SWITCH_CAMERA
+})
+
+export const switchMic = () => ({
+  type:conferenceActions.CONFERENCE_SWITCH_MIC
+})

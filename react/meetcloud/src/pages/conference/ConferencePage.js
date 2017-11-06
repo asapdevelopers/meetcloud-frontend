@@ -11,6 +11,7 @@ import Conference from "../../Components/Conference/Conference";
 import * as AuthActions from "../../store/actions/auth";
 import * as SettingsActions from "../../store/actions/settings";
 import * as ConferenceActions from "../../store/actions/conferene";
+import * as ChatActions from "../../store/actions/chat";
 // Redux
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -31,11 +32,11 @@ class ConferencePage extends Component {
   }
 
   render() {
-    const { conference } = this.props;
+    const { conference, chat } = this.props;
     const { roomName } = this.state;
     return (
       <div className="conferencePage">
-        <Conference conference={conference} peers={conference.peers} roomName={roomName}/>
+        <Conference conference={conference} peers={conference.peers} roomName={roomName} chat={chat}/>
       </div>
     );
   }
@@ -44,11 +45,13 @@ class ConferencePage extends Component {
 const mapStateToProps = state => ({
   auth: state.auth,
   conference: state.conference,
-  settings: state.settings
+  settings: state.settings,
+  chat:state.chat
 });
 
 const mapDispatchToProps = dispatch => ({
   authActions: bindActionCreators(AuthActions, dispatch),
+  chatACtions:bindActionCreators(ChatActions, dispatch),
   conferenceACtions: bindActionCreators(ConferenceActions, dispatch),
   settingsActions: bindActionCreators(SettingsActions, dispatch)
 });

@@ -1,6 +1,7 @@
 import { store } from "../../store/store";
 import * as conferenceConsts from "../../constants/conference";
 import * as conferenceActions from "../../constants/actions/conferenceActions";
+import * as actions from "../../store/actions/conferene";
 const browser = require("detect-browser");
 
 const maxCALLERS = conferenceConsts.MAX_CALLERS;
@@ -13,7 +14,7 @@ function getIdOfBox(boxNum) {
 
 function callEverybodyElse(roomName, otherPeople) {
   window.easyrtc.setRoomOccupantListener(null); // so we're only called once.
-  debugger;
+
   var list = [];
   var connectCount = 0;
   for (var easyrtcid in otherPeople) {
@@ -24,10 +25,6 @@ function callEverybodyElse(roomName, otherPeople) {
   // empty slots.
   function establishConnection(position) {
     function callSuccess(id) {
-      store.dispatch({
-        type: conferenceActions.CONFERENCE_PEERS_UPDATE_PEER_SETTINGS,
-        payload: id
-      });
       connectCount++;
       if (connectCount < maxCALLERS && position > 0) {
         establishConnection(position - 1);
@@ -55,12 +52,12 @@ function messageListener(easyrtcid, msgType, content) {
 
 // Event that add a new stream to the call
 window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
+  let username = window.easyrtc.idToName(callerEasyrtcid);
   store.dispatch({
     type: conferenceActions.CONFERENCE_PEERS_ADD_PEER,
-    payload: { callerEasyrtcid, stream }
+    payload: { callerEasyrtcid, stream, username }
   });
   setTimeout(() => {
-    debugger;
     var video =
       document.getElementById("u-" + callerEasyrtcid) ||
       document.getElementById("us-" + callerEasyrtcid);
@@ -73,23 +70,21 @@ window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
 
 // Evenet that removes an stream from the call
 window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
-  var video =
-    document.getElementById("u-" + callerEasyrtcid) ||
-    document.getElementById("us-" + callerEasyrtcid);
-  if (video) {
-    console.log("Cleaning video stream");
-    window.easyrtc.setVideoObjectSrc(video, "");
-  }
+  store.dispatch({
+    type: conferenceActions.CONFERENCE_PEERS_REMOVE_PEER,
+    payload: { callerEasyrtcid}
+  });
 });
 
 // Media got successfully
 function mediaSuccess(rommName) {
-  //this.removePopup();
+  store.dispatch({type:conferenceActions.CONFERECE_HIDE_LOADING});
+  store.dispatch({type:conferenceActions.CONFERECE_UPDATE_JOINED_DATA, payload:true});
   var selfVideo = document.getElementById("self-video-div");
   window.easyrtc.setVideoObjectSrc(selfVideo, window.easyrtc.getLocalStream());
   window.easyrtc.connect(
     globalRoomName,
-    () => console.log("success"),
+    () => console.log("media success"),
     (e, e1) => console.log(e, e1)
   );
   window.easyrtc.enableMicrophone(true);
@@ -134,6 +129,7 @@ export function appInit(domainServer, roomName, username) {
     window.easyrtc.supportsGetUserMedia &&
     window.easyrtc.supportsGetUserMedia()
   ) {
+    store.dispatch({type:conferenceActions.CONFERECE_SHOW_LOADING});
     globalRoomName = roomName;
     // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
     window.easyrtc.setSocketUrl(domainServer, {
@@ -175,7 +171,25 @@ export function appInit(domainServer, roomName, username) {
   }
 }
 
+// Close conference
+export function closeConference(){
+  window.easyrtc.hangupAll();
+  window.easyrtc.disconnect();
+}
+
 // Media methods
+export function switchCamera(){
+  store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_CAMERA});
+  let currentValue = store.getState().conference.cameraEnabled;
+  window.easyrtc.enableCamera(currentValue);
+}
+
+export function switchMic(){
+  store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_MIC});
+  let currentValue = store.getState().conference.micEnabled;
+  window.easyrtc.enableMicrophone(currentValue);
+}
+
 export function* getAudioSourceList() {
   //var index = 0;
   var selectedAudioDevice = null;

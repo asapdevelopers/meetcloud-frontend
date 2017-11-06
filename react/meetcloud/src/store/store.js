@@ -1,14 +1,14 @@
-import { createStore, applyMiddleware, compose } from 'redux';
-import { routerMiddleware } from 'react-router-redux';
+import { createStore, applyMiddleware, compose } from "redux";
+import { routerMiddleware } from "react-router-redux";
 // history
-import createHistory from 'history/createBrowserHistory';
+import createHistory from "history/createBrowserHistory";
 // saga
-import createSagaMiddleware from 'redux-saga';
-import AuthSaga from './sagas/authSaga';
-import VideosSaga from './sagas/videosSaga';
-import ProfileSaga from './sagas/profileSaga';
+import createSagaMiddleware from "redux-saga";
+import AuthSaga from "./sagas/authSaga";
+import VideosSaga from "./sagas/videosSaga";
+import ProfileSaga from "./sagas/profileSaga";
 // import root reducer
-import rootReducer from './reducers/index';
+import rootReducer from "./reducers/index";
 // i18n
 //import {loadi18n} from "../i18n";
 
@@ -16,32 +16,42 @@ import rootReducer from './reducers/index';
 const history = createHistory();
 const sagaMiddleware = createSagaMiddleware();
 
-const middleware = applyMiddleware(
-    routerMiddleware(history),
-    sagaMiddleware
-);
+const middleware = applyMiddleware(routerMiddleware(history), sagaMiddleware);
 
 let authData = {};
 if (localStorage.auth) {
-    authData = JSON.parse(localStorage.auth);
+  authData = JSON.parse(localStorage.auth);
 }
 
 let domainData = {};
 if (localStorage.conference) {
-    domainData = JSON.parse(localStorage.conference);
+  domainData = JSON.parse(localStorage.conference);
 }
 
 const defaultState = {
-    auth: {
-        token: authData.token,
-        expiration: authData.expiration,
-        user: authData.user,
-        error: null
-    },
-    conference: {
-        peers:[],
-        domain:domainData.domain
+  auth: {
+    token: authData.token,
+    expiration: authData.expiration,
+    user: authData.user,
+    error: null
+  },
+  conference: {
+    peers: [],
+    domain: domainData.domain,
+    cameraEnabled: true,
+    micEnabled: true,
+    joined: false,
+    data: {
+      duration: 0,
+      date: new Date(),
+      cost: 0
     }
+  },
+  chat: {
+    visible: false,
+    messages: [],
+    unreadMessages: 0
+  }
 };
 
 // Use Redux devtools

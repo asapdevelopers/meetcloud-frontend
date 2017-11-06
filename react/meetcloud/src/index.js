@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import "./Styles/flexboxgrid.css";
+import "./Styles/boostrap-utility-classes.css";
 import registerServiceWorker from "./registerServiceWorker";
 // redux
 import { Provider } from "react-redux";

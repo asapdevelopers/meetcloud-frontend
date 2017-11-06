@@ -12,9 +12,13 @@ import Footer from "./Footer/Footer";
 import Chat from "./Chat/Chat";
 import Header from "./Header/Header";
 import UserVideo from "./UserVideo/UserVideo";
+import InvitePeoplePopup from "./InvitePeoplePopup/InvitePeoplePopup";
 import * as conferenceConsts from "../../constants/conference";
+import * as conferenceActionsConts from "../../constants/actions/conferenceActions";
 import { inviteToConference } from "../../Services/conference/conferenceApi";
 import NotificationSystem from "react-notification-system";
+import * as ConferenceActions from "../../store/actions/conferene";
+import { store } from "../../store/store";
 
 class Conference extends Component {
   _notificationSystem = null;
@@ -22,17 +26,15 @@ class Conference extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
       modal: false,
       modalText: "",
       valid: true,
       error: null,
-      unreadMessages: false,
       showChat: false,
       redirectHome: false,
       cameraEnabled: true,
       micEnabled: true,
-      messages:[]
+      messages: []
       //username: localStorage.getItem("username"),
       //room: "",
       //domain: {},
@@ -173,19 +175,20 @@ class Conference extends Component {
 
   // To keep timer counter updated
   clockInterval = () => {
-    if (this.state.joined) {
-      // room fields might not be instantly available
-      let data = this.state.conferenceData;
-
-      let joinedAux = this.state.joined;
-      if (data) {
-        var now = new moment();
-        var duration = now.diff(this.state.joined.date);
-        joinedAux.duration = moment.utc(duration).format("HH:mm:ss");
-        joinedAux.cost =
-          moment.duration(duration).asSeconds() * data.costPerHour / 3600;
-      }
-      this.setState({ joined: joinedAux });
+    const { conference } = this.props;
+    if (conference.data) {
+      var now = new moment();
+      var duration = now.diff(conference.data.date);
+      let joinedAux = conference.data;
+      joinedAux.duration = moment.utc(duration).format("HH:mm:ss");
+      joinedAux.cost =
+        moment.duration(duration).asSeconds() *
+        conference.data.costPerHour /
+        3600;
+      store.dispatch({
+        type: conferenceActionsConts.CONFERECE_UPDATE_GENERAL_DATA,
+        payload: joinedAux
+      });
     }
   };
 
@@ -261,15 +264,20 @@ class Conference extends Component {
   };
 
   switchCamera = () => {
-    let cameraEnabled = !this.state.cameraEnabled;
-    this.setState({ cameraEnabled });
-    window.easyrtc.enableCamera(cameraEnabled);
+    rtcHelper.switchCamera();
+    //window.easyrtc.enableCamera(cameraEnabled);
   };
 
   switchMic = () => {
     let micEnabled = !this.state.micEnabled;
     this.setState({ micEnabled });
     window.easyrtc.enableMicrophone(micEnabled);
+  };
+
+  finishCall = () => {
+    debugger;
+    rtcHelper.closeConference();
+    this.setState({ redirectHome: true });
   };
 
   shareRoomWithContact = () => {
@@ -359,7 +367,11 @@ class Conference extends Component {
     }
 
     this.intervalId = setInterval(this.clockInterval, 1000);
-    rtcHelper.appInit(this.props.conference.domain.server, this.props.roomName, "username");
+    rtcHelper.appInit(
+      this.props.conference.domain.server,
+      this.props.roomName,
+      localStorage["username"]
+    );
 
     //rtcHelper.initializeEasyRTC(this.state.domain.server);
 
@@ -498,7 +510,6 @@ class Conference extends Component {
 
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
-    this.selfVideoElement = document.getElementById("self-video-div");
     let domain =
       localStorage.getItem("conference") != null
         ? JSON.parse(localStorage.getItem("conference")).domain
@@ -516,7 +527,11 @@ class Conference extends Component {
               if (data.costPerHour) {
                 data.costPerHour = parseFloat(data.costPerHour);
               }
-              this.setState({ conferenceData: data });
+              data.date = new Date();
+              store.dispatch({
+                type: conferenceActionsConts.CONFERECE_UPDATE_GENERAL_DATA,
+                payload: data
+              });
               this.initConference();
             } else {
               this.invalidConference(data);
@@ -534,15 +549,11 @@ class Conference extends Component {
   componentWillUnmount() {
     clearInterval(this.intervalId);
     this.cancelPermissionChecker();
-    window.easyrtc.leaveRoom(this.state.domain.roomToJoin, function() {
-      this.setState({ joined: null });
-    });
-    window.easyrtc.hangupAll();
-    this.disconnect();
+    rtcHelper.closeConference();
   }
 
   render() {
-    const { peers } = this.props;
+    const { conference, peers, chat } = this.props;
     const { redirectHome, room } = this.state;
 
     if (redirectHome) {
@@ -551,7 +562,7 @@ class Conference extends Component {
 
     // Modal
     let modalContent = "";
-    if (this.state.isLoading) {
+    if (conference.loading) {
       modalContent = <MDSpinner />;
     } else {
       modalContent = this.state.modalText;
@@ -633,47 +644,23 @@ class Conference extends Component {
         </div>
       );
     }
-    let modal = (this.state.modal || this.state.isLoading) && (
+    let modal = (this.state.modal || conference.loading) && (
       <div>{modalContent}</div>
     );
-    let shareContent = "";
-    if (this.state.shareRoom) {
-      shareContent = (
-        <Modal className="share-dialog">
-          <div className="share-text">Invite your friends to this room.</div>
-          <form onSubmit={event => this.invitePersonToConference(event)}>
-            <span className="share-email">Email :</span>
-            <input
-              className="inputText"
-              type="text"
-              value={this.state.invitePersonEmail}
-              onChange={event =>
-                this.setState({ invitePersonEmail: event.target.value })}
-            />
-            <div className="share-text">
-              <button className="button" type="submit">
-                Invite
-              </button>
-            </div>
-          </form>
-        </Modal>
-      );
-    }
 
-    let shareRoomModal = this.state.shareRoom && { shareContent };
     // Empty room
     let emptyRoom = "";
     if (peers.length === 0) {
       emptyRoom = <span>Room is empty, waiting...</span>;
     }
     let header = "";
-    if (this.state.joined != null) {
+    if (conference.data != null) {
       header = (
         <Header
-          durationCall={this.state.joined.duration}
-          unreadMessages={this.state.unreadMessages}
-          openChat={this.openChat}
-          cost={this.state.joined.cost}
+          durationCall={conference.data.duration}
+          unreadMessages={chat.unreadMessages}
+          openChat={chat.visible}
+          cost={conference.data.cost}
         />
       );
     }
@@ -681,10 +668,18 @@ class Conference extends Component {
       <div className="Conference">
         <NotificationSystem ref="notificationSystem" />
         <video muted className="videoBackground" id="video-selected" />
-        <Modal isOpen={this.state.modal || this.state.isLoading}>
+        <Modal
+          className={{
+            base: "loadingModal"
+          }}
+          isOpen={this.state.modal || conference.loading}
+        >
           {modalContent}
         </Modal>
-        {shareRoomModal}
+        <InvitePeoplePopup
+          isOpen={this.state.shareRoom}
+          onCloseModal={() => this.setState({ shareRoom: false })}
+        />
         {peers.length > 0 && <div className="conferenceHeader" />}
         <img alt="" className="conferenceLogo" src={ConferenceLogo} /> {header}
         <div className="emptyRoom">{emptyRoom}</div>
@@ -730,13 +725,14 @@ class Conference extends Component {
           </div>
         </div>
         <Footer
-          onCameraClick={this.switchCamera}
-          onMicClick={this.switchMic}
+          onCameraClick={rtcHelper.switchCamera.bind(null)}
+          onMicClick={rtcHelper.switchMic.bind(null)}
           onShareClick={this.shareRoomWithContact}
           onShareScreenClick={this.shareScreen}
           shareScreenEnabled={this.state.sharingScreen}
-          cameraEnabled={this.state.camera}
-          micEnabled={this.state.mic}
+          cameraEnabled={conference.cameraEnabled}
+          micEnabled={conference.micEnabled}
+          onHangUp={this.finishCall.bind(null)}
         />
         <Chat
           messages={this.state.messages}

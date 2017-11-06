@@ -7,7 +7,6 @@ const browser = require("detect-browser");
 // private functions
 function callEveryoneElse(roomName, otherPeople) {
   //Get differences
-  debugger;
   const currentList = store.getState().conference.peers;
   const newList = Object.values(otherPeople);
 
@@ -18,8 +17,6 @@ function callEveryoneElse(roomName, otherPeople) {
   let removed = currentList.filter(
     e => !newList.find(a => e.easyrtcid === a.easyrtcid)
   );
-
-  debugger;
 
   if (added.length > 0 || removed.length > 0) {
     store.dispatch({
@@ -41,10 +38,10 @@ function callEveryoneElse(roomName, otherPeople) {
 
   function establishConnection(position) {
     function callSuccess(id) {
-      store.dispatch({
+      /*store.dispatch({
         type: conferenceActions.CONFERENCE_PEERS_UPDATE_PEER_SETTINGS,
         payload: id
-      });
+      });*/
       connectCount++;
       if (connectCount < conferenceConsts.MAX_CALLERS && position > 0) {
         establishConnection(position - 1);
@@ -66,7 +63,6 @@ function callEveryoneElse(roomName, otherPeople) {
 function addStreamToVideoTag(id, stream) {}
 
 function messageListener(easyrtcid, msgType, content) {
-  debugger;
   for (var i = 0; i < conferenceConsts.MAX_CALLERS; i++) {
     if (window.easyrtc.getIthCaller(i) == easyrtcid) {
       /*var startArea = document.getElementById(getIdOfBox(i + 1));
@@ -181,6 +177,7 @@ export function createConnection(
 // Initialize
 export function initializeEasyRTC(domainServer) {
   // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
+  store.dispatch({type:conferenceActions.CONFERECE_SHOW_LOADING});
   window.easyrtc.setSocketUrl(domainServer, {
     transports: ["websocket"],
     reconnection: false

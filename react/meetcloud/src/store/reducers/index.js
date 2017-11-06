@@ -6,6 +6,7 @@ import auth from './auth';
 import settings from './settings';
 import profile from './profile';
 import conference from './conference';
+import chat from './chat';
 
 const rootReducer = combineReducers({
     videos,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
     settings,
     profile,
     conference,
+    chat,
     routing: routerReducer
 });
 
