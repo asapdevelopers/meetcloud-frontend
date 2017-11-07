@@ -61,7 +61,8 @@ class HomePage extends Component {
       friendlyName: data.friendlyName,
       server: data.server,
       roomName: data.room,
-      roomToJoin: `${data.name}.${data.room}`
+      roomToJoin: `${data.name}.${data.room}`,
+      username: this.state.userName
     };
     localStorage["conference"] = JSON.stringify({ domain });
     localStorage["username"] = this.state.userName;

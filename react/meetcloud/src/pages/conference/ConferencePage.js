@@ -32,11 +32,11 @@ class ConferencePage extends Component {
   }
 
   render() {
-    const { conference, chat } = this.props;
+    const { conference, conferenceActions, chat, chatActions } = this.props;
     const { roomName } = this.state;
     return (
       <div className="conferencePage">
-        <Conference conference={conference} peers={conference.peers} roomName={roomName} chat={chat}/>
+        <Conference conference={conference} conferenceActions={conferenceActions} peers={conference.peers} roomName={roomName} chat={chat} chatActions={chatActions}/>
       </div>
     );
   }
@@ -51,8 +51,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   authActions: bindActionCreators(AuthActions, dispatch),
-  chatACtions:bindActionCreators(ChatActions, dispatch),
-  conferenceACtions: bindActionCreators(ConferenceActions, dispatch),
+  chatActions:bindActionCreators(ChatActions, dispatch),
+  conferenceActions: bindActionCreators(ConferenceActions, dispatch),
   settingsActions: bindActionCreators(SettingsActions, dispatch)
 });
 

@@ -1,5 +1,6 @@
 import { store } from "../../store/store";
 import * as conferenceConsts from "../../constants/conference";
+import * as chatActions from "../../constants/actions/chatActions";
 import * as conferenceActions from "../../constants/actions/conferenceActions";
 import * as actions from "../../store/actions/conferene";
 const browser = require("detect-browser");
@@ -44,9 +45,9 @@ function callEverybodyElse(roomName, otherPeople) {
 }
 
 function messageListener(easyrtcid, msgType, content) {
-  for (var i = 0; i < maxCALLERS; i++) {
-    if (window.easyrtc.getIthCaller(i) == easyrtcid) {
-    }
+  if(msgType === conferenceConsts.CHAT_MESSAGE_TYPE){
+    store.dispatch({type:chatActions.CHAT_ADD_MESSAGE, payload:content});
+    store.dispatch({type:chatActions.CHAT_ADD_UNREAD});
   }
 }
 
@@ -72,18 +73,22 @@ window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
 window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
   store.dispatch({
     type: conferenceActions.CONFERENCE_PEERS_REMOVE_PEER,
-    payload: { callerEasyrtcid}
+    payload: { callerEasyrtcid }
   });
 });
 
 // Media got successfully
-function mediaSuccess(rommName) {
-  store.dispatch({type:conferenceActions.CONFERECE_HIDE_LOADING});
-  store.dispatch({type:conferenceActions.CONFERECE_UPDATE_JOINED_DATA, payload:true});
+function mediaSuccess(room) {
+  store.dispatch({ type: conferenceActions.CONFERECE_HIDE_LOADING });
+  store.dispatch({
+    type: conferenceActions.CONFERECE_UPDATE_JOINED_DATA,
+    payload: true
+  });
   var selfVideo = document.getElementById("self-video-div");
   window.easyrtc.setVideoObjectSrc(selfVideo, window.easyrtc.getLocalStream());
+  window.easyrtc.joinRoom(globalRoomName, {});
   window.easyrtc.connect(
-    globalRoomName,
+    conferenceConsts.WEB_RTC_APP,
     () => console.log("media success"),
     (e, e1) => console.log(e, e1)
   );
@@ -129,7 +134,7 @@ export function appInit(domainServer, roomName, username) {
     window.easyrtc.supportsGetUserMedia &&
     window.easyrtc.supportsGetUserMedia()
   ) {
-    store.dispatch({type:conferenceActions.CONFERECE_SHOW_LOADING});
+    store.dispatch({ type: conferenceActions.CONFERECE_SHOW_LOADING });
     globalRoomName = roomName;
     // Prevent reconnection because it gives a lot of issues, see manual calls to disconnect as well
     window.easyrtc.setSocketUrl(domainServer, {
@@ -172,20 +177,20 @@ export function appInit(domainServer, roomName, username) {
 }
 
 // Close conference
-export function closeConference(){
+export function closeConference() {
   window.easyrtc.hangupAll();
   window.easyrtc.disconnect();
 }
 
 // Media methods
-export function switchCamera(){
-  store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_CAMERA});
+export function switchCamera() {
+  store.dispatch({ type: conferenceActions.CONFERENCE_SWITCH_CAMERA });
   let currentValue = store.getState().conference.cameraEnabled;
   window.easyrtc.enableCamera(currentValue);
 }
 
-export function switchMic(){
-  store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_MIC});
+export function switchMic() {
+  store.dispatch({ type: conferenceActions.CONFERENCE_SWITCH_MIC });
   let currentValue = store.getState().conference.micEnabled;
   window.easyrtc.enableMicrophone(currentValue);
 }
@@ -305,6 +310,25 @@ export function detectBrowser() {
   } else {
     return "other";
   }
+}
+//Chat
+export function sendPeerMessage(targetRoom, msgType, msg, source) {
+  window.easyrtc.sendPeerMessage(
+    { targetRoom },
+    msgType,
+    { msg, source },
+    () => {
+      //TODO: add message to the list
+      store.dispatch({
+        type: chatActions.CHAT_ADD_MESSAGE,
+        payload: { msg, source:"Me" }
+      });
+    },
+    (e, s) => {
+      //TODO: notification error
+      console.log("Chat: message error", e, s);
+    }
+  );
 }
 
 // Play sounds

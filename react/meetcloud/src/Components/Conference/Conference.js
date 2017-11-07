@@ -109,22 +109,12 @@ class Conference extends Component {
   };
 
   invalidConference = error => {
-    console.log("Invalid conference");
     if (error) console.log(error);
     this.setState({
       valid: false,
       redirectHome: true,
       room: this.props.match.params.roomName
     });
-  };
-
-  openChat = () => {
-    this.setState({ showChat: true });
-    this.setState({ unreadMessages: false });
-  };
-
-  closeChat = () => {
-    this.setState({ showChat: false });
   };
 
   setFullScreenVideo = user => {
@@ -185,10 +175,7 @@ class Conference extends Component {
         moment.duration(duration).asSeconds() *
         conference.data.costPerHour /
         3600;
-      store.dispatch({
-        type: conferenceActionsConts.CONFERECE_UPDATE_GENERAL_DATA,
-        payload: joinedAux
-      });
+      this.props.conferenceActions.updateGeneralData(joinedAux);
     }
   };
 
@@ -218,39 +205,6 @@ class Conference extends Component {
     window.easyrtc.hangupAll();
   };
 
-  sendMessage = msg => {
-    if (!msg) {
-      return;
-    }
-
-    var suc = (a, b) => {
-      // Add self message
-      this.addMessage(msg, "Me");
-    };
-
-    var er = (a, b) => {
-      alert("Failed to send message.");
-    };
-
-    // Broadcast message to everyone in the room.
-    // We can use room name (original one)
-    console.log("MSG TYPE: " + conferenceConsts.CHAT_MESSAGE_TYPE);
-    console.log("this.state.joined.name: " + this.state.joined.name);
-    console.log("this.state.username: " + this.state.username);
-    window.easyrtc.sendPeerMessage(
-      {
-        targetRoom: this.state.joined.name
-      },
-      conferenceConsts.CHAT_MESSAGE_TYPE,
-      {
-        msg: msg,
-        source: this.state.username
-      },
-      suc,
-      er
-    );
-  };
-
   sendWakeUp = target => {
     window.easyrtc.sendPeerMessage(
       target,
@@ -275,7 +229,6 @@ class Conference extends Component {
   };
 
   finishCall = () => {
-    debugger;
     rtcHelper.closeConference();
     this.setState({ redirectHome: true });
   };
@@ -508,6 +461,11 @@ class Conference extends Component {
     );
   };
 
+  sendPeerMessage = (msg) =>{
+    const {conference} = this.props;
+    rtcHelper.sendPeerMessage(conference.domain.roomName, conferenceConsts.CHAT_MESSAGE_TYPE, msg, conference.domain.username);
+  }
+
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
     let domain =
@@ -528,10 +486,7 @@ class Conference extends Component {
                 data.costPerHour = parseFloat(data.costPerHour);
               }
               data.date = new Date();
-              store.dispatch({
-                type: conferenceActionsConts.CONFERECE_UPDATE_GENERAL_DATA,
-                payload: data
-              });
+              this.props.conferenceActions.updateGeneralData(data);
               this.initConference();
             } else {
               this.invalidConference(data);
@@ -553,7 +508,7 @@ class Conference extends Component {
   }
 
   render() {
-    const { conference, peers, chat } = this.props;
+    const { conference, peers, chat, chatActions } = this.props;
     const { redirectHome, room } = this.state;
 
     if (redirectHome) {
@@ -653,17 +608,6 @@ class Conference extends Component {
     if (peers.length === 0) {
       emptyRoom = <span>Room is empty, waiting...</span>;
     }
-    let header = "";
-    if (conference.data != null) {
-      header = (
-        <Header
-          durationCall={conference.data.duration}
-          unreadMessages={chat.unreadMessages}
-          openChat={chat.visible}
-          cost={conference.data.cost}
-        />
-      );
-    }
     return (
       <div className="Conference">
         <NotificationSystem ref="notificationSystem" />
@@ -681,7 +625,15 @@ class Conference extends Component {
           onCloseModal={() => this.setState({ shareRoom: false })}
         />
         {peers.length > 0 && <div className="conferenceHeader" />}
-        <img alt="" className="conferenceLogo" src={ConferenceLogo} /> {header}
+        <img alt="" className="conferenceLogo" src={ConferenceLogo} />
+        {conference.data && (
+          <Header
+            durationCall={conference.data.duration}
+            unreadMessages={chat.unreadMessages}
+            openChat={chatActions.swithVisible.bind(null)}
+            cost={conference.data.cost}
+          />
+        )}
         <div className="emptyRoom">{emptyRoom}</div>
         <div className="videoList">
           <div className="row start">
@@ -735,10 +687,10 @@ class Conference extends Component {
           onHangUp={this.finishCall.bind(null)}
         />
         <Chat
-          messages={this.state.messages}
-          opened={this.state.showChat}
-          onCloseChat={this.closeChat}
-          onSendMessage={this.sendMessage}
+          messages={chat.messages}
+          opened={chat.visible}
+          onCloseChat={chatActions.swithVisible.bind(null)}
+          onSendMessage={this.sendPeerMessage.bind(null)}
         />
       </div>
     );

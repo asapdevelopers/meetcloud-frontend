@@ -1,5 +1,6 @@
 import { store } from "../../store/store";
 import * as conferenceConsts from "../../constants/conference";
+import * as chatActions from "../../constants/actions/chatActions";
 import * as conferenceActions from "../../constants/actions/conferenceActions";
 
 const browser = require("detect-browser");
@@ -63,8 +64,11 @@ function callEveryoneElse(roomName, otherPeople) {
 function addStreamToVideoTag(id, stream) {}
 
 function messageListener(easyrtcid, msgType, content) {
-  for (var i = 0; i < conferenceConsts.MAX_CALLERS; i++) {
-    if (window.easyrtc.getIthCaller(i) == easyrtcid) {
+  if(msgType === conferenceConsts.CHAT_MESSAGE_TYPE){
+    store.dispatch({type:chatActions.CHAT_ADD_MESSAGE, payload:content)
+  }
+  //for (var i = 0; i < conferenceConsts.MAX_CALLERS; i++) {
+    //if (window.easyrtc.getIthCaller(i) == easyrtcid) {
       /*var startArea = document.getElementById(getIdOfBox(i + 1));
       var startX =
         parseInt(startArea.offsetLeft) + parseInt(startArea.offsetWidth) / 2;

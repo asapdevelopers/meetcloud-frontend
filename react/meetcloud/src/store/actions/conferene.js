@@ -6,6 +6,11 @@ export const addConferenceData = conferenceData => ({
   payload: conferenceData
 });
 
+export const updateGeneralData = data => ({
+  type: conferenceActions.CONFERECE_UPDATE_GENERAL_DATA,
+  payload: data
+});
+
 //peers
 export const updatePeers = peerList => ({
   type: conferenceActions.CONFERENCE_PEERS_UPDATE_LIST,
