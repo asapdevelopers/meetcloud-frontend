@@ -14,11 +14,8 @@ import Header from "./Header/Header";
 import UserVideo from "./UserVideo/UserVideo";
 import InvitePeoplePopup from "./InvitePeoplePopup/InvitePeoplePopup";
 import * as conferenceConsts from "../../constants/conference";
-import * as conferenceActionsConts from "../../constants/actions/conferenceActions";
 import { inviteToConference } from "../../Services/conference/conferenceApi";
 import NotificationSystem from "react-notification-system";
-import * as ConferenceActions from "../../store/actions/conferene";
-import { store } from "../../store/store";
 
 class Conference extends Component {
   _notificationSystem = null;
@@ -474,9 +471,6 @@ class Conference extends Component {
         : null;
     this.setState({ domain });
 
-    const roomName = this.props.roomName;
-    let errData = { roomName, error: "" };
-
     if (domain) {
       authenticateToken(domain.token).then(response => {
         response.json().then(
@@ -599,10 +593,6 @@ class Conference extends Component {
         </div>
       );
     }
-    let modal = (this.state.modal || conference.loading) && (
-      <div>{modalContent}</div>
-    );
-
     // Empty room
     let emptyRoom = "";
     if (peers.length === 0) {

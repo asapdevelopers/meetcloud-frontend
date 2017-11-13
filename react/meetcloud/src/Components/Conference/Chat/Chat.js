@@ -6,7 +6,6 @@ import MdTagFaces from "react-icons/lib/md/tag-faces";
 import { Picker } from "emoji-mart";
 //import Linkify from 'linkifyjs/react';
 import { emojify } from "react-emojione";
-import * as RTCHelper from "../../../Services/helpers/easyapp";
 
 class Chat extends Component {
   constructor(props) {
@@ -25,6 +24,10 @@ class Chat extends Component {
       }
     };
   }
+
+  //#region test
+  asdasds
+  //#endregion
 
   addEmoji = event => {
     this.setState({

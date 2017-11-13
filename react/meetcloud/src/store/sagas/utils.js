@@ -1,4 +1,3 @@
-import { store } from '../store';
 export const fetchJSON = (url, options = {}) => {
     // Include JWT Token
     let authData = {};

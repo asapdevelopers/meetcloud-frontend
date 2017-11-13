@@ -5,8 +5,6 @@ import createHistory from "history/createBrowserHistory";
 // saga
 import createSagaMiddleware from "redux-saga";
 import AuthSaga from "./sagas/authSaga";
-import VideosSaga from "./sagas/videosSaga";
-import ProfileSaga from "./sagas/profileSaga";
 // import root reducer
 import rootReducer from "./reducers/index";
 // i18n

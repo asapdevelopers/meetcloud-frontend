@@ -11,7 +11,7 @@ import * as ConferenceActions from "../../store/actions/conferene";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 //Router
-import { withRouter, Redirect } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 // Components
 import ContactUs from "../../Components/ContactUs/ContactUs";
 
@@ -84,7 +84,6 @@ class HomePage extends Component {
   };
 
   render() {
-    const { redirect } = this.state;
 
     var sectionStyle = {
       background: `url("${this.state.backgroundImage}") no-repeat center`,

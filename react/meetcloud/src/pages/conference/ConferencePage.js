@@ -1,10 +1,5 @@
 import React, { Component } from "react";
-import moment from "moment";
-import logo from "../../assets/logo.png";
 import "./ConferencePage.css";
-import { getBackgroundImage } from "../../Services/helpers/general";
-import { authenticateDomain } from "../../Services/conference/conferenceApi";
-import * as RTCHelper2 from "../../Services/helpers/easyapp";
 // Components
 import Conference from "../../Components/Conference/Conference";
 // Actions
@@ -16,7 +11,7 @@ import * as ChatActions from "../../store/actions/chat";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 //Router
-import { withRouter, Redirect } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 class ConferencePage extends Component {
   constructor(props) {

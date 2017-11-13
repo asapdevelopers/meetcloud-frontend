@@ -2,16 +2,10 @@ import { store } from "../../store/store";
 import * as conferenceConsts from "../../constants/conference";
 import * as chatActions from "../../constants/actions/chatActions";
 import * as conferenceActions from "../../constants/actions/conferenceActions";
-import * as actions from "../../store/actions/conferene";
 const browser = require("detect-browser");
 
 const maxCALLERS = conferenceConsts.MAX_CALLERS;
-var connectCount = 0;
 var globalRoomName = "";
-
-function getIdOfBox(boxNum) {
-  return "box" + boxNum;
-}
 
 function callEverybodyElse(roomName, otherPeople) {
   window.easyrtc.setRoomOccupantListener(null); // so we're only called once.
@@ -45,9 +39,9 @@ function callEverybodyElse(roomName, otherPeople) {
 }
 
 function messageListener(easyrtcid, msgType, content) {
-  if(msgType === conferenceConsts.CHAT_MESSAGE_TYPE){
-    store.dispatch({type:chatActions.CHAT_ADD_MESSAGE, payload:content});
-    store.dispatch({type:chatActions.CHAT_ADD_UNREAD});
+  if (msgType === conferenceConsts.CHAT_MESSAGE_TYPE) {
+    store.dispatch({ type: chatActions.CHAT_ADD_MESSAGE, payload: content });
+    store.dispatch({ type: chatActions.CHAT_ADD_UNREAD });
   }
 }
 
@@ -97,35 +91,30 @@ function mediaSuccess(room) {
 }
 
 // Media error
-function mediaError() {
-  mediaError = (a, b) => {
-    console.log("Failed to get media source first time, trying again: ", a, b);
-    // On media error attempt to disable all media features
-    // so we can still receive connections
-    window.easyrtc.enableVideo(false);
-    //try again with only audio
-    window.easyrtc.initMediaSource(mediaSuccess, () => {
-      console.log("Failed to get media source a second time: ", a, b);
-      window.easyrtc.disconnect();
-      //TODO: create a redux action to show the popup
-      if (a.includes("MEDIA_ERR")) {
-        if (
-          b.includes("PermissionDeniedError") ||
-          b.includes("SecurityError")
-        ) {
-          this.showPopup("", false, "permissionError");
-        }
-        if (b.includes("DevicesNotFoundError")) {
-          this.showPopup("", false, "deviceNotFound");
-        }
-        if (b.includes("NotFoundError")) {
-          this.showPopup("", false, "deviceNotFound");
-        }
-      } else {
-        this.showPopup("Failed to connect, please try again.");
+function mediaError(a, b) {
+  console.log("Failed to get media source first time, trying again: ", a, b);
+  // On media error attempt to disable all media features
+  // so we can still receive connections
+  window.easyrtc.enableVideo(false);
+  //try again with only audio
+  window.easyrtc.initMediaSource(mediaSuccess, () => {
+    console.log("Failed to get media source a second time: ", a, b);
+    window.easyrtc.disconnect();
+    //TODO: create a redux action to show the popup
+    if (a.includes("MEDIA_ERR")) {
+      if (b.includes("PermissionDeniedError") || b.includes("SecurityError")) {
+        this.showPopup("", false, "permissionError");
       }
-    });
-  };
+      if (b.includes("DevicesNotFoundError")) {
+        this.showPopup("", false, "deviceNotFound");
+      }
+      if (b.includes("NotFoundError")) {
+        this.showPopup("", false, "deviceNotFound");
+      }
+    } else {
+      this.showPopup("Failed to connect, please try again.");
+    }
+  });
 }
 
 // Init method
@@ -152,7 +141,7 @@ export function appInit(domainServer, roomName, username) {
     // These are used for calling and should be disabled if the media doesn't work otherwise connection
     // will be slower and won't properly work
     window.easyrtc.enableAudio(true);
-    window.easyrtc.enableVideo(true);
+    window.easyrtc.enableVideo(false); //TODO: change this (dev only)
     window.easyrtc.enableDataChannels(true);
     window.easyrtc.enableVideoReceive(true);
     window.easyrtc.enableAudioReceive(true);
@@ -321,7 +310,7 @@ export function sendPeerMessage(targetRoom, msgType, msg, source) {
       //TODO: add message to the list
       store.dispatch({
         type: chatActions.CHAT_ADD_MESSAGE,
-        payload: { msg, source:"Me" }
+        payload: { msg, source: "Me" }
       });
     },
     (e, s) => {
