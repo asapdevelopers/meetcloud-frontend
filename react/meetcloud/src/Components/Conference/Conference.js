@@ -142,7 +142,8 @@ class Conference extends Component {
         moment.duration(duration).asSeconds() *
         conference.data.costPerHour /
         3600;
-      this.props.conferenceActions.updateGeneralData(joinedAux);
+      // TODO: dev only
+      //this.props.conferenceActions.updateGeneralData(joinedAux);
     }
   };
 
@@ -186,13 +187,10 @@ class Conference extends Component {
 
   switchCamera = () => {
     rtcHelper.switchCamera();
-    //window.easyrtc.enableCamera(cameraEnabled);
   };
 
   switchMic = () => {
-    let micEnabled = !this.state.micEnabled;
-    this.setState({ micEnabled });
-    window.easyrtc.enableMicrophone(micEnabled);
+    rtcHelper.switchMic();
   };
 
   finishCall = () => {
@@ -376,6 +374,7 @@ class Conference extends Component {
     } else {
       window.getScreenId((error, sourceId, screen_constraints) => {
         if (error || !sourceId) {
+
           alert(
             "Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk"
           );
@@ -490,12 +489,10 @@ class Conference extends Component {
     let modalContentBrowser = "";
     if (this.state.modal.deviceNotFound || this.state.modal.permissionError) {
       if (this.state.modal.deviceNotFound) {
-        modalContentBrowser =
-          "Your computer does not have camera or microphone";
+        modalContentBrowser = "Your computer does not have camera or microphone";
       }
       if (this.state.modal.permissionError) {
         let browser = rtcHelper.detectBrowser();
-
         switch (browser) {
           case "chrome":
             modalContentBrowser = (

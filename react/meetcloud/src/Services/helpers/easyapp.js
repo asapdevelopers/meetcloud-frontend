@@ -52,6 +52,7 @@ window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
     type: conferenceActions.CONFERENCE_PEERS_ADD_PEER,
     payload: { callerEasyrtcid, stream, username }
   });
+  store.dispatch({ type: chatActions.CHAT_ADD_MESSAGE, payload: {msg: username, source:"New connection"} });
   setTimeout(() => {
     var video =
       document.getElementById("u-" + callerEasyrtcid) ||
@@ -65,10 +66,12 @@ window.easyrtc.setStreamAcceptor(function(callerEasyrtcid, stream) {
 
 // Evenet that removes an stream from the call
 window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
+  let username = window.easyrtc.idToName(callerEasyrtcid);
   store.dispatch({
     type: conferenceActions.CONFERENCE_PEERS_REMOVE_PEER,
     payload: { callerEasyrtcid }
   });
+  store.dispatch({ type: chatActions.CHAT_ADD_MESSAGE, payload: {msg: username, source:"Lost connection"} });
 });
 
 // Media got successfully
@@ -141,7 +144,7 @@ export function appInit(domainServer, roomName, username) {
     // These are used for calling and should be disabled if the media doesn't work otherwise connection
     // will be slower and won't properly work
     window.easyrtc.enableAudio(true);
-    window.easyrtc.enableVideo(false); //TODO: change this (dev only)
+    window.easyrtc.enableVideo(true); //TODO: change this (dev only)
     window.easyrtc.enableDataChannels(true);
     window.easyrtc.enableVideoReceive(true);
     window.easyrtc.enableAudioReceive(true);
@@ -307,7 +310,6 @@ export function sendPeerMessage(targetRoom, msgType, msg, source) {
     msgType,
     { msg, source },
     () => {
-      //TODO: add message to the list
       store.dispatch({
         type: chatActions.CHAT_ADD_MESSAGE,
         payload: { msg, source: "Me" }

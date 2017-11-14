@@ -25,10 +25,6 @@ class Chat extends Component {
     };
   }
 
-  //#region test
-  asdasds
-  //#endregion
-
   addEmoji = event => {
     this.setState({
       msg: this.state.msg + event.colons
@@ -51,7 +47,7 @@ class Chat extends Component {
   };
 
   render() {
-    const {messages, opened} = this.props;
+    const { messages, opened } = this.props;
     const { showEmojis } = this.state;
     return (
       <div>
@@ -84,7 +80,19 @@ class Chat extends Component {
                         </div>
                       </li>
                     );
-                  } else {
+                  }
+                  if (message.source === "New connection") {
+                    return <span>New connection: {message.msg} </span>;
+                  }
+                  if (message.source === "Lost connection") {
+                    return <span>Lost connection: {message.msg} </span>;
+                  }
+                  {console.log(message.source)}
+                  if (
+                    message.source !== "Lost connection" &&
+                    message.source !== "New connection" &&
+                    message.source !== "Me connection"
+                  ) {
                     return (
                       <li className="other">
                         <div className="msg">
@@ -100,6 +108,7 @@ class Chat extends Component {
                       </li>
                     );
                   }
+
                 })}
               </ol>
             </div>

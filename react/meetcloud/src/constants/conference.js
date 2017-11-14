@@ -1,6 +1,7 @@
 // Conference
 export const WEB_RTC_APP = 'app';
 export const CHAT_MESSAGE_TYPE = 'chatMessage';
+export const CHAT_MESSAGE_NOTIFICATION_TYPE = 'chatNotification';
 export const WAKE_UP_MESSAGE_TYPE = 'wakeUpMessage';
 export const SCREEN_SHARING_STREAM_NAME = 'ssharing';
 export const DEBUG = false; //TODO
