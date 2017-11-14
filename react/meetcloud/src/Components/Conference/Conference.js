@@ -32,37 +32,7 @@ class Conference extends Component {
       cameraEnabled: true,
       micEnabled: true,
       messages: []
-      //username: localStorage.getItem("username"),
-      //room: "",
-      //domain: {},
-      //conferenceData: {},
-      //connected: null,
-      //joined: null,
-      //members: [],
-      //membersDict: {},
-      //selectedAudioDevice: null,
-      //audioDevices: [],
-      //selectedVideoDevice: null,
-      //videoDevices: [],
-      //audioOutputDevices: [],
-      //selectedAudioOutputDevice: null,
-
-      //mediaSourceWorking: null,
-      //sharingScreen: false,
-      //cameraEnabled:
-      //  localStorage.getItem("cameraEnabled") != null
-      //    ? localStorage.getItem("cameraEnabled")
-      //    : true, // Global camera setting, can be only changed while disconnected
-      //camera: true, // Turn on/off cam
-      //mic: true, // turn on/off mic
-      //sharingWithMe: [],
-      //sharingWithMeDict: {},
-      //pendingCallsDict: {},
-      //firstRoomListener: true,
-      //shareRoom: false,
-      //invitePersonEmail: null,
     };
-    //this.permissionInterval = this.permissionInterval.bind(this);
   }
 
   // Helper to allow setting audio output of an element

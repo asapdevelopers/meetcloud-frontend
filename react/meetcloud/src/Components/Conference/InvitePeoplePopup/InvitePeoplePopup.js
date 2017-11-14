@@ -13,8 +13,9 @@ export default class InvitePeoplePopup extends Component {
   }
 
   invitePeople = event => {
+    const {email} = this.state;
     event.preventDefault();
-    inviteToConference(this.state.invitePersonEmail, window.location.href).then(
+    inviteToConference(email, window.location.href).then(
       response => {
         response.json().then(data => {
           //TODO: add notification
