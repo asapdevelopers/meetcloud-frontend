@@ -80,7 +80,7 @@ class Conference extends Component {
     this.setState({
       valid: false,
       redirectHome: true,
-      room: this.props.match.params.roomName
+      room: this.props.roomName
     });
   };
 

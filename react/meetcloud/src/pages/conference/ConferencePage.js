@@ -16,14 +16,11 @@ import { withRouter } from "react-router-dom";
 class ConferencePage extends Component {
   constructor(props) {
     super(props);
+    let roomName = (this.props.match.params && this.props.match.params.roomName)? this.props.match.params.roomName : "";
     this.state = {
-      roomName: "",
+      roomName,
       selectedUser: null
     };
-  }
-
-  componentDidMount() {
-    this.setState({roomName: this.props.match.params.roomName});
   }
 
   render() {

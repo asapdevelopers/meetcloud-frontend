@@ -20,11 +20,7 @@ const domain = window.location.hostname;
 class HomePage extends Component {
   constructor(props) {
     super(props);
-    let roomName = "";
-    if ((this.props.match.url.match(/\//g) || []).length === 1) {
-      roomName = this.props.match.url.substring(1, this.props.match.url.length);
-    }
-
+    let roomName = (this.props.match.params && this.props.match.params.roomName)? this.props.match.params.roomName : "";
     let background =
       localStorage["background"] !== undefined
         ? localStorage["background"]
@@ -32,7 +28,7 @@ class HomePage extends Component {
 
     //State
     this.state = {
-      roomName: roomName,
+      roomName,
       userName: "",
       backgroundImage: background,
       redirect: false,
