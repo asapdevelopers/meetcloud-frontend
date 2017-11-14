@@ -53,11 +53,8 @@ class Chat extends Component {
       <div>
         {opened && (
           <div className="chat-box">
-            <div className="chat-title">
-              <span>Chat</span>
-              <div className="icon-close" onClick={this.props.onCloseChat}>
-                <CloseIcon />
-              </div>
+            <div className="icon-close" onClick={this.props.onCloseChat}>
+              <CloseIcon />
             </div>
             {messages.length === 0 && (
               <span className="no-messages">No messages</span>
@@ -82,10 +79,10 @@ class Chat extends Component {
                     );
                   }
                   if (message.source === "New connection") {
-                    return <span>New connection: {message.msg} </span>;
+                    return <span className="newConnect">New connection: {message.msg} </span>;
                   }
                   if (message.source === "Lost connection") {
-                    return <span>Lost connection: {message.msg} </span>;
+                    return <span className="lostConnect">Lost connection: {message.msg} </span>;
                   }
                   {console.log(message.source)}
                   if (
