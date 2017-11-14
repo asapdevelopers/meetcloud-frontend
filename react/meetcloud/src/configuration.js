@@ -8,7 +8,7 @@ switch (environment) {
     conferenceApiPrefix = "http://localhost:8000/";
     break;
   case "prod":
-    conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/";
+    conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/api/";
     break;
   default:
     conferenceApiPrefix = "http://localhost:8000/";
