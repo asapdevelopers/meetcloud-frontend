@@ -143,7 +143,7 @@ class Conference extends Component {
         conference.data.costPerHour /
         3600;
       // TODO: dev only
-      //this.props.conferenceActions.updateGeneralData(joinedAux);
+      // this.props.conferenceActions.updateGeneralData(joinedAux);
     }
   };
 
@@ -373,8 +373,29 @@ class Conference extends Component {
       this.stopShareScreen();
     } else {
       window.getScreenId((error, sourceId, screen_constraints) => {
-        if (error || !sourceId) {
+        // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
+        // sourceId == null || 'string' || 'firefox'
+        debugger;
+        navigator.getUserMedia =
+          navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+        navigator.getUserMedia(
+          screen_constraints,
+          stream => {
+            debugger;
+            rtcHelper.turnOffCamera();
+            let selfVideo = document.getElementById("self-video-div");
+            window.easyrtc.setVideoObjectSrc(selfVideo, stream);
+            // share this "MediaStream" object using RTCPeerConnection API
+          },
+          function(error) {
+            console.error(error);
+          }
+        );
+      });
 
+      /*window.getScreenId((error, sourceId, screen_constraints) => {
+        if (error || !sourceId) {
+          //TODO: add a notification
           alert(
             "Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk"
           );
@@ -389,10 +410,10 @@ class Conference extends Component {
                 conferenceConsts.SCREEN_SHARING_STREAM_NAME
               );
               this.setState({ sharingScreen: true });
-              this.setState({ camera: false });
+
+              rtcHelper.turnOffCamera();
               this.setState({ userScreen: stream });
               window.easyrtc.setVideoObjectSrc(this.selfVideoElement, stream);
-              //window.easyrtc.enableCamera(false);
 
               stream.oninactive = () => {
                 if (stream.oninactive) {
@@ -405,7 +426,7 @@ class Conference extends Component {
             error => console.error(error)
           );
         }
-      });
+      });*/
     }
   };
 
@@ -427,10 +448,15 @@ class Conference extends Component {
     );
   };
 
-  sendPeerMessage = (msg) =>{
-    const {conference} = this.props;
-    rtcHelper.sendPeerMessage(conference.domain.roomName, conferenceConsts.CHAT_MESSAGE_TYPE, msg, conference.domain.username);
-  }
+  sendPeerMessage = msg => {
+    const { conference } = this.props;
+    rtcHelper.sendPeerMessage(
+      conference.domain.roomName,
+      conferenceConsts.CHAT_MESSAGE_TYPE,
+      msg,
+      conference.domain.username
+    );
+  };
 
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
@@ -489,7 +515,8 @@ class Conference extends Component {
     let modalContentBrowser = "";
     if (this.state.modal.deviceNotFound || this.state.modal.permissionError) {
       if (this.state.modal.deviceNotFound) {
-        modalContentBrowser = "Your computer does not have camera or microphone";
+        modalContentBrowser =
+          "Your computer does not have camera or microphone";
       }
       if (this.state.modal.permissionError) {
         let browser = rtcHelper.detectBrowser();

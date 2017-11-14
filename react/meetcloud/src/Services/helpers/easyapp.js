@@ -181,6 +181,13 @@ export function switchCamera() {
   window.easyrtc.enableCamera(currentValue);
 }
 
+export function turnOffCamera(){
+  if (store.getState().conference.cameraEnabled){
+    store.dispatch({ type: conferenceActions.CONFERENCE_SWITCH_CAMERA });
+    window.easyrtc.enableCamera(false);
+  }
+}
+
 export function switchMic() {
   store.dispatch({ type: conferenceActions.CONFERENCE_SWITCH_MIC });
   let currentValue = store.getState().conference.micEnabled;
@@ -325,4 +332,10 @@ export function sendPeerMessage(targetRoom, msgType, msg, source) {
 // Play sounds
 export function playSound(obj) {
   obj.play();
+}
+
+
+// Screen sharing
+export function shareScreen(stream){
+
 }
