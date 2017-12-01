@@ -16,6 +16,7 @@ import InvitePeoplePopup from "./InvitePeoplePopup/InvitePeoplePopup";
 import * as conferenceConsts from "../../constants/conference";
 import { inviteToConference } from "../../Services/conference/conferenceApi";
 import NotificationSystem from "react-notification-system";
+import SettingsPopup from "./SettingsPopup/SettingsPopup";
 
 class Conference extends Component {
   _notificationSystem = null;
@@ -31,7 +32,8 @@ class Conference extends Component {
       redirectHome: false,
       cameraEnabled: true,
       micEnabled: true,
-      messages: []
+      messages: [],
+      showSettings: false
     };
   }
 
@@ -608,6 +610,10 @@ class Conference extends Component {
           isOpen={this.state.shareRoom}
           onCloseModal={() => this.setState({ shareRoom: false })}
         />
+        <SettingsPopup
+          isOpen={this.state.showSettings}
+          onCloseModal={() => this.setState({ showSettings: false })}
+        />
         {peers.length > 0 && <div className="conferenceHeader" />}
         <img alt="" className="conferenceLogo" src={ConferenceLogo} />
         {conference.data && (
@@ -615,6 +621,7 @@ class Conference extends Component {
             durationCall={conference.data.duration}
             unreadMessages={chat.unreadMessages}
             openChat={chatActions.swithVisible.bind(null)}
+            openSettings={() => this.setState({showSettings: true})}
             cost={conference.data.cost}
           />
         )}

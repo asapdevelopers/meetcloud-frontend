@@ -14,8 +14,10 @@ class Header extends Component {
         <div className="icons row right-xs">
           <label className="items">Call duration: {this.props.durationCall}</label>
           <div className="icons-top">
-            <a data-tip data-for='global'><CallButton className="items" icon="Money" data-tip="ReactTooltip"/></a>
-            <CallButton className="items" icon="Settings"/>
+            <a data-tip data-for='global'>
+              <CallButton className="items" icon="Money" data-tip="ReactTooltip"/>
+            </a>
+            <CallButton className="items" icon="Settings" onClick={this.props.openSettings}/>
             <CallButton className="items" icon="Chat" onClick={this.props.openChat} alert={this.props.unreadMessages}/>
           </div>
         </div>
