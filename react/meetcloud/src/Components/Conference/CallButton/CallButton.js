@@ -13,6 +13,10 @@ import Chat from '../../../assets/images/Chat.png';
 import Invite from '../../../assets/images/Invite.png';
 import HangUp from '../../../assets/images/HangUp.png';
 
+import VideoCamera from '../../../assets/images/camera1.png';
+import Input from '../../../assets/images/input.png';
+import Output from '../../../assets/images/Output.png';
+
 const ICONS = {
   Camera,
   CameraDisabled,
@@ -24,7 +28,10 @@ const ICONS = {
   Settings,
   Chat,
   Invite,
-  HangUp
+  HangUp,
+  VideoCamera,
+  Input,
+  Output
 }
 
 const CallButton = ({onClick, icon, alert}) => {
