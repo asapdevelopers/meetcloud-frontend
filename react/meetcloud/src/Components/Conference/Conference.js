@@ -612,6 +612,7 @@ class Conference extends Component {
           onAudioInputSelected={settingsActions.audioDeviceSelected}
           onAudioOutputSelected={settingsActions.audioDeviceSinkSelected}
           onCloseModal={() => this.setState({ showSettings: false })}
+          rtcHelper={rtcHelper}
         />
         {peers.length > 0 && <div className="conferenceHeader" />}
         <img alt="" className="conferenceLogo" src={ConferenceLogo} />

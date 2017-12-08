@@ -76,9 +76,15 @@ window
       var video = document.getElementById("u-" + callerEasyrtcid) || document.getElementById("us-" + callerEasyrtcid);
       if (video) {
         console.log("Adding video stream");
+
+        let deviceId = store
+          .getState()
+          .settings
+          .audioDeviceSelected;
         window
           .easyrtc
           .setVideoObjectSrc(video, stream);
+        setAudioOutput(video, deviceId);
       }
     }, 100);
   });
@@ -181,10 +187,10 @@ export function appInit(domainServer, roomName, username) {
     window
       .easyrtc
       .setRoomOccupantListener(callEverybodyElse);
-    // window.easyrtc.setAutoInitUserMedia(true); Enable audio and video medias. This
-    // can only be changed before connecting so careful. These are used for calling
-    // and should be disabled if the media doesn't work otherwise connection will be
-    // slower and won't properly work
+    // window.easyrtc.setAutoInitUserMedia(true); Enable audio and video medias.
+    // This can only be changed before connecting so careful. These are used for
+    // calling and should be disabled if the media doesn't work otherwise connection
+    // will be slower and won't properly work
     window
       .easyrtc
       .enableAudio(true);
@@ -420,6 +426,23 @@ export function sendPeerMessage(targetRoom, msgType, msg, source) {
       //TODO: notification error
       console.log("Chat: message error", e, s);
     });
+}
+
+export function setAudioInput(deviceId) {
+  window
+    .easyrtc
+    .setAudioSource(deviceId);
+}
+
+export function setAudioOutput(element, deviceId) {
+  window
+    .easyrtc
+    .setAudioSource(element, deviceId);
+}
+export function setVideoInput(deviceId) {
+  window
+    .easyrtc
+    .setAudioSource(deviceId);
 }
 
 // Play sounds

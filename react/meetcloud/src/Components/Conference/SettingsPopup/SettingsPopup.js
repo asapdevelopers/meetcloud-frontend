@@ -56,7 +56,9 @@ export default class SettingsPopup extends Component {
         .props
         .onAudioOutputSelected(selectedAudioOutput);
     }
-    this.props.onCloseModal();
+    this
+      .props
+      .onCloseModal();
   }
 
   render() {
