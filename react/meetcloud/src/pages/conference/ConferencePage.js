@@ -24,11 +24,11 @@ class ConferencePage extends Component {
   }
 
   render() {
-    const { conference, conferenceActions, chat, chatActions } = this.props;
+    const { conference, conferenceActions, chat, chatActions, settings, settingsActions } = this.props;
     const { roomName } = this.state;
     return (
       <div className="conferencePage">
-        <Conference conference={conference} conferenceActions={conferenceActions} peers={conference.peers} roomName={roomName} chat={chat} chatActions={chatActions}/>
+        <Conference settings={settings} conference={conference} conferenceActions={conferenceActions} peers={conference.peers} roomName={roomName} chat={chat} chatActions={chatActions} settingsActions={settingsActions}/>
       </div>
     );
   }

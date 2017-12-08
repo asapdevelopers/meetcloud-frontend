@@ -45,6 +45,15 @@ const defaultState = {
       cost: 0
     }
   },
+  settings:{
+    language: "es",
+    audioDeviceSelected:{},
+    audioDevicesList:[],
+    videoDeviceSelected:{},
+    videoDevicesList:[],
+    audioDeviceSinkSelected:{},
+    audioDevicesSinkList:[]
+  },
   chat: {
     visible: false,
     messages: [],

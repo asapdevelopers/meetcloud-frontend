@@ -377,13 +377,11 @@ class Conference extends Component {
       window.getScreenId((error, sourceId, screen_constraints) => {
         // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
         // sourceId == null || 'string' || 'firefox'
-        debugger;
         navigator.getUserMedia =
           navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
         navigator.getUserMedia(
           screen_constraints,
           stream => {
-            debugger;
             rtcHelper.turnOffCamera();
             let selfVideo = document.getElementById("self-video-div");
             window.easyrtc.setVideoObjectSrc(selfVideo, stream);
@@ -499,7 +497,7 @@ class Conference extends Component {
   }
 
   render() {
-    const { conference, peers, chat, chatActions } = this.props;
+    const { conference, peers, chat, chatActions, conferenceActions, settingsActions } = this.props;
     const { redirectHome, room } = this.state;
 
     if (redirectHome) {
@@ -599,9 +597,6 @@ class Conference extends Component {
         <NotificationSystem ref="notificationSystem" />
         <video muted className="videoBackground" id="video-selected" />
         <Modal
-          className={{
-            base: "loadingModal"
-          }}
           isOpen={this.state.modal || conference.loading}
         >
           {modalContent}
@@ -612,6 +607,10 @@ class Conference extends Component {
         />
         <SettingsPopup
           isOpen={this.state.showSettings}
+          settings={this.props.settings}
+          onVideoInputSelected={settingsActions.videoDevicesSelected}
+          onAudioInputSelected={settingsActions.audioDeviceSelected}
+          onAudioOutputSelected={settingsActions.audioDeviceSinkSelected}
           onCloseModal={() => this.setState({ showSettings: false })}
         />
         {peers.length > 0 && <div className="conferenceHeader" />}
