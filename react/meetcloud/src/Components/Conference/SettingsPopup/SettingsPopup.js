@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import "./SettingsPopup.css";
 import Modal from "react-modal";
-import {inviteToConference} from "../../../Services/conference/conferenceApi";
 import CloseIcon from "../../Icons/Close";
 import CallButton from '../CallButton/CallButton';
 
@@ -62,7 +61,7 @@ export default class SettingsPopup extends Component {
   }
 
   render() {
-    const {isOpen, onCloseModal} = this.props;
+    const {onCloseModal} = this.props;
     return (
       <Modal isOpen={this.props.isOpen} className="openSettings">
         <div className="share-text">Settings</div>

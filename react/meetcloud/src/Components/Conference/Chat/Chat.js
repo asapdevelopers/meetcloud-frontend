@@ -62,6 +62,7 @@ class Chat extends Component {
             <div className="chatContainer">
               <ol className="chat">
                 {messages.map(message => {
+
                   if (message.source === "Me") {
                     return (
                       <li className="self">
@@ -84,7 +85,6 @@ class Chat extends Component {
                   if (message.source === "Lost connection") {
                     return <span className="lostConnect">Lost connection: {message.msg} </span>;
                   }
-                  {console.log(message.source)}
                   if (
                     message.source !== "Lost connection" &&
                     message.source !== "New connection" &&
@@ -105,7 +105,7 @@ class Chat extends Component {
                       </li>
                     );
                   }
-
+                  return null;
                 })}
               </ol>
             </div>

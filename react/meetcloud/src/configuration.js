@@ -11,7 +11,7 @@ switch (environment) {
     conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/api/";
     break;
   default:
-    conferenceApiPrefix ="http://localhost:8000/";
+    conferenceApiPrefix ="https://localhost:8000/";
 }
 
 function parseRoute(route, params) {
