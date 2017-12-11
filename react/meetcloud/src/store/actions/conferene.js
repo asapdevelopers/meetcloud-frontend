@@ -34,3 +34,6 @@ export const switchMic = () => ({
 export const switchShare = () =>{
   type:conferenceActions.CONFERENCE_SWITCH_SHARE
 }
+export const addLocalStream = () =>{
+  type:conferenceActions.CONFERENCE_ADD_LOCAL_STREAM
+}

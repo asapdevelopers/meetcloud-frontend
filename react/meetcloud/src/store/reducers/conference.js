@@ -16,7 +16,6 @@ function conferenceReducer(state = [], { type, payload }) {
     }
     // Peers
     case conferenceActions.CONFERENCE_PEERS_ADD_PEER: {
-      debugger;
       let newPeers = state.peers;
       let hasVideo = payload.stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME? false : true;
       let hasScreen = payload.stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME? true : false;
@@ -54,6 +53,18 @@ function conferenceReducer(state = [], { type, payload }) {
         peers: state.peers.filter(
           x => x.callerEasyrtcid !== payload.callerEasyrtcid
         )
+      };
+    }
+    case conferenceActions.CONFERENCE_ADD_LOCAL_STREAM: {
+      return {
+        ...state,
+        localStream: payload
+      };
+    }
+    case conferenceActions.CONFERENCE_REMOVE_LOCAL_STREAM: {
+      return {
+        ...state,
+        localStream: {}
       };
     }
     case conferenceActions.CONFERENCE_UPDATE_OTHER_PEOPLE: {

@@ -44,7 +44,8 @@ const defaultState = {
       duration: 0,
       date: new Date(),
       cost: 0
-    }
+    },
+    localStream:{}
   },
   settings:{
     language: "es",

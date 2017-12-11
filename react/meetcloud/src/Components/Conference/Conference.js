@@ -50,7 +50,12 @@ class Conference extends Component {
     this.setState({valid: false, redirectHome: true, room: this.props.roomName});
   };
 
+  saveSettings = () => {
+    rtcHelper.reconnect();
+  }
+
   setFullScreenVideo = user => {
+    const {conference} = this.props;
     if (user === undefined) {
       if (this.state.sharingWithMe.length > 0) {
         let firstVideo = this.state.sharingWithMe[0];
@@ -67,15 +72,17 @@ class Conference extends Component {
     } else {
       this.setState({selectedUser: user});
       if (user === "me") {
-        if (this.state.userScreen !== undefined) {
+        if (conference.sharingScreen) {
           window
             .easyrtc
-            .setVideoObjectSrc(document.getElementById("video-selected"), this.state.userScreen);
+            .setVideoObjectSrc(document.getElementById("video-selected"), conference.localStream);
+
         } else {
           window
             .easyrtc
-            .setVideoObjectSrc(document.getElementById("video-selected"), this.state.userMedia);
+            .setVideoObjectSrc(document.getElementById("video-selected"), rtcHelper.getLocalUserStream());
         }
+
       } else {
         if (user.screen !== undefined) {
           window
@@ -103,7 +110,11 @@ class Conference extends Component {
       joinedAux.cost = moment
         .duration(duration)
         .asSeconds() * conference.data.costPerHour / 3600;
-      // TODO: dev only this.props.conferenceActions.updateGeneralData(joinedAux);
+      // TODO: dev only
+      /*this
+        .props
+        .conferenceActions
+        .updateGeneralData(joinedAux);*/
     }
   };
 
@@ -401,10 +412,10 @@ class Conference extends Component {
     }
 
     let selfVideoStyles = "selfVideo ";
-    if(this.state.selectedUser){
+    if (this.state.selectedUser) {
       selfVideoStyles += "selected ";
     }
-    if (!conference.sharingScreen){
+    if (!conference.sharingScreen) {
       selfVideoStyles += " mirror ";
     }
     return (
@@ -424,7 +435,8 @@ class Conference extends Component {
           onAudioInputSelected={settingsActions.audioDeviceSelected}
           onAudioOutputSelected={settingsActions.audioDeviceSinkSelected}
           onCloseModal={() => this.setState({showSettings: false})}
-          rtcHelper={rtcHelper}/> {peers.length > 0 && <div className="conferenceHeader"/>}
+          rtcHelper={rtcHelper}
+          onSaveSettings={this.saveSettings}/> {peers.length > 0 && <div className="conferenceHeader"/>}
         <img alt="" className="conferenceLogo" src={ConferenceLogo}/> {conference.data && (<Header
           durationCall={conference.data.duration}
           unreadMessages={chat.unreadMessages}
@@ -443,10 +455,7 @@ class Conference extends Component {
                 this.setFullScreenVideo("me");
               }}>
                 <span className="videoNameSelf">You</span>
-                <video
-                  id="self-video-div"
-                  muted
-                  className={selfVideoStyles}/>
+                <video id="self-video-div" muted className={selfVideoStyles}/>
               </div>
             </div>
             {peers.map(user => {

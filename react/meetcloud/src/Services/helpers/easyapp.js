@@ -115,13 +115,14 @@ window
 window
   .easyrtc
   .setOnStreamClosed(function (callerEasyrtcid) {
-    debugger;
     let username = window
       .easyrtc
       .idToName(callerEasyrtcid);
     // Check if the stream closed is "screenShare"
-    debugger;
-    let peerClosed = store.getState().conference.peers
+    let peerClosed = store
+      .getState()
+      .conference
+      .peers
       .find(x => x.callerEasyrtcid === callerEasyrtcid);
     if (peerClosed && !peerClosed.hasScreen) {
       store.dispatch({type: conferenceActions.CONFERENCE_PEERS_REMOVE_PEER, payload: {
@@ -157,6 +158,12 @@ function mediaSuccess(room) {
   window
     .easyrtc
     .enableCamera(true);
+}
+
+export function getLocalUserStream() {
+  return window
+    .easyrtc
+    .getLocalStream();
 }
 
 // Media error
@@ -286,6 +293,12 @@ export function switchCamera() {
   window
     .easyrtc
     .enableCamera(currentValue);
+  if (currentValue) {
+    var selfVideo = document.getElementById("self-video-div");
+    window
+      .easyrtc
+      .setVideoObjectSrc(selfVideo, window.easyrtc.getLocalStream());
+  }
 }
 
 export function turnOffCamera() {
@@ -308,122 +321,113 @@ export function switchMic() {
     .enableMicrophone(currentValue);
 }
 
-export function * getAudioSourceList() {
-  //var index = 0;
+export function getAudioSourceList() {
   var selectedAudioDevice = null;
   var audioDevices = [];
 
-  yield new Promise(resolve => {
-    window
-      .easyrtc
-      .getAudioSourceList(function (audioList) {
-        let savedAudioDeviceId = localStorage.getItem("selectedAudioDeviceId");
+  window
+    .easyrtc
+    .getAudioSourceList(function (audioList) {
+      let savedAudioDeviceId = localStorage.getItem("selectedAudioDeviceId");
 
-        for (var i = 0; i < audioList.length; i++) {
-          let a = audioList[i];
-          // Copy object because we can't modify the original one
-          a = {
-            deviceId: a.deviceId,
-            label: a.label
-          };
-          if (!a.label) {
-            a.label = "Mic " + (i + 1);
-          }
-          if (savedAudioDeviceId === a.deviceId) {
-            selectedAudioDevice = a;
-          }
-          audioDevices.push(a);
+      for (var i = 0; i < audioList.length; i++) {
+        let a = audioList[i];
+        // Copy object because we can't modify the original one
+        a = {
+          deviceId: a.deviceId,
+          label: a.label
+        };
+        if (!a.label) {
+          a.label = "Mic " + (i + 1);
         }
-        if (audioDevices.length > 0 && !selectedAudioDevice) {
-          selectedAudioDevice = audioDevices[0];
+        if (savedAudioDeviceId === a.deviceId) {
+          selectedAudioDevice = a;
         }
-        store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICES_LIST, payload: audioDevices});
-        store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICE_SELECTED, payload: selectedAudioDevice});
-        resolve({selectedAudioDevice, audioDevices});
-      });
-  });
+        audioDevices.push(a);
+      }
+      if (audioDevices.length > 0 && !selectedAudioDevice) {
+        selectedAudioDevice = audioDevices[0];
+      }
+      store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICES_LIST, payload: audioDevices});
+      store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICE_SELECTED, payload: selectedAudioDevice});
+    });
 }
 
-export function * getVideoSourceList() {
+export function getVideoSourceList() {
   var selectedVideoDevice = null;
   var videoDevices = [];
 
-  yield new Promise(resolve => {
-    window
-      .easyrtc
-      .getVideoSourceList(function (videoList) {
-        let savedVideoDeviceId = localStorage.getItem("selectedVideoDeviceId");
+  window
+    .easyrtc
+    .getVideoSourceList(function (videoList) {
+      let savedVideoDeviceId = localStorage.getItem("selectedVideoDeviceId");
 
-        for (var i = 0; i < videoList.length; i++) {
-          let a = videoList[i];
-          // Copy object because we can't modify the original one
-          a = {
-            deviceId: a.deviceId,
-            label: a.label
-          };
+      for (var i = 0; i < videoList.length; i++) {
+        let a = videoList[i];
+        // Copy object because we can't modify the original one
+        a = {
+          deviceId: a.deviceId,
+          label: a.label
+        };
 
-          if (!a.label) {
-            a.label = "Cam " + (i + 1);
-          }
-
-          if (savedVideoDeviceId === a.deviceId) {
-            selectedVideoDevice = a;
-          }
-
-          videoDevices.push(a);
+        if (!a.label) {
+          a.label = "Cam " + (i + 1);
         }
-        if (videoDevices.length > 0 && !selectedVideoDevice) {
-          selectedVideoDevice = videoDevices[0];
+
+        if (savedVideoDeviceId === a.deviceId) {
+          selectedVideoDevice = a;
         }
-        //TODO: check if camera is enabled
-        let cameraEnabled = true;
-        if (videoDevices.length === 0) {
-          cameraEnabled = false;
-        }
-        store.dispatch({type: settingsActions.SETTINGS_VIDEO_DEVICE_SELECTED, payload: selectedVideoDevice});
-        store.dispatch({type: settingsActions.SETTINGS_VIDEO_DEVICES_LIST, payload: videoDevices});
-        resolve({selectedVideoDevice, videoDevices, cameraEnabled});
-      });
-  });
+
+        videoDevices.push(a);
+      }
+      if (videoDevices.length > 0 && !selectedVideoDevice) {
+        selectedVideoDevice = videoDevices[0];
+      }
+      //TODO: check if camera is enabled
+      let cameraEnabled = true;
+      if (videoDevices.length === 0) {
+        cameraEnabled = false;
+      }
+      store.dispatch({type: settingsActions.SETTINGS_VIDEO_DEVICE_SELECTED, payload: selectedVideoDevice});
+      store.dispatch({type: settingsActions.SETTINGS_VIDEO_DEVICES_LIST, payload: videoDevices});
+    });
 }
 
-export function * getAudioSinkList() {
+export function getAudioSinkList() {
   var audioOutputDevices = [];
   var selectedAudioOutputDevice = null;
 
-  yield new Promise(resolve => {
-    window
-      .easyrtc
-      .getAudioSinkList(function (outputList) {
-        audioOutputDevices = [];
+  window
+    .easyrtc
+    .getAudioSinkList(function (outputList) {
+      audioOutputDevices = [];
 
-        let savedAudioOutputDeviceId = localStorage.getItem("selectedAudioOutputDeviceId");
+      let savedAudioOutputDeviceId = localStorage.getItem("selectedAudioOutputDeviceId");
 
-        for (var i = 0; i < outputList.length; i++) {
-          let a = outputList[i];
-          // Copy object because we can't modify the original one
-          a = {
-            deviceId: a.deviceId,
-            label: a.label
-          };
+      for (var i = 0; i < outputList.length; i++) {
+        let a = outputList[i];
+        // Copy object because we can't modify the original one
+        a = {
+          deviceId: a.deviceId,
+          label: a.label
+        };
 
-          if (!a.label) {
-            a.label = "Audio Out " + (i + 1);
-          }
-
-          if (savedAudioOutputDeviceId === a.deviceId) {
-            selectedAudioOutputDevice = a;
-          }
-
-          audioOutputDevices.push(a);
+        if (!a.label) {
+          a.label = "Audio Out " + (i + 1);
         }
-        if (audioOutputDevices.length > 0 && !selectedAudioOutputDevice) {
-          selectedAudioOutputDevice = audioOutputDevices[0];
+
+        if (savedAudioOutputDeviceId === a.deviceId) {
+          selectedAudioOutputDevice = a;
         }
-        store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICES_SINK_LIST, payload: audioOutputDevices});
-        store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICE_SINK_SELECTED, payload: selectedAudioOutputDevice});
-      });
-  });
+
+        audioOutputDevices.push(a);
+      }
+      if (audioOutputDevices.length > 0 && !selectedAudioOutputDevice) {
+        selectedAudioOutputDevice = audioOutputDevices[0];
+      }
+      store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICES_SINK_LIST, payload: audioOutputDevices});
+      store.dispatch({type: settingsActions.SETTINGS_AUDIO_DEVICE_SINK_SELECTED, payload: selectedAudioOutputDevice});
+    });
 }
 
 // Detect browser methods
@@ -483,7 +487,20 @@ export function stopSharingScreen() {
   window
     .easyrtc
     .closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-  store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_SHARE});
+  if (store.getState().conference.sharingScreen) {
+    store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_SHARE});
+    store.dispatch({type: conferenceActions.CONFERENCE_REMOVE_LOCAL_STREAM});
+  }
+}
+
+export function reconnect(){
+  let domain = store.getState().conference.domain;
+  window.easyrtc.leaveRoom(domain.roomToJoin, ()=> {
+    setTimeout(()=>{
+      appInit(domain.server, domain.roomName, localStorage["username"]);
+    }, 500);
+  })
+  window.easyrtc.hangupAll();
 }
 
 export function shareScreen() {
@@ -512,6 +529,8 @@ export function shareScreen() {
             window
               .easyrtc
               .setVideoObjectSrc(selfVideo, stream);
+
+            store.dispatch({type: conferenceActions.CONFERENCE_ADD_LOCAL_STREAM, payload: stream});
             // OnInactive stop sharing screen
             stream.oninactive = () => {
               if (stream.oninactive) {

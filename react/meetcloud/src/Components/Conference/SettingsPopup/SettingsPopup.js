@@ -32,6 +32,8 @@ export default class SettingsPopup extends Component {
       this
         .props
         .onAudioInputSelected(selectedAudioInput);
+        debugger;
+        this.props.onSaveSettings();
     }
 
     if (this.props.settings.videoDevicesList) {
