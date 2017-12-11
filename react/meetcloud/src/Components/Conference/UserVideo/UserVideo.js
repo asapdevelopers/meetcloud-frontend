@@ -9,13 +9,13 @@ class UserVideo extends Component {
     if (user.hasVideo) {
       video = (
         <video
-          className={selected ? "videoContainer selected" : "videoContainer"}
+          className={selected ? "videoContainer selected mirror" : "videoContainer"}
           key={"u-" + user.callerEasyrtcid}
           id={"u-" + user.callerEasyrtcid}
         />
       );
     }
-    if (user.screen) {
+    if (user.hasScreen) {
       video = (
         <video
           className={selected ? "videoContainer selected" : "videoContainer"}

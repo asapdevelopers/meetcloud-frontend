@@ -1,4 +1,5 @@
 import * as conferenceActions from "../../constants/actions/conferenceActions";
+import * as conferenceConsts from "../../constants/conference";
 
 function conferenceReducer(state = [], { type, payload }) {
   switch (type) {
@@ -15,18 +16,36 @@ function conferenceReducer(state = [], { type, payload }) {
     }
     // Peers
     case conferenceActions.CONFERENCE_PEERS_ADD_PEER: {
-      return {
-        ...state,
-        peers: [
+      debugger;
+      let newPeers = state.peers;
+      let hasVideo = payload.stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME? false : true;
+      let hasScreen = payload.stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME? true : false;
+      // Is the peer new?
+      let index = state.peers.findIndex(x => x.callerEasyrtcid === payload.callerEasyrtcid);
+      // if the peer is already on the store, we update the hasVideo and hasScreen variables
+      if (index !=-1 ){
+        newPeers = [
+          ...state.peers.slice(0, index),
+          { ...state.peers[index], hasVideo, hasScreen },
+          ...state.peers.slice(index + 1)
+        ]
+      }else{
+        // if the peer is not on the store, we add it
+        newPeers = [
           ...state.peers,
           {
             callerEasyrtcid: payload.callerEasyrtcid,
             stream: payload.stream,
             username: payload.username,
-            hasVideo: true,
-            hasAudio: true
+            hasVideo,
+            hasAudio: true,
+            hasScreen
           }
         ]
+      }
+      return {
+        ...state,
+        peers: newPeers
       };
     }
     case conferenceActions.CONFERENCE_PEERS_REMOVE_PEER: {
@@ -73,6 +92,12 @@ function conferenceReducer(state = [], { type, payload }) {
       return {
         ...state,
         micEnabled: !state.micEnabled
+      };
+    }
+    case conferenceActions.CONFERENCE_SWITCH_SHARE: {
+      return {
+        ...state,
+        sharingScreen: !state.sharingScreen
       };
     }
     default:

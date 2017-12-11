@@ -38,6 +38,7 @@ const defaultState = {
     domain: domainData.domain,
     cameraEnabled: true,
     micEnabled: true,
+    sharingScreen:false,
     joined: false,
     data: {
       duration: 0,

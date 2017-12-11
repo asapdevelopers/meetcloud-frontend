@@ -247,61 +247,7 @@ class Conference extends Component {
   };
 
   shareScreen = () => {
-    if (this.state.sharingScreen) {
-      this.stopShareScreen();
-    } else {
-      window.getScreenId((error, sourceId, screen_constraints) => {
-        // error    == null || 'permission-denied' || 'not-installed' ||
-        // 'installed-disabled' || 'not-chrome' sourceId == null || 'string' ||
-        // 'firefox'
-        navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
-        navigator.getUserMedia(screen_constraints, stream => {
-          rtcHelper.turnOffCamera();
-          let selfVideo = document.getElementById("self-video-div");
-          window
-            .easyrtc
-            .setVideoObjectSrc(selfVideo, stream);
-          // share this "MediaStream" object using RTCPeerConnection API
-        }, function (error) {
-          console.error(error);
-        });
-      });
-
-      /*window.getScreenId((error, sourceId, screen_constraints) => {
-        if (error || !sourceId) {
-          //TODO: add a notification
-          alert(
-            "Failed to get screen, make sure plugin is installed. https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk"
-          );
-        } else {
-          var _ = this;
-          navigator.getUserMedia(
-            screen_constraints,
-            stream => {
-              // register screen stream and send it to all existing peers.
-              window.easyrtc.register3rdPartyLocalMediaStream(
-                stream,
-                conferenceConsts.SCREEN_SHARING_STREAM_NAME
-              );
-              this.setState({ sharingScreen: true });
-
-              rtcHelper.turnOffCamera();
-              this.setState({ userScreen: stream });
-              window.easyrtc.setVideoObjectSrc(this.selfVideoElement, stream);
-
-              stream.oninactive = () => {
-                if (stream.oninactive) {
-                  stream.oninactive = undefined;
-                  _.stopShareScreen();
-                }
-              };
-              _.sendLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-            },
-            error => console.error(error)
-          );
-        }
-      });*/
-    }
+    rtcHelper.shareScreen();
   };
 
   invitePersonToConference = event => {
@@ -453,6 +399,14 @@ class Conference extends Component {
     if (peers.length === 0) {
       emptyRoom = <span>Room is empty, waiting...</span>;
     }
+
+    let selfVideoStyles = "selfVideo ";
+    if(this.state.selectedUser){
+      selfVideoStyles += "selected ";
+    }
+    if (!conference.sharingScreen){
+      selfVideoStyles += " mirror ";
+    }
     return (
       <div className="Conference">
         <NotificationSystem ref="notificationSystem"/>
@@ -492,9 +446,7 @@ class Conference extends Component {
                 <video
                   id="self-video-div"
                   muted
-                  className={this.state.selectedUser === "me"
-                  ? "selfVideo selected"
-                  : "selfVideo"}/>
+                  className={selfVideoStyles}/>
               </div>
             </div>
             {peers.map(user => {
@@ -519,9 +471,9 @@ class Conference extends Component {
           .bind(null)}
           onShareClick={this.shareRoomWithContact}
           onShareScreenClick={this.shareScreen}
-          shareScreenEnabled={this.state.sharingScreen}
           cameraEnabled={conference.cameraEnabled}
           micEnabled={conference.micEnabled}
+          shareScreenEnabled={conference.sharingScreen}
           onHangUp={this
           .finishCall
           .bind(null)}/>

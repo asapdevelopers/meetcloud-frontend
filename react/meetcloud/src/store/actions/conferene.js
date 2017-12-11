@@ -31,3 +31,6 @@ export const switchCamera = () => ({
 export const switchMic = () => ({
   type:conferenceActions.CONFERENCE_SWITCH_MIC
 })
+export const switchShare = () =>{
+  type:conferenceActions.CONFERENCE_SWITCH_SHARE
+}

@@ -54,9 +54,17 @@ function messageListener(easyrtcid, msgType, content) {
 window
   .easyrtc
   .setStreamAcceptor(function (callerEasyrtcid, stream) {
+    let peers = store
+      .getState()
+      .conference
+      .peers;
+    let peerIndex = peers.find(x => x.callerEasyrtcid === callerEasyrtcid);
+
+    // Adds or updates the user
     let username = window
       .easyrtc
       .idToName(callerEasyrtcid);
+
     store.dispatch({
       type: conferenceActions.CONFERENCE_PEERS_ADD_PEER,
       payload: {
@@ -65,47 +73,68 @@ window
         username
       }
     });
-    store.dispatch({
-      type: chatActions.CHAT_ADD_MESSAGE,
-      payload: {
-        msg: username,
-        source: "New connection"
-      }
-    });
-    setTimeout(() => {
-      var video = document.getElementById("u-" + callerEasyrtcid) || document.getElementById("us-" + callerEasyrtcid);
-      if (video) {
-        console.log("Adding video stream");
 
-        let deviceId = store
-          .getState()
-          .settings
-          .audioDeviceSelected;
-        window
-          .easyrtc
-          .setVideoObjectSrc(video, stream);
-        setAudioOutput(video, deviceId);
+    if (!peerIndex) {
+      store.dispatch({
+        type: chatActions.CHAT_ADD_MESSAGE,
+        payload: {
+          msg: username,
+          source: "New connection"
+        }
+      });
+    }
+
+    setTimeout(() => {
+      if (stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
+        var video = document.getElementById("us-" + callerEasyrtcid);
+        if (video) {
+          console.log("Adding share screen stream");
+          window
+            .easyrtc
+            .setVideoObjectSrc(video, stream);
+        }
+      } else {
+        var video = document.getElementById("u-" + callerEasyrtcid) || document.getElementById("us-" + callerEasyrtcid);
+        if (video) {
+          console.log("Adding video stream");
+
+          let deviceId = store
+            .getState()
+            .settings
+            .audioDeviceSelected;
+          window
+            .easyrtc
+            .setVideoObjectSrc(video, stream);
+          setAudioOutput(video, deviceId);
+        }
       }
     }, 100);
   });
 
-// Evenet that removes an stream from the call
+// Event that removes an stream from the call
 window
   .easyrtc
   .setOnStreamClosed(function (callerEasyrtcid) {
+    debugger;
     let username = window
       .easyrtc
       .idToName(callerEasyrtcid);
-    store.dispatch({type: conferenceActions.CONFERENCE_PEERS_REMOVE_PEER, payload: {
-        callerEasyrtcid
-      }});
-    store.dispatch({
-      type: chatActions.CHAT_ADD_MESSAGE,
-      payload: {
-        msg: username,
-        source: "Lost connection"
-      }
-    });
+    // Check if the stream closed is "screenShare"
+    debugger;
+    let peerClosed = store.getState().conference.peers
+      .find(x => x.callerEasyrtcid === callerEasyrtcid);
+    if (peerClosed && !peerClosed.hasScreen) {
+      store.dispatch({type: conferenceActions.CONFERENCE_PEERS_REMOVE_PEER, payload: {
+          callerEasyrtcid
+        }});
+      store.dispatch({
+        type: chatActions.CHAT_ADD_MESSAGE,
+        payload: {
+          msg: username,
+          source: "Lost connection"
+        }
+      });
+    }
   });
 
 // Media got successfully
@@ -450,5 +479,81 @@ export function playSound(obj) {
   obj.play();
 }
 
-// Screen sharing
-export function shareScreen(stream) {}
+export function stopSharingScreen() {
+  window
+    .easyrtc
+    .closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+  store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_SHARE});
+}
+
+export function shareScreen() {
+  let sharingScreen = store
+    .getState()
+    .conference
+    .sharingScreen;
+  if (sharingScreen) {
+    stopSharingScreen();
+  } else {
+    window
+      .getScreenId(function (error, sourceId, screen_constraints) {
+        // Everything is OK
+        if (error === null || error === "installed-enabled" || error === "firefox") {
+          navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+          navigator.getUserMedia(screen_constraints, function (stream) {
+            // TODO:turn off camera
+            store.dispatch({type: conferenceActions.CONFERENCE_SWITCH_SHARE});
+            turnOffCamera();
+            let selfVideo = document.getElementById("self-video-div");
+            // Add share plugin as media stream
+            window
+              .easyrtc
+              .register3rdPartyLocalMediaStream(stream, conferenceConsts.SCREEN_SHARING_STREAM_NAME);
+            // Set local video stream
+            window
+              .easyrtc
+              .setVideoObjectSrc(selfVideo, stream);
+            // OnInactive stop sharing screen
+            stream.oninactive = () => {
+              if (stream.oninactive) {
+                stream.oninactive = undefined;
+                stopSharingScreen(); // calling this twice won't hurt
+              }
+            };
+
+            // add share stream to all peers
+            let peers = store
+              .getState()
+              .conference
+              .peers;
+            for (var i = 0; i < peers.length; i++) {
+              window
+                .easyrtc
+                .addStreamToCall(peers[i].callerEasyrtcid, conferenceConsts.SCREEN_SHARING_STREAM_NAME, () => {
+                  console.log("Share screen accepted.");
+                });
+            }
+          }, function (error) {
+            console.error(error);
+          });
+        } else {
+          switch (error) {
+            case "permission-denied":
+              alert("Permission denied");
+              break;
+            case "not-chrome":
+              alert("This features work on Google Chrome only");
+              break;
+            case "installed-disabled":
+              alert("Share plugin disabled");
+              break;
+            case "not-installed":
+              alert("Share plugin not installed. Please install: https://chrome.google.com/webstore/d" +
+                  "etail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk");
+              break;
+            default:
+              console.log("Unknown share plugin error: " + error);
+          }
+        }
+      });
+  }
+}

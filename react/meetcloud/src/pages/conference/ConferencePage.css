@@ -3,11 +3,12 @@
   height: 150px;
   margin-left: 20px;
   cursor: pointer;
-  margin-right: 10px;
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  /* Safari and Chrome */
-  -moz-transform: rotateY(180deg); }
+  margin-right: 10px; }
+  .selfVideo .mirror {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    /* Safari and Chrome */
+    -moz-transform: rotateY(180deg); }
 
 .loadingModal {
   width: 20vw;
