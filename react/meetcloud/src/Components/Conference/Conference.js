@@ -137,20 +137,6 @@ class Conference extends Component {
     this.setState({isLoading: false, modal: false});
   };
 
-  // In order to change stream sources we need to re-obtain medias and re connect
-  // from peers with the new streams
-  changeSources = () => {
-    window
-      .easyrtc
-      .leaveRoom(this.state.domain.roomToJoin, function () {
-        this.setState({joined: null});
-        this.connect(); //timeout 500ms?
-      });
-    window
-      .easyrtc
-      .hangupAll();
-  };
-
   switchCamera = () => {
     rtcHelper.switchCamera();
   };
@@ -182,80 +168,24 @@ class Conference extends Component {
     }
   };
 
-  // Permissions
-  cancelPermissionChecker = () => {
-    clearInterval(this.state.permissions_interval_checker);
-  };
-
-  permissionInterval = () => {
-    try {
-      navigator
-        .mediaDevices
-        .enumerateDevices()
-        .then(devices => {
-          if (devices.some(device => device.label !== "")) {
-            this.cancelPermissionChecker();
-            rtcHelper.getAudioSourceList();
-            rtcHelper.getVideoSourceList();
-            rtcHelper.getAudioSinkList();
-          }
-        });
-    } catch (err) {
-      this.cancelPermissionChecker();
-    }
-  };
-
   // Conference logic
   initConference = () => {
-    console.log("Detect browser: " + rtcHelper.detectBrowser());
-    let browser = rtcHelper.detectBrowser();
-    if (browser === "chrome") {
-      this.permissions_interval_checker = setInterval(this.permissionInterval, 1000);
-      this.setState({permissions_interval_checker: this.permissions_interval_checker});
-    }
-
+    // Interval that updates the call clock
     this.intervalId = setInterval(this.clockInterval, 1000);
 
     rtcHelper.appInit(this.props.conference.domain.server, this.props.roomName, localStorage["username"]);
 
-    rtcHelper.getAudioSourceList();
-    rtcHelper.getVideoSourceList();
-    rtcHelper.getAudioSinkList();
-  };
+   /*rtcHelper.getAudioSourceList();
+   rtcHelper.getVideoSourceList();
+   rtcHelper.getAudioSinkList();
+  */
+};
 
   // Share screen features --- Screen sharing tests --- #1: <script
   // src="https://cdn.WebRTC-Experiment.com/getScreenId.js"></script> in order to
   // add a helper js #2: Users must download chrome extension:
   // https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgc
   // o dmmfdlknahffk
-
-  stopShareScreen = () => {
-    window
-      .easyrtc
-      .closeLocalStream(conferenceConsts.SCREEN_SHARING_STREAM_NAME);
-    this.setState({sharingScreen: false});
-    this.setState({userScreen: null});
-    this.switchCamera();
-    if (this.state.userMedia) {
-      window
-        .easyrtc
-        .setVideoObjectSrc(this.selfVideoElement, this.state.userMedia);
-    }
-    this.setFullScreenVideo();
-    console.log("Fabricio");
-    console.log(this.state.userMedia);
-    this.sendLocalStream(this.state.userMedia.streamName);
-  };
-
-  sendLocalStream = streamName => {
-    for (let i = 0; i < this.state.sharingWithMe.length; i++) {
-      window
-        .easyrtc
-        .addStreamToCall(this.state.sharingWithMe[i].id, streamName, function () {
-          console.log("Stream accepted: " + streamName);
-        });
-    }
-  };
 
   shareScreen = () => {
     rtcHelper.shareScreen();

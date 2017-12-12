@@ -199,8 +199,41 @@ function mediaError(a, b) {
     });
 }
 
+// Permission checker
+var permissions_interval_checker = null;
+
+export function cancelPermissionChecker() {
+  clearInterval(permissions_interval_checker);
+};
+
+function permissionInterval() {
+  try {
+    debugger;
+    navigator
+      .mediaDevices
+      .enumerateDevices()
+      .then(devices => {
+        debugger;
+        if (devices.some(device => device.label !== "")) {
+          cancelPermissionChecker();
+          getAudioSourceList();
+          getVideoSourceList();
+          getAudioSinkList();
+        }
+      });
+  } catch (err) {
+    cancelPermissionChecker();
+  }
+};
+
 // Init method
 export function appInit(domainServer, roomName, username) {
+  debugger;
+  let browser = detectBrowser();
+  if (browser === "chrome") {
+    permissions_interval_checker = setInterval(permissionInterval(), 1000);
+  }
+
   if (window.easyrtc.supportsGetUserMedia && window.easyrtc.supportsGetUserMedia()) {
     store.dispatch({type: conferenceActions.CONFERECE_SHOW_LOADING});
     globalRoomName = roomName;
@@ -493,14 +526,10 @@ export function stopSharingScreen() {
   }
 }
 
-export function reconnect(){
-  let domain = store.getState().conference.domain;
-  window.easyrtc.leaveRoom(domain.roomToJoin, ()=> {
-    setTimeout(()=>{
-      appInit(domain.server, domain.roomName, localStorage["username"]);
-    }, 500);
-  })
-  window.easyrtc.hangupAll();
+// In order to change stream sources we need to re-obtain medias and re connect
+// from peers with the new streams
+export function reconnect() {
+  window.location.reload();
 }
 
 export function shareScreen() {

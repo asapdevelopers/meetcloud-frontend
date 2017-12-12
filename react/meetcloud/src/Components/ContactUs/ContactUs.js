@@ -13,10 +13,10 @@ class ContactUs extends Component {
           </div>
           <div className="col-xs-3">
             <div className="row">
-              <span>Sillicon Valley</span>
+              <span>San Francisco</span>
             </div>
             <div className="row">
-              <span>1701 N. California Blvd. Walnut Creek, CA 94596</span>
+              <span>535 Mission St, 14th floor, San Francisco, CA 94105</span>
             </div>
             <div className="row">
               <span>Tel: (+415) 967 3920</span>
