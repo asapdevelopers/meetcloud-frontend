@@ -8,10 +8,10 @@ switch (environment) {
     conferenceApiPrefix = "http://localhost:8000/";
     break;
   case "prod":
-    conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/api/";
+    conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/";
     break;
   default:
-    conferenceApiPrefix ="https://localhost:8000/";
+    conferenceApiPrefix = "https://localhost:8000/";
 }
 
 function parseRoute(route, params) {
@@ -24,7 +24,7 @@ function parseRoute(route, params) {
 export const api = {
   conference: {
     authenticateDomain: conferenceApiPrefix + "auth/domain/",
-    authenticateToken: function(obj) {
+    authenticateToken: function (obj) {
       return parseRoute(conferenceApiPrefix + "auth/token/?token={token}", obj);
     }
   },

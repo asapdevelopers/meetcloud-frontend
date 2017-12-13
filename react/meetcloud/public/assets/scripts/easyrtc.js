@@ -56,7 +56,7 @@ return {
   "statsNotSupported":"call statistics not supported by this browser, try Chrome.",
    "noWebrtcSupport":"Your browser doesn't appear to support WebRTC.",
    "gumFailed":"Failed to get access to local media. Error code was {0}.",
-   "requireAudioOrVideo":"At least one of audio and video must be provided"   
+   "requireAudioOrVideo":"At least one of audio and video must be provided"
 };
 
 }));
@@ -3253,7 +3253,7 @@ var Easyrtc = function() {
     }
 
     /**
-     * Sets the audio output device of a Video object. 
+     * Sets the audio output device of a Video object.
      * That is to say, this controls what speakers get the sound.
      * In theory, this works on Chrome but probably doesn't work anywhere else yet.
      * This code was cribbed from https://webrtc.github.io/samples/src/content/devices/multi/.
@@ -3481,7 +3481,7 @@ var Easyrtc = function() {
         }
         else {
 
-            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate 
+            // Tested Firefox 49 and MS Edge require minFrameRate and maxFrameRate
             // instead max,min,ideal that cause GetUserMedia failure.
             // Until confirmed both browser support idea,max and min we need this.
             if (
@@ -3496,7 +3496,7 @@ var Easyrtc = function() {
                     constraints.video.height = self._desiredVideoProperties.height;
                 }
                 if (self._desiredVideoProperties.frameRate) {
-                    constraints.video.frameRate = { 
+                    constraints.video.frameRate = {
                         minFrameRate: self._desiredVideoProperties.frameRate,
                         maxFrameRate: self._desiredVideoProperties.frameRate
                     };
@@ -3506,13 +3506,13 @@ var Easyrtc = function() {
                 }
 
             // chrome and opera
-            } else { 
+            } else {
                 constraints.video = {};
                 if (self._desiredVideoProperties.width) {
-                     constraints.video.width = { 
+                     constraints.video.width = {
                         max: self._desiredVideoProperties.width,
                         min : self._desiredVideoProperties.width,
-                        ideal : self._desiredVideoProperties.width 
+                        ideal : self._desiredVideoProperties.width
                      };
                 }
                 if (self._desiredVideoProperties.height) {
@@ -5408,11 +5408,11 @@ var Easyrtc = function() {
 
     /** @private */
     function getRemoteStreamByName(peerConn, otherUser, streamName) {
-                    
+
         var keyToMatch = null;
         var remoteStreams = peerConn.pc.getRemoteStreams();
 
-        // No streamName lead to default 
+        // No streamName lead to default
         if (!streamName) {
             streamName = "default";
         }
@@ -5438,12 +5438,12 @@ var Easyrtc = function() {
             }
         }
 
-        // 
+        //
         if (!keyToMatch) {
             self.showError(self.errCodes.DEVELOPER_ERR, "remote peer does not have media stream called " + streamName);
         }
 
-        // 
+        //
         for (var i = 0; i < remoteStreams.length; i++) {
             var remoteId;
             if (remoteStreams[i].id) {
@@ -6326,7 +6326,7 @@ var Easyrtc = function() {
             };
 
             pc.onsignalingstatechange = function () {
-                
+
                 var eventTarget = event.currentTarget || event.target || pc,
                     signalingState = eventTarget.signalingState || 'unknown';
 
@@ -7020,7 +7020,7 @@ var Easyrtc = function() {
 
     /** @private */
     function hangupBody(otherUser) {
-        
+
         logDebug("Hanging up on " + otherUser);
         clearQueuedMessages(otherUser);
 
@@ -7028,14 +7028,14 @@ var Easyrtc = function() {
 
             if (peerConns[otherUser].pc) {
                 closePeer(otherUser);
-            } 
+            }
 
             if (peerConns[otherUser]) {
                 delete peerConns[otherUser];
             }
 
             updateConfigurationInfo();
-            
+
             if (self.webSocket) {
                 sendSignalling(otherUser, "hangup", null, function() {
                     logDebug("hangup succeeds");
@@ -7047,7 +7047,7 @@ var Easyrtc = function() {
         }
     }
 
-    
+
 
     /**
      * Hang up on a particular user or all users.
@@ -8417,7 +8417,7 @@ var Easyrtc = function() {
 
 return new Easyrtc();
 
-})); 
+}));
 
 /* global define, module, require, console */
 /*!
@@ -8471,7 +8471,7 @@ return new Easyrtc();
     "use strict";
 
     /**
-     * This file adds additional methods to Easyrtc for simplifying the 
+     * This file adds additional methods to Easyrtc for simplifying the
      * management of video-mediastream assignment.
      * @class Easyrtc_App
      */
@@ -8502,7 +8502,7 @@ return new Easyrtc();
         var videoIdsP = videoIds || [],
             numPEOPLE = videoIds.length,
             videoIdToCallerMap = {},
-            onCall = null, 
+            onCall = null,
             onHangup = null;
 
         /**
@@ -8519,7 +8519,7 @@ return new Easyrtc();
                 easyrtc.showError(easyrtc.errCodes.DEVELOPER_ERR, "The monitor video id passed to easyApp was bad, saw " + monitorVideoId);
                 return false;
             }
-    
+
             for (i in videoIds) {
                 if (!videoIds.hasOwnProperty(i)) {
                     continue;
@@ -8576,7 +8576,7 @@ return new Easyrtc();
             document.getElementById(monitorVideoId).muted = "muted";
         }
 
-        easyrtc.addEventListener("roomOccupants", 
+        easyrtc.addEventListener("roomOccupants",
             function(eventName, eventData) {
                 var i;
                 for (i = 0; i < numPEOPLE; i++) {
@@ -8593,7 +8593,7 @@ return new Easyrtc();
             }
         );
 
-        /** Sets an event handler that gets called when an incoming MediaStream is assigned 
+        /** Sets an event handler that gets called when an incoming MediaStream is assigned
          * to a video object. The name is poorly chosen and reflects a simpler era when you could
          * only have one media stream per peer connection.
          * @function
@@ -8626,7 +8626,7 @@ return new Easyrtc();
             onHangup = cb;
         };
 
-        /** 
+        /**
           * Get the easyrtcid of the ith caller, starting at 0.
           * @function
           * @memberOf Easyrtc_App
@@ -8641,12 +8641,12 @@ return new Easyrtc();
             return getCallerOfVideo(vid);
         };
 
-        /** 
+        /**
           * This is the complement of getIthCaller. Given an easyrtcid,
           * it determines which slot the easyrtc is in.
           * @function
           * @memberOf Easyrtc_App
-          * @param {string} easyrtcid 
+          * @param {string} easyrtcid
           * @returns {number} or -1 if the easyrtcid is not a caller.
           */
         easyrtc.getSlotOfCaller = function(easyrtcid) {
@@ -8793,7 +8793,7 @@ return new Easyrtc();
      *              });
      */
     easyrtc.easyApp = function(applicationName, monitorVideoId, videoIds, onReady, onFailure) {
-        
+
         var gotMediaCallback = null,
             gotConnectionCallback = null;
 
@@ -8832,7 +8832,7 @@ return new Easyrtc();
         easyrtc.setGotConnection = function(gotConnectionCB) {
             gotConnectionCallback = gotConnectionCB;
         };
-        
+
         function nextInitializationStep(/* token */) {
             if (gotConnectionCallback) {
                 gotConnectionCallback(true, "");

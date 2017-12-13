@@ -23,6 +23,7 @@ export default class SettingsPopup extends Component {
   }
 
   saveSettings = () => {
+    debugger;
     if (this.props.settings.audioDevicesList) {
       let selectedAudioInput = this
         .props
@@ -32,8 +33,6 @@ export default class SettingsPopup extends Component {
       this
         .props
         .onAudioInputSelected(selectedAudioInput);
-        debugger;
-        this.props.onSaveSettings();
     }
 
     if (this.props.settings.videoDevicesList) {
@@ -57,6 +56,7 @@ export default class SettingsPopup extends Component {
         .props
         .onAudioOutputSelected(selectedAudioOutput);
     }
+    this.props.onSaveSettings();
     this
       .props
       .onCloseModal();

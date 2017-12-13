@@ -98,14 +98,16 @@ window
         if (video) {
           console.log("Adding video stream");
 
-          let deviceId = store
-            .getState()
-            .settings
-            .audioDeviceSelected;
           window
             .easyrtc
             .setVideoObjectSrc(video, stream);
-          setAudioOutput(video, deviceId);
+          let selectedDevice = store
+            .getState()
+            .settings
+            .audioDeviceSinkSelected;
+          if (selectedDevice) {
+            setAudioOutput(video, selectedDevice.deviceId);
+          }
         }
       }
     }, 100);
@@ -208,17 +210,16 @@ export function cancelPermissionChecker() {
 
 function permissionInterval() {
   try {
-    debugger;
     navigator
       .mediaDevices
       .enumerateDevices()
       .then(devices => {
-        debugger;
         if (devices.some(device => device.label !== "")) {
           cancelPermissionChecker();
           getAudioSourceList();
           getVideoSourceList();
           getAudioSinkList();
+          //setTimeout(appInit(),200);
         }
       });
   } catch (err) {
@@ -228,82 +229,96 @@ function permissionInterval() {
 
 // Init method
 export function appInit(domainServer, roomName, username) {
-  debugger;
+  // Show loading
+  store.dispatch({type: conferenceActions.CONFERECE_SHOW_LOADING});
+
+  // Permissions checker if Chrome
   let browser = detectBrowser();
   if (browser === "chrome") {
     permissions_interval_checker = setInterval(permissionInterval(), 1000);
   }
+  // Executes
+  setTimeout(() => {
+    if (window.easyrtc.supportsGetUserMedia && window.easyrtc.supportsGetUserMedia()) {
+      globalRoomName = roomName;
+      // Prevent reconnection because it gives a lot of issues, see manual calls to
+      // disconnect as well
+      window
+        .easyrtc
+        .setSocketUrl(domainServer, {
+          transports: ["websocket"],
+          reconnection: false
+        });
+      window
+        .easyrtc
+        .enableDebug(conferenceConsts.DEBUG);
+      window
+        .easyrtc
+        .setOnError(function (e) {
+          console.log("error from easyrtc:", e);
+        });
+      window
+        .easyrtc
+        .setRoomOccupantListener(callEverybodyElse);
+      // window.easyrtc.setAutoInitUserMedia(true); Enable audio and video medias.
+      // This can only be changed before connecting so careful. These are used for
+      // calling and should be disabled if the media doesn't work otherwise connection
+      // will be slower and won't properly work
+      window
+        .easyrtc
+        .enableAudio(true);
+      window
+        .easyrtc
+        .enableVideo(true); //TODO: change this (dev only)
+      window
+        .easyrtc
+        .enableDataChannels(true);
+      window
+        .easyrtc
+        .enableVideoReceive(true);
+      window
+        .easyrtc
+        .enableAudioReceive(true);
+      window
+        .easyrtc
+        .setUsername(username);
 
-  if (window.easyrtc.supportsGetUserMedia && window.easyrtc.supportsGetUserMedia()) {
-    store.dispatch({type: conferenceActions.CONFERECE_SHOW_LOADING});
-    globalRoomName = roomName;
-    // Prevent reconnection because it gives a lot of issues, see manual calls to
-    // disconnect as well
-    window
-      .easyrtc
-      .setSocketUrl(domainServer, {
-        transports: ["websocket"],
-        reconnection: false
-      });
-    window
-      .easyrtc
-      .enableDebug(conferenceConsts.DEBUG);
-    window
-      .easyrtc
-      .setOnError(function (e) {
-        console.log("error from easyrtc:", e);
-      });
-    window
-      .easyrtc
-      .setRoomOccupantListener(callEverybodyElse);
-    // window.easyrtc.setAutoInitUserMedia(true); Enable audio and video medias.
-    // This can only be changed before connecting so careful. These are used for
-    // calling and should be disabled if the media doesn't work otherwise connection
-    // will be slower and won't properly work
-    window
-      .easyrtc
-      .enableAudio(true);
-    window
-      .easyrtc
-      .enableVideo(true); //TODO: change this (dev only)
-    window
-      .easyrtc
-      .enableDataChannels(true);
-    window
-      .easyrtc
-      .enableVideoReceive(true);
-    window
-      .easyrtc
-      .enableAudioReceive(true);
-    window
-      .easyrtc
-      .setUsername(username);
+      // Some defaults. The simply turn on/off
+      window
+        .easyrtc
+        .enableCamera(true);
+      window
+        .easyrtc
+        .enableMicrophone(true);
 
-    // Some defaults. The simply turn on/off
-    window
-      .easyrtc
-      .enableCamera(true);
-    window
-      .easyrtc
-      .enableMicrophone(true);
+      // Set audio input
+      let selectedAudioInput = store
+        .getState()
+        .settings
+        .audioDeviceSelected;
+      console.log("Selectedaudioinput", selectedAudioInput);
+      if (selectedAudioInput) {
+        setAudioInput(selectedAudioInput.deviceId);
+      }
 
-    window
-      .easyrtc
-      .setPeerListener(messageListener);
-    window
-      .easyrtc
-      .setDisconnectListener(function () {
-        window
-          .easyrtc
-          .showError("LOST-CONNECTION", "Lost connection to signaling server");
-      });
+      window
+        .easyrtc
+        .setPeerListener(messageListener);
+      window
+        .easyrtc
+        .setDisconnectListener(function () {
+          window
+            .easyrtc
+            .showError("LOST-CONNECTION", "Lost connection to signaling server");
+        });
 
-    window
-      .easyrtc
-      .initMediaSource(mediaSuccess, mediaError);
-  } else {
-    console.log("Browser does not support WebRTC");
-  }
+      window
+        .easyrtc
+        .initMediaSource(mediaSuccess, mediaError);
+    } else {
+      console.log("Browser does not support WebRTC");
+    }
+  }, 250);
 }
 
 // Close conference
@@ -471,6 +486,7 @@ export function detectBrowser() {
     return "other";
   }
 }
+
 //Chat
 export function sendPeerMessage(targetRoom, msgType, msg, source) {
   window
@@ -503,12 +519,7 @@ export function setAudioInput(deviceId) {
 export function setAudioOutput(element, deviceId) {
   window
     .easyrtc
-    .setAudioSource(element, deviceId);
-}
-export function setVideoInput(deviceId) {
-  window
-    .easyrtc
-    .setAudioSource(deviceId);
+    .setAudioOutput(element, deviceId);
 }
 
 // Play sounds
@@ -529,7 +540,7 @@ export function stopSharingScreen() {
 // In order to change stream sources we need to re-obtain medias and re connect
 // from peers with the new streams
 export function reconnect() {
-  window.location.reload();
+  setTimeout(() => window.location.reload(), 200);
 }
 
 export function shareScreen() {

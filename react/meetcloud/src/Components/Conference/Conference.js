@@ -29,7 +29,8 @@ class Conference extends Component {
       valid: true,
       error: null,
       redirectHome: false,
-      showSettings: false
+      showSettings: false,
+      conferenceData: null
     };
   }
 
@@ -111,6 +112,7 @@ class Conference extends Component {
         .duration(duration)
         .asSeconds() * conference.data.costPerHour / 3600;
       // TODO: dev only
+
       /*this
         .props
         .conferenceActions
@@ -245,14 +247,16 @@ class Conference extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.intervalId);
-    this.cancelPermissionChecker();
+    if(this.intervalId){
+      clearInterval(this.intervalId);
+    }
+    //this.cancelPermissionChecker();
     rtcHelper.closeConference();
   }
 
   render() {
     const {conference, peers, chat, chatActions, settingsActions} = this.props;
-    const {redirectHome, room} = this.state;
+    const {redirectHome, room, conferenceData} = this.state;
 
     if (redirectHome) {
       return <Redirect to={"/home/" + room}/>;
@@ -367,7 +371,8 @@ class Conference extends Component {
           onCloseModal={() => this.setState({showSettings: false})}
           rtcHelper={rtcHelper}
           onSaveSettings={this.saveSettings}/> {peers.length > 0 && <div className="conferenceHeader"/>}
-        <img alt="" className="conferenceLogo" src={ConferenceLogo}/> {conference.data && (<Header
+        <img alt="" className="conferenceLogo" src={ConferenceLogo}/> {conference.data &&
+        (<Header
           durationCall={conference.data.duration}
           unreadMessages={chat.unreadMessages}
           openChat={chatActions
