@@ -1,0 +1,12 @@
+// Get videos
+export const VIDEO_GET_LIST = 'VIDEO_GET_LIST';
+export const VIDEO_GET_LIST_SUCCESS = 'VIDEO_GET_LIST_SUCCESS';
+export const VIDEO_GET_LIST_FAILURE = 'VIDEO_GET_LIST_FAILURE';
+
+// Upload video
+export const VIDEO_UPLOAD = 'VIDEO_UPLOAD';
+export const VIDEO_UPLOAD_SUCCESS = 'VIDEO_UPLOAD_SUCCESS';
+export const VIDEO_UPLOAD_FAILURE = 'VIDEO_UPLOAD_FAILURE';
+
+// Add like
+export const VIDEO_ADD_LIKE = 'VIDEO_ADD_LIKE';
