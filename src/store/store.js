@@ -8,7 +8,7 @@ import AuthSaga from "./sagas/authSaga";
 // import root reducer
 import rootReducer from "./reducers/index";
 // i18n
-//import {loadi18n} from "../i18n";
+// import {loadi18n} from "../i18n";
 
 // create middlewares
 const history = createHistory();
@@ -38,23 +38,23 @@ const defaultState = {
     domain: domainData.domain,
     cameraEnabled: true,
     micEnabled: true,
-    sharingScreen:false,
+    sharingScreen: false,
     joined: false,
     data: {
       duration: 0,
       date: new Date(),
       cost: 0
     },
-    localStream:{}
+    localStream: {}
   },
-  settings:{
+  settings: {
     language: "es",
-    audioDeviceSelected:{},
-    audioDevicesList:[],
-    videoDeviceSelected:{},
-    videoDevicesList:[],
-    audioDeviceSinkSelected:{},
-    audioDevicesSinkList:[]
+    audioDeviceSelected: {},
+    audioDevicesList: [],
+    videoDeviceSelected: {},
+    videoDevicesList: [],
+    audioDeviceSinkSelected: {},
+    audioDevicesSinkList: []
   },
   chat: {
     visible: false,
@@ -68,7 +68,8 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancer = composeEnhancers(middleware);
 
 // Create the store
-export const store = createStore(rootReducer, defaultState, enhancer);
+const store = createStore(rootReducer, defaultState, enhancer);
 
+export default store;
 // Run saga middleware
 sagaMiddleware.run(AuthSaga);

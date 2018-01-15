@@ -1,5 +1,5 @@
-import * as chatActions from "../../constants/actions/chatActions";
 import moment from "moment";
+import * as chatActions from "../../constants/actions/chatActions";
 
 function chatReducer(state = [], { type, payload }) {
   switch (type) {
@@ -19,13 +19,13 @@ function chatReducer(state = [], { type, payload }) {
         ]
       };
     }
-    case chatActions.CHAT_ADD_UNREAD:{
+    case chatActions.CHAT_ADD_UNREAD: {
       return {
         ...state,
         unreadMessages: state.unreadMessages + 1
       };
     }
-    case chatActions.CHAT_MARK_AS_READ:{
+    case chatActions.CHAT_MARK_AS_READ: {
       return {
         ...state,
         unreadMessages: 0

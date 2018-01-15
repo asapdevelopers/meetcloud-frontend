@@ -1,6 +1,6 @@
 import * as conferenceActions from "../../constants/actions/conferenceActions";
 
-//conference data
+// conference data
 export const addConferenceData = conferenceData => ({
   type: conferenceActions.CONFERENCE_ADD_DATA,
   payload: conferenceData
@@ -11,7 +11,7 @@ export const updateGeneralData = data => ({
   payload: data
 });
 
-//peers
+// peers
 export const updatePeers = peerList => ({
   type: conferenceActions.CONFERENCE_PEERS_UPDATE_LIST,
   payload: peerList

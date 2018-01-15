@@ -11,13 +11,13 @@
   border-radius: 25px;
 }
 
-.alert{
+.alert {
   position: absolute;
-margin-left: 30px;
-background-color: red;
-width: 10px;
-height: 10px;
-border-radius: 25px;
-float: right;
-margin-top: 10px;
+  margin-left: 30px;
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  border-radius: 25px;
+  float: right;
+  margin-top: 10px;
 }

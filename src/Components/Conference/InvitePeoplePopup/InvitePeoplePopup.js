@@ -1,6 +1,6 @@
+import Modal from "react-modal";
 import React, { Component } from "react";
 import "./InvitePeoplePopup.css";
-import Modal from "react-modal";
 import { inviteToConference } from "../../../Services/conference/conferenceApi";
 import CloseIcon from "../../Icons/Close";
 
@@ -13,18 +13,18 @@ export default class InvitePeoplePopup extends Component {
   }
 
   invitePeople = event => {
-    const {email} = this.state;
+    const { email } = this.state;
     event.preventDefault();
     inviteToConference(email, window.location.href).then(
       response => {
-        response.json().then(data => {
-          //TODO: add notification
+        response.json().then(res => {
+          // TODO: add notification
 
-          /*this.addNotification(
+          /* this.addNotification(
             "Invitation",
             "Your invitation was sent",
             "success"
-          );*/
+          ); */
           this.setState({ email: "" });
           this.props.onCloseModal();
         });
@@ -38,7 +38,7 @@ export default class InvitePeoplePopup extends Component {
     return (
       <Modal isOpen={isOpen} className="share-dialog">
         <div className="share-text">Invite your friends to this room.</div>
-        <div onClick={onCloseModal}>
+        <div aria-hidden role="button" onClick={onCloseModal}>
           <CloseIcon className="closeIcon" />
         </div>
         <form onSubmit={event => this.invitePeople(event)}>
