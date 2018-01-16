@@ -1,5 +1,5 @@
 const environments = ["local", "test", "prod"];
-const environment = environments[0];
+const environment = environments[2];
 
 let conferenceApiPrefix;
 
