@@ -4,11 +4,17 @@ import ReactTooltip from "react-tooltip";
 import CallButton from "../CallButton/CallButton";
 import "./Header.css";
 
-const Header = () => (
+const Header = ({
+  cost,
+  durationCall,
+  openSettings,
+  openChat,
+  unreadMessages
+}) => (
   <div className="Header">
     <ReactTooltip id="global" place="bottom" type="light" effect="solid">
       <NumberFormat
-        value={this.props.cost}
+        value={cost}
         decimalPrecision={2}
         thousandSeparator
         prefix="$"
@@ -16,21 +22,17 @@ const Header = () => (
       />
     </ReactTooltip>
     <div className="icons row right-xs">
-      <label className="items">Call duration: {this.props.durationCall}</label>
+      <label className="items">Call duration: {durationCall}</label>
       <div className="icons-top">
         <a data-tip data-for="global">
           <CallButton className="items" icon="Money" data-tip="ReactTooltip" />
         </a>
-        <CallButton
-          className="items"
-          icon="Settings"
-          onClick={this.props.openSettings}
-        />
+        <CallButton className="items" icon="Settings" onClick={openSettings} />
         <CallButton
           className="items"
           icon="Chat"
-          onClick={this.props.openChat}
-          alert={this.props.unreadMessages}
+          onClick={openChat}
+          alert={unreadMessages}
         />
       </div>
     </div>
