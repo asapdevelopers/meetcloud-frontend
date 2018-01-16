@@ -28,7 +28,6 @@ class Header extends Component {
   // To keep timer counter updated
   clockInterval = () => {
     const { conference } = this.props;
-    debugger;
     if (conference.data) {
       const now = new moment();
       const durationAux = now.diff(conference.data.date);

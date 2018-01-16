@@ -68,6 +68,7 @@ class Conference extends Component {
   componentWillUnmount() {
     // this.cancelPermissionChecker();
     rtcHelper.closeConference();
+    this.props.chatActions.clearChat();
   }
 
   setFullScreenVideo = user => {
@@ -171,6 +172,7 @@ class Conference extends Component {
   };
 
   finishCall = () => {
+    this.props.chatActions.clearChat();
     rtcHelper.closeConference();
     this.setState({ redirectHome: true });
   };

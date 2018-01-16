@@ -31,6 +31,13 @@ function chatReducer(state = [], { type, payload }) {
         unreadMessages: 0
       };
     }
+    case chatActions.CHAT_CLEAR: {
+      return {
+        visible: false,
+        messages: [],
+        unreadMessages: 0
+      };
+    }
     default:
       return state;
   }

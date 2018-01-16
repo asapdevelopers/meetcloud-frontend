@@ -10,3 +10,7 @@ export const addMessage = (message, userType) => ({
   type: chatActions.CHAT_ADD_MESSAGE,
   payload: { message, userType }
 });
+
+export const clearChat = () => ({
+  type: chatActions.CHAT_CLEAR
+});
