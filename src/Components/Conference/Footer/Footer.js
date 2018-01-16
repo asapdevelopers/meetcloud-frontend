@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 import CallButton from "../CallButton/CallButton";
 import "./Footer.css";

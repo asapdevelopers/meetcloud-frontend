@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import { Route, BrowserRouter, Redirect } from "react-router-dom";
 import { Provider } from "react-redux";
 import registerServiceWorker from "./registerServiceWorker";
-import { store } from "./store/store";
+import store from "./store/store";
 
 // pages
 import HomePage from "./pages/home/HomePage";

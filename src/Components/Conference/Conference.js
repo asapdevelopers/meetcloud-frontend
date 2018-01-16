@@ -1,3 +1,4 @@
+import Chat from "./Chat/Chat";
 import React, { Component } from "react";
 import moment from "moment";
 import NotificationSystem from "react-notification-system";
@@ -13,7 +14,7 @@ import * as rtcHelper from "../../Services/helpers/easyapp";
 import CameraIconPermission from "../../assets/images/camera_permission.png";
 import ConferenceLogo from "../../assets/images/ConferenceLogo.png";
 import Footer from "./Footer/Footer";
-import Chat from "./Chat/Chat";
+
 import Header from "./Header/Header";
 import UserVideo from "./UserVideo/UserVideo";
 import InvitePeoplePopup from "./InvitePeoplePopup/InvitePeoplePopup";

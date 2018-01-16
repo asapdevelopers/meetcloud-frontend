@@ -1,4 +1,4 @@
-import { store } from "../../store/store";
+import store from "../../store/store";
 import * as conferenceConsts from "../../constants/conference";
 import * as chatActions from "../../constants/actions/chatActions";
 import * as conferenceActions from "../../constants/actions/conferenceActions";
@@ -360,10 +360,10 @@ export function getVideoSourceList() {
       selectedVideoDevice = videoDevices[0];
     }
     // TODO: check if camera is enabled
-    let cameraEnabled = true;
+    /*let cameraEnabled = true;
     if (videoDevices.length === 0) {
       cameraEnabled = false;
-    }
+    }*/
     store.dispatch({
       type: settingsActions.SETTINGS_VIDEO_DEVICE_SELECTED,
       payload: selectedVideoDevice
