@@ -49,13 +49,13 @@
 
 /* CONECTION */
 .newConnect {
-  color: #7ED321;
+  color: #7ed321;
   font-size: 12px;
   font-weight: bold;
   margin-left: 10px; }
 
 .lostConnect {
-  color: #F5A623;
+  color: #f5a623;
   font-size: 12px;
   font-weight: bold;
   margin-left: 10px; }
@@ -111,7 +111,7 @@
   position: absolute;
   top: 3px;
   left: 110px;
-  font-family: 'Lato';
+  font-family: "Lato";
   font-size: 25px;
   font-weight: 300;
   color: rgba(255, 255, 255, 0.98);
@@ -121,7 +121,7 @@
   position: absolute;
   top: 30px;
   left: 115px;
-  font-family: 'Lato';
+  font-family: "Lato";
   font-size: 11px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.6);
@@ -174,8 +174,8 @@
   text-align: center;
   color: #c0c0c0;
   height: 20px;
-  text-shadow: 7px 0px 0px #e5e5e5, 6px 0px 0px #e5e5e5, 5px 0px 0px #e5e5e5, 4px 0px 0px #e5e5e5, 3px 0px 0px #e5e5e5, 2px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 0px 0px 0px #e5e5e5, -1px 0px 0px #e5e5e5, -2px 0px 0px #e5e5e5, -3px 0px 0px #e5e5e5, -4px 0px 0px #e5e5e5, -5px 0px 0px #e5e5e5, -6px 0px 0px #e5e5e5, -7px 0px 0px #e5e5e5;
-  box-shadow: inset 20px 0px 0px #e5e5e5, inset -20px 0px 0px #e5e5e5, inset 0px -2px 0px #d7d7d7;
+  text-shadow: 7px 0px 0px #e5e5e5, 6px 0px 0px #e5e5e5, 5px 0px 0px #e5e5e5, 4px 0px 0px #e5e5e5, 3px 0px 0px #e5e5e5, 2px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 0px 0px 0px #e5e5e5, -1px 0px 0px #e5e5e5, -2px 0px 0px #e5e5e5, -3px 0px 0px #e5e5e5, -4px 0px 0px #e5e5e5, -5px 0px 0px #e5e5e5, -6px 0px 0px #e5e5e5, -7px 0px 0px #e5e5e5;
+  box-shadow: inset 20px 0px 0px #e5e5e5, inset -20px 0px 0px #e5e5e5, inset 0px -2px 0px #d7d7d7;
   line-height: 38px;
   margin-top: 5px;
   margin-bottom: 20px;
@@ -188,7 +188,7 @@
 .other .msg {
   order: 1;
   border-top-left-radius: 0px;
-  background: #F0F0F0;
+  background: #f0f0f0;
   color: black; }
 
 .other:before {
@@ -199,7 +199,7 @@
   left: 40px;
   width: 0px;
   height: 0px;
-  border: 5px solid #F0F0F0;
+  border: 5px solid #f0f0f0;
   border-left-color: transparent;
   border-bottom-color: transparent; }
 
@@ -210,7 +210,7 @@
 .self .msg {
   order: 1;
   border-bottom-right-radius: 0px;
-  background: #1B75BB;
+  background: #1b75bb;
   color: white; }
 
 .self .avatar {
@@ -227,7 +227,7 @@
   border: 5px solid #fff;
   border-right-color: transparent;
   border-top-color: transparent;
-  box-shadow: 0px 2px 0px #D4D4D4; }
+  box-shadow: 0px 2px 0px #d4d4d4; }
 
 .msg {
   min-width: 50px;
@@ -331,7 +331,7 @@ input.textarea {
   text-align: center;
   padding: 12px 4px;
   overflow: hidden;
-  transition: color .1s ease-out; }
+  transition: color 0.1s ease-out; }
 
 .emoji-mart-anchor:hover,
 .emoji-mart-anchor-selected {
@@ -370,7 +370,7 @@ input.textarea {
   font-size: 16px;
   display: block;
   width: 100%;
-  padding: .2em .6em;
+  padding: 0.2em 0.6em;
   border-radius: 25px;
   border: 1px solid #d9d9d9;
   outline: 0; }
@@ -422,7 +422,7 @@ input.textarea {
   display: none; }
 
 .emoji-mart-no-results .emoji-mart-no-results-label {
-  margin-top: .2em; }
+  margin-top: 0.2em; }
 
 .emoji-mart-no-results .emoji-mart-emoji:hover:before {
   content: none; }
@@ -460,7 +460,7 @@ input.textarea {
 .emoji-mart-preview-shortname + .emoji-mart-preview-shortname,
 .emoji-mart-preview-shortname + .emoji-mart-preview-emoticon,
 .emoji-mart-preview-emoticon + .emoji-mart-preview-emoticon {
-  margin-left: .5em; }
+  margin-left: 0.5em; }
 
 .emoji-mart-preview-emoticon {
   font-size: 11px;
@@ -474,7 +474,7 @@ input.textarea {
   padding: 0; }
 
 .emoji-mart-title-label {
-  color: #999A9C;
+  color: #999a9c;
   font-size: 26px;
   font-weight: 300; }
 
@@ -490,33 +490,33 @@ input.textarea {
   padding: 0 2px; }
 
 .emoji-mart-skin-swatches-opened .emoji-mart-skin-swatch-selected:after {
-  opacity: .75; }
+  opacity: 0.75; }
 
 .emoji-mart-skin-swatch {
   display: inline-block;
   width: 0;
   vertical-align: middle;
   transition-property: width, padding;
-  transition-duration: .125s;
+  transition-duration: 0.125s;
   transition-timing-function: ease-out; }
 
 .emoji-mart-skin-swatch:nth-child(1) {
   transition-delay: 0s; }
 
 .emoji-mart-skin-swatch:nth-child(2) {
-  transition-delay: .03s; }
+  transition-delay: 0.03s; }
 
 .emoji-mart-skin-swatch:nth-child(3) {
-  transition-delay: .06s; }
+  transition-delay: 0.06s; }
 
 .emoji-mart-skin-swatch:nth-child(4) {
-  transition-delay: .09s; }
+  transition-delay: 0.09s; }
 
 .emoji-mart-skin-swatch:nth-child(5) {
-  transition-delay: .12s; }
+  transition-delay: 0.12s; }
 
 .emoji-mart-skin-swatch:nth-child(6) {
-  transition-delay: .15s; }
+  transition-delay: 0.15s; }
 
 .emoji-mart-skin-swatch-selected {
   position: relative;
@@ -535,7 +535,7 @@ input.textarea {
   border-radius: 100%;
   pointer-events: none;
   opacity: 0;
-  transition: opacity .2s ease-out; }
+  transition: opacity 0.2s ease-out; }
 
 .emoji-mart-skin {
   display: inline-block;

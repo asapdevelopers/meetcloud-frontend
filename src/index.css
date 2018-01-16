@@ -1,11 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400");
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-weight: 300;
 }
-
 
 /* Override row style*/
 
@@ -16,20 +15,20 @@ body {
 
 /*Inputs*/
 .text {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 14px;
   line-height: 19px;
   margin-bottom: 5px;
   margin-top: 15px;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 .inputText {
   height: 40px;
   width: 95%;
   border-radius: 8px;
-  background-color: #FFFFFF;
-  color: #4A4A4A;
+  background-color: #ffffff;
+  color: #4a4a4a;
   font-family: "Open Sans";
   font-size: 14px;
   line-height: 19px;
@@ -46,19 +45,19 @@ body {
   cursor: pointer;
   height: 40px;
   width: 100%;
-  border: 1px solid #1B75BB;
+  border: 1px solid #1b75bb;
   border-radius: 8px;
-  background-color: #67C4F9;
+  background-color: #67c4f9;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 14px;
   line-height: 19px;
   text-align: center;
   margin-top: 15px;
-  font-family: 'Open Sans';
+  font-family: "Open Sans";
   font-weight: 300;
 }
-.button:hover{
+.button:hover {
   background-color: #24a3ed;
 }
 

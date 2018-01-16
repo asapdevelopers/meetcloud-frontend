@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import "./Chat.css";
 import PropTypes from "prop-types";
 import CloseIcon from "react-icons/lib/md/close";
 import MdTagFaces from "react-icons/lib/md/tag-faces";
+import React, { Component } from "react";
 import { Picker } from "emoji-mart";
-//import Linkify from 'linkifyjs/react';
+// import Linkify from 'linkifyjs/react';
 import { emojify } from "react-emojione";
+import "./Chat.css";
 
 class Chat extends Component {
   constructor(props) {
@@ -32,9 +32,7 @@ class Chat extends Component {
     this.setState({ showEmojis: false });
   };
 
-  formatMesasge = msg => {
-    return "a";
-  };
+  formatMesasge = msg => "a";
 
   sendMessage = event => {
     if (event) {
@@ -62,7 +60,6 @@ class Chat extends Component {
             <div className="chatContainer">
               <ol className="chat">
                 {messages.map(message => {
-
                   if (message.source === "Me") {
                     return (
                       <li className="self">
@@ -72,7 +69,7 @@ class Chat extends Component {
                             <time>{message.date.format("LT")}</time>
                           </p>
                           <p>
-                            {/*<Linkify>*/}
+                            {/* <Linkify> */}
                             {emojify(message.msg, this.state.emojiOptions)}
                           </p>
                         </div>
@@ -80,10 +77,18 @@ class Chat extends Component {
                     );
                   }
                   if (message.source === "New connection") {
-                    return <span className="newConnect">New connection: {message.msg} </span>;
+                    return (
+                      <span className="newConnect">
+                        New connection: {message.msg}{" "}
+                      </span>
+                    );
                   }
                   if (message.source === "Lost connection") {
-                    return <span className="lostConnect">Lost connection: {message.msg} </span>;
+                    return (
+                      <span className="lostConnect">
+                        Lost connection: {message.msg}{" "}
+                      </span>
+                    );
                   }
                   if (
                     message.source !== "Lost connection" &&
@@ -98,7 +103,7 @@ class Chat extends Component {
                             <time>{message.date.format("LT")}</time>
                           </p>
                           <p>
-                            {/*<Linkify>*/}
+                            {/* <Linkify> */}
                             {emojify(message.msg)}
                           </p>
                         </div>
@@ -139,7 +144,8 @@ class Chat extends Component {
               onClick={() =>
                 this.setState({
                   showEmojis: !this.state.showEmojis
-                })}
+                })
+              }
             >
               <MdTagFaces />
             </div>

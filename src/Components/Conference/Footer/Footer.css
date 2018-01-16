@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400");
 .footer {
   height: 65px;
   position: absolute;
@@ -7,7 +7,7 @@
   margin: 0px padding;
   position: absolute;
   padding: 0 0px;
-  background-color: rgba(0, 0, 0, 0.30);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .footer .icons {
@@ -18,7 +18,7 @@
   box-sizing: border-box;
   height: 2px;
   margin-bottom: 22px;
-  border-top: 1px solid #FFFFFF;
+  border-top: 1px solid #ffffff;
   opacity: 0.71;
   text-align: center;
   margin: 0 auto;

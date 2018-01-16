@@ -1,71 +1,83 @@
+import Chat from "./Chat/Chat";
 import React, { Component } from "react";
 import moment from "moment";
-import "./Conference.css";
-import { Redirect } from "react-router-dom";
-import { authenticateToken } from "../../Services/conference/conferenceApi";
-import * as rtcHelper from "../../Services/helpers/easyapp";
+import NotificationSystem from "react-notification-system";
 import Modal from "react-modal";
 import MDSpinner from "react-md-spinner";
+import { Redirect } from "react-router-dom";
+import {
+  authenticateToken,
+  inviteToConference
+} from "../../Services/conference/conferenceApi";
+import "./Conference.css";
+import * as rtcHelper from "../../Services/helpers/easyapp";
 import CameraIconPermission from "../../assets/images/camera_permission.png";
 import ConferenceLogo from "../../assets/images/ConferenceLogo.png";
 import Footer from "./Footer/Footer";
-import Chat from "./Chat/Chat";
+
 import Header from "./Header/Header";
 import UserVideo from "./UserVideo/UserVideo";
 import InvitePeoplePopup from "./InvitePeoplePopup/InvitePeoplePopup";
 import * as conferenceConsts from "../../constants/conference";
-import { inviteToConference } from "../../Services/conference/conferenceApi";
-import NotificationSystem from "react-notification-system";
 import SettingsPopup from "./SettingsPopup/SettingsPopup";
 
 class Conference extends Component {
-  _notificationSystem = null;
-
   constructor(props) {
     super(props);
     this.state = {
       modal: false,
       modalText: "",
-      valid: true,
-      error: null,
       redirectHome: false,
-      showSettings: false,
-      conferenceData: null
+      showSettings: false
     };
   }
 
-  // Modal clicks
-  handleClick = () => this.setState({ modal: true });
-  handleClose = () => this.setState({ modal: false });
+  componentDidMount() {
+    this._notificationSystem = this.refs.notificationSystem;
+    const domain =
+      localStorage.getItem("conference") != null
+        ? JSON.parse(localStorage.getItem("conference")).domain
+        : null;
+    this.setState({ domain });
 
-  // add notification
-  addNotification = (title, message, level) => {
-    this._notificationSystem.addNotification({
-      title,
-      message,
-      level,
-      autoDismiss: 3
-    });
-  };
+    if (domain) {
+      authenticateToken(domain.token).then(response => {
+        response.json().then(
+          data => {
+            const newData = data;
+            if (response.status === 200) {
+              if (newData.costPerHour) {
+                newData.costPerHour = parseFloat(newData.costPerHour);
+              }
+              newData.date = new Date();
+              this.props.conferenceActions.updateGeneralData(newData);
+              this.initConference();
+            } else {
+              this.invalidConference(newData);
+            }
+          },
+          () => this.invalidConference()
+        );
+      }, this.invalidConference);
+    } else {
+      // No information
+      this.invalidConference();
+    }
+  }
 
-  invalidConference = error => {
-    if (error) console.log(error);
-    this.setState({
-      valid: false,
-      redirectHome: true,
-      room: this.props.roomName
-    });
-  };
-
-  saveSettings = () => {
-    rtcHelper.reconnect();
-  };
+  componentWillUnmount() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+    // this.cancelPermissionChecker();
+    rtcHelper.closeConference();
+  }
 
   setFullScreenVideo = user => {
     const { conference } = this.props;
     if (user === undefined) {
       if (this.state.sharingWithMe.length > 0) {
-        let firstVideo = this.state.sharingWithMe[0];
+        const firstVideo = this.state.sharingWithMe[0];
         this.setState({ selectedUser: firstVideo });
         window.easyrtc.setVideoObjectSrc(
           document.getElementById("video-selected"),
@@ -92,29 +104,55 @@ class Conference extends Component {
             rtcHelper.getLocalUserStream()
           );
         }
+      } else if (user.screen !== undefined) {
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("video-selected"),
+          user.screen
+        );
       } else {
-        if (user.screen !== undefined) {
-          window.easyrtc.setVideoObjectSrc(
-            document.getElementById("video-selected"),
-            user.screen
-          );
-        } else {
-          window.easyrtc.setVideoObjectSrc(
-            document.getElementById("video-selected"),
-            user.stream
-          );
-        }
+        window.easyrtc.setVideoObjectSrc(
+          document.getElementById("video-selected"),
+          user.stream
+        );
       }
     }
   };
+
+  // Modal clicks
+  handleClick = () => this.setState({ modal: true });
+  handleClose = () => this.setState({ modal: false });
+
+  // add notification
+  addNotification = (title, message, level) => {
+    this._notificationSystem.addNotification({
+      title,
+      message,
+      level,
+      autoDismiss: 3
+    });
+  };
+
+  invalidConference = error => {
+    if (error) console.log(error);
+    this.setState({
+      redirectHome: true,
+      room: this.props.roomName
+    });
+  };
+
+  saveSettings = () => {
+    rtcHelper.reconnect();
+  };
+
+  _notificationSystem = null;
 
   // To keep timer counter updated
   clockInterval = () => {
     const { conference } = this.props;
     if (conference.data) {
-      var now = new moment();
-      var duration = now.diff(conference.data.date);
-      let joinedAux = conference.data;
+      const now = new moment();
+      const duration = now.diff(conference.data.date);
+      const joinedAux = conference.data;
       joinedAux.duration = moment.utc(duration).format("HH:mm:ss");
       joinedAux.cost =
         moment.duration(duration).asSeconds() *
@@ -122,10 +160,10 @@ class Conference extends Component {
         3600;
       // TODO: dev only
 
-      /*this
+      /* this
         .props
         .conferenceActions
-        .updateGeneralData(joinedAux);*/
+        .updateGeneralData(joinedAux); */
     }
   };
 
@@ -166,7 +204,7 @@ class Conference extends Component {
   };
 
   openFullScreen = evt => {
-    let elem = evt.currentTarget;
+    const elem = evt.currentTarget;
 
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
@@ -187,10 +225,10 @@ class Conference extends Component {
     rtcHelper.appInit(
       this.props.conference.domain.server,
       this.props.roomName,
-      localStorage["username"]
+      localStorage.username
     );
 
-    /*rtcHelper.getAudioSourceList();
+    /* rtcHelper.getAudioSourceList();
    rtcHelper.getVideoSourceList();
    rtcHelper.getAudioSinkList();
   */
@@ -234,46 +272,6 @@ class Conference extends Component {
     );
   };
 
-  componentDidMount() {
-    this._notificationSystem = this.refs.notificationSystem;
-    let domain =
-      localStorage.getItem("conference") != null
-        ? JSON.parse(localStorage.getItem("conference")).domain
-        : null;
-    this.setState({ domain });
-
-    if (domain) {
-      authenticateToken(domain.token).then(response => {
-        response.json().then(
-          data => {
-            if (response.status === 200) {
-              if (data.costPerHour) {
-                data.costPerHour = parseFloat(data.costPerHour);
-              }
-              data.date = new Date();
-              this.props.conferenceActions.updateGeneralData(data);
-              this.initConference();
-            } else {
-              this.invalidConference(data);
-            }
-          },
-          () => this.invalidConference()
-        );
-      }, this.invalidConference);
-    } else {
-      // No information
-      this.invalidConference();
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
-    //this.cancelPermissionChecker();
-    rtcHelper.closeConference();
-  }
-
   render() {
     const {
       conference,
@@ -285,7 +283,7 @@ class Conference extends Component {
     const { redirectHome, room } = this.state;
 
     if (redirectHome) {
-      return <Redirect to={"/home/" + room} />;
+      return <Redirect to={`/home/${room}`} />;
     }
 
     // Modal
@@ -303,7 +301,7 @@ class Conference extends Component {
           "Your computer does not have camera or microphone";
       }
       if (this.state.modal.permissionError) {
-        let browser = rtcHelper.detectBrowser();
+        const browser = rtcHelper.detectBrowser();
         switch (browser) {
           case "chrome":
             modalContentBrowser = (
@@ -430,24 +428,22 @@ class Conference extends Component {
                 <video id="self-video-div" muted className={selfVideoStyles} />
               </div>
             </div>
-            {peers.map(user => {
-              return (
-                <div key={user.callerEasyrtcid} className="col">
-                  <div
-                    className="box box-video"
-                    onClick={event => this.setFullScreenVideo(user)}
-                  >
-                    <UserVideo
-                      selected={
-                        this.state.selectedUser &&
-                        this.state.selectedUser.id === user.callerEasyrtcid
-                      }
-                      user={user}
-                    />
-                  </div>
+            {peers.map(user => (
+              <div key={user.callerEasyrtcid} className="col">
+                <div
+                  className="box box-video"
+                  onClick={event => this.setFullScreenVideo(user)}
+                >
+                  <UserVideo
+                    selected={
+                      this.state.selectedUser &&
+                      this.state.selectedUser.id === user.callerEasyrtcid
+                    }
+                    user={user}
+                  />
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
         <Footer

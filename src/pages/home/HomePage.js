@@ -1,32 +1,36 @@
 import React, { Component } from "react";
+// Redux
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+// Router
+import { withRouter } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import "./HomePage.css";
-import { getBackgroundImage } from "../../Services/helpers/general";
-import { authenticateDomain } from "../../Services/conference/conferenceApi";
 // Actions
 import * as AuthActions from "../../store/actions/auth";
 import * as SettingsActions from "../../store/actions/settings";
 import * as ConferenceActions from "../../store/actions/conferene";
-// Redux
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
-//Router
-import { withRouter } from "react-router-dom";
+
+import { getBackgroundImage } from "../../Services/helpers/general";
+import { authenticateDomain } from "../../Services/conference/conferenceApi";
 // Components
 import ContactUs from "../../Components/ContactUs/ContactUs";
+import "./HomePage.css";
 
 const domain = window.location.hostname;
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
-    let roomName = (this.props.match.params && this.props.match.params.roomName)? this.props.match.params.roomName : "";
-    let background =
-      localStorage["background"] !== undefined
-        ? localStorage["background"]
+    const roomName =
+      this.props.match.params && this.props.match.params.roomName
+        ? this.props.match.params.roomName
+        : "";
+    const background =
+      localStorage.background !== undefined
+        ? localStorage.background
         : "/assets/background.jpg";
 
-    //State
+    // State
     this.state = {
       roomName,
       userName: "",
@@ -40,8 +44,8 @@ class HomePage extends Component {
     getBackgroundImage().then(response => {
       if (response.status === 200) {
         response.json().then(res => {
-          if (localStorage["background"] !== res.url) {
-            localStorage["background"] = res.url;
+          if (localStorage.background !== res.url) {
+            localStorage.background = res.url;
             this.setState({ backgroundImage: res.url });
           }
         });
@@ -50,7 +54,7 @@ class HomePage extends Component {
   }
 
   init = data => {
-    let domain = {
+    const domain = {
       token: data.token,
       id: data.id,
       name: data.name,
@@ -60,11 +64,11 @@ class HomePage extends Component {
       roomToJoin: `${data.name}.${data.room}`,
       username: this.state.userName
     };
-    localStorage["conference"] = JSON.stringify({ domain });
-    localStorage["username"] = this.state.userName;
+    localStorage.conference = JSON.stringify({ domain });
+    localStorage.username = this.state.userName;
     this.props.conferenceActions.addConferenceData(domain);
     this.setState({ redirect: true });
-    this.props.history.push("/conference/" + domain.roomName);
+    this.props.history.push(`/conference/${domain.roomName}`);
   };
 
   connect = event => {
@@ -80,8 +84,7 @@ class HomePage extends Component {
   };
 
   render() {
-
-    var sectionStyle = {
+    const sectionStyle = {
       background: `url("${this.state.backgroundImage}") no-repeat center`,
       backgroundSize: "cover"
     };
@@ -109,7 +112,8 @@ class HomePage extends Component {
                       type="text"
                       value={this.state.roomName}
                       onChange={event =>
-                        this.setState({ roomName: event.target.value })}
+                        this.setState({ roomName: event.target.value })
+                      }
                     />
                   </div>
                   <div className="row">
@@ -121,7 +125,8 @@ class HomePage extends Component {
                       type="text"
                       value={this.state.userName}
                       onChange={event =>
-                        this.setState({ userName: event.target.value })}
+                        this.setState({ userName: event.target.value })
+                      }
                     />
                   </div>
                   <div className="row center-xs">

@@ -1,5 +1,7 @@
-import {api} from '../../configuration'
+import { api } from "../../configuration";
 
 export function getBackgroundImage() {
-  return fetch(api.site.backgroundImage, {mode: 'cors'});
+  return fetch(api.site.backgroundImage, { mode: "cors" });
 }
+
+export default getBackgroundImage;

@@ -4,7 +4,7 @@ import * as conferenceConsts from "../../constants/conference";
 function conferenceReducer(state = [], { type, payload }) {
   switch (type) {
     case conferenceActions.CONFERENCE_PEERS_UPDATE_LIST: {
-      let peers = Object.values(payload);
+      const peers = Object.values(payload);
       return { ...state, peers };
     }
     // Loading
@@ -17,18 +17,24 @@ function conferenceReducer(state = [], { type, payload }) {
     // Peers
     case conferenceActions.CONFERENCE_PEERS_ADD_PEER: {
       let newPeers = state.peers;
-      let hasVideo = payload.stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME? false : true;
-      let hasScreen = payload.stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME? true : false;
+      const hasVideo =
+        payload.stream.streamName !==
+        conferenceConsts.SCREEN_SHARING_STREAM_NAME;
+      const hasScreen =
+        payload.stream.streamName ===
+        conferenceConsts.SCREEN_SHARING_STREAM_NAME;
       // Is the peer new?
-      let index = state.peers.findIndex(x => x.callerEasyrtcid === payload.callerEasyrtcid);
+      const index = state.peers.findIndex(
+        x => x.callerEasyrtcid === payload.callerEasyrtcid
+      );
       // if the peer is already on the store, we update the hasVideo and hasScreen variables
-      if (index !==-1 ){
+      if (index !== -1) {
         newPeers = [
           ...state.peers.slice(0, index),
           { ...state.peers[index], hasVideo, hasScreen },
           ...state.peers.slice(index + 1)
-        ]
-      }else{
+        ];
+      } else {
         // if the peer is not on the store, we add it
         newPeers = [
           ...state.peers,
@@ -40,7 +46,7 @@ function conferenceReducer(state = [], { type, payload }) {
             hasAudio: true,
             hasScreen
           }
-        ]
+        ];
       }
       return {
         ...state,
@@ -68,7 +74,7 @@ function conferenceReducer(state = [], { type, payload }) {
       };
     }
     case conferenceActions.CONFERENCE_UPDATE_OTHER_PEOPLE: {
-      let op = Object.values(payload);
+      const op = Object.values(payload);
       return {
         ...state,
         otherPeople: op
