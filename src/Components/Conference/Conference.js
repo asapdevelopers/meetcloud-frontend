@@ -66,9 +66,6 @@ class Conference extends Component {
   }
 
   componentWillUnmount() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
     // this.cancelPermissionChecker();
     rtcHelper.closeConference();
   }
@@ -146,27 +143,6 @@ class Conference extends Component {
 
   _notificationSystem = null;
 
-  // To keep timer counter updated
-  clockInterval = () => {
-    const { conference } = this.props;
-    if (conference.data) {
-      const now = new moment();
-      const duration = now.diff(conference.data.date);
-      const joinedAux = conference.data;
-      joinedAux.duration = moment.utc(duration).format("HH:mm:ss");
-      joinedAux.cost =
-        moment.duration(duration).asSeconds() *
-        conference.data.costPerHour /
-        3600;
-      // TODO: dev only
-
-      /* this
-        .props
-        .conferenceActions
-        .updateGeneralData(joinedAux); */
-    }
-  };
-
   showPopup = (message, loading = false, modalType = null) => {
     this.setState({
       isLoading: loading,
@@ -219,9 +195,6 @@ class Conference extends Component {
 
   // Conference logic
   initConference = () => {
-    // Interval that updates the call clock
-    this.intervalId = setInterval(this.clockInterval, 1000);
-
     rtcHelper.appInit(
       this.props.conference.domain.server,
       this.props.roomName,
@@ -407,11 +380,11 @@ class Conference extends Component {
         <img alt="" className="conferenceLogo" src={ConferenceLogo} />{" "}
         {conference.data && (
           <Header
-            durationCall={conference.data.duration}
+            conferenceActions={this.props.conferenceActions}
+            conference={conference}
             unreadMessages={chat.unreadMessages}
             openChat={chatActions.swithVisible.bind(null)}
             openSettings={() => this.setState({ showSettings: true })}
-            cost={conference.data.cost}
           />
         )}
         <div className="emptyRoom">{emptyRoom}</div>
