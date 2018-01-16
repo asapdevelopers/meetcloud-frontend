@@ -16,10 +16,11 @@ module.exports = {
   },
   rules: {
     "import/no-extraneous-dependencies": 0,
+    "new-cap": [1],
     "import/no-unresolved": [1, { ignore: ["^@storybook/react"] }],
     "no-underscore-dangle": 0,
     "import/extensions": ["error", "never", { packages: "always" }],
-    //"react/prop-types": [1],
+    "react/prop-types": [1],
     "react/forbid-prop-types": 0,
     "react/jsx-filename-extension": [
       1,

@@ -39,8 +39,13 @@ Footer.propTypes = {
   onShareClick: PropTypes.func.isRequired,
   onShareScreenClick: PropTypes.func.isRequired,
   onMicClick: PropTypes.func.isRequired,
-  onHangUpClick: PropTypes.func.isRequired,
   onHangUp: PropTypes.func.isRequired
+};
+
+Footer.defaultProps = {
+  cameraEnabled: true,
+  shareScreenEnabled: true,
+  micEnabled: true
 };
 
 export default Footer;

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import moment from "moment";
 import NumberFormat from "react-number-format";
 import ReactTooltip from "react-tooltip";
@@ -31,8 +32,8 @@ class Header extends Component {
     if (conference.data) {
       const now = new moment();
       const durationAux = now.diff(conference.data.date);
-      let duration = moment.utc(durationAux).format("HH:mm:ss");
-      let cost =
+      const duration = moment.utc(durationAux).format("HH:mm:ss");
+      const cost =
         moment.duration(durationAux).asSeconds() *
         conference.data.costPerHour /
         3600;
@@ -41,7 +42,7 @@ class Header extends Component {
   };
 
   render() {
-    const { conference, openSettings, openChat, unreadMessages } = this.props;
+    const { openSettings, openChat, unreadMessages } = this.props;
     const { cost, duration } = this.state;
     return (
       <div className="Header">
@@ -55,15 +56,15 @@ class Header extends Component {
           />
         </ReactTooltip>
         <div className="icons row right-xs">
-          <label className="items">Call duration: {duration}</label>
+          <span className="items">Call duration: {duration}</span>
           <div className="icons-top">
-            <a data-tip data-for="global">
+            <span data-tip data-for="global">
               <CallButton
                 className="items"
                 icon="Money"
                 data-tip="ReactTooltip"
               />
-            </a>
+            </span>
             <CallButton
               className="items"
               icon="Settings"
@@ -81,4 +82,15 @@ class Header extends Component {
     );
   }
 }
+
+Header.propTypes = {
+  conference: PropTypes.object.isRequired,
+  openSettings: PropTypes.func.isRequired,
+  openChat: PropTypes.func.isRequired,
+  unreadMessages: PropTypes.number
+};
+
+Header.defaultProps = {
+  unreadMessages: 0
+};
 export default Header;

@@ -255,10 +255,10 @@ class Conference extends Component {
       chatActions,
       settingsActions
     } = this.props;
-    const { redirectHome, room } = this.state;
+    const { redirectHome, domain } = this.state;
 
     if (redirectHome) {
-      return <Redirect to={`/home/${room}`} />;
+      return <Redirect to={`/home/${domain.roomName}`} />;
     }
 
     // Modal

@@ -32,8 +32,6 @@ class Chat extends Component {
     this.setState({ showEmojis: false });
   };
 
-  formatMesasge = msg => "a";
-
   sendMessage = event => {
     if (event) {
       event.preventDefault();
@@ -51,7 +49,12 @@ class Chat extends Component {
       <div>
         {opened && (
           <div className="chat-box">
-            <div className="icon-close" onClick={this.props.onCloseChat}>
+            <div
+              role="button"
+              aria-hidden
+              className="icon-close"
+              onClick={this.props.onCloseChat}
+            >
               <CloseIcon />
             </div>
             {messages.length === 0 && (
@@ -140,6 +143,8 @@ class Chat extends Component {
               />
             </form>
             <div
+              role="button"
+              aria-hidden
               className="icon-send"
               onClick={() =>
                 this.setState({
@@ -157,7 +162,14 @@ class Chat extends Component {
 }
 
 Chat.propTypes = {
-  opened: PropTypes.bool
+  opened: PropTypes.bool,
+  onSendMessage: PropTypes.func.isRequired,
+  onCloseChat: PropTypes.func.isRequired,
+  messages: PropTypes.array
 };
 
+Chat.defaultProps = {
+  opened: false,
+  messages: []
+};
 export default Chat;
