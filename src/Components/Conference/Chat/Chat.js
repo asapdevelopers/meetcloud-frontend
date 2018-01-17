@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import CloseIcon from "react-icons/lib/md/close";
 import MdTagFaces from "react-icons/lib/md/tag-faces";
 import React, { Component } from "react";
+import format from 'date-fns/format'
 import { Picker } from "emoji-mart";
 // import Linkify from 'linkifyjs/react';
 import { emojify } from "react-emojione";
@@ -69,7 +70,7 @@ class Chat extends Component {
                         <div key={message.date} className="msg">
                           <p className="author">
                             Me
-                            <time>{message.date.format("LT")}</time>
+                            <time>{format(message.date, "HH:mm A")}</time>
                           </p>
                           <p>
                             {/* <Linkify> */}

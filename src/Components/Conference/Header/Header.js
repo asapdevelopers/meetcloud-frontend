@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
+import differenceInSeconds from "date-fns/difference_in_seconds";
+import distanceInWordsStrict from "date-fns/distance_in_words_strict";
 import NumberFormat from "react-number-format";
 import ReactTooltip from "react-tooltip";
 import CallButton from "../CallButton/CallButton";
@@ -30,13 +31,9 @@ class Header extends Component {
   clockInterval = () => {
     const { conference } = this.props;
     if (conference.data) {
-      const now = new moment();
-      const durationAux = now.diff(conference.data.date);
-      const duration = moment.utc(durationAux).format("HH:mm:ss");
-      const cost =
-        moment.duration(durationAux).asSeconds() *
-        conference.data.costPerHour /
-        3600;
+      const diffSeconds = differenceInSeconds(new Date(), conference.data.date);
+      const duration = distanceInWordsStrict(new Date(), conference.data.date); // format(durationAux, "HH:mm:ss");
+      const cost = diffSeconds / 60 / 60 * conference.data.costPerHour;
       this.setState({ cost, duration });
     }
   };

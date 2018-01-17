@@ -1,4 +1,3 @@
-import moment from "moment";
 import * as chatActions from "../../constants/actions/chatActions";
 
 function chatReducer(state = [], { type, payload }) {
@@ -12,7 +11,7 @@ function chatReducer(state = [], { type, payload }) {
         messages: [
           ...state.messages,
           {
-            date: new moment(),
+            date: new Date(),
             msg: payload.msg,
             source: payload.source
           }

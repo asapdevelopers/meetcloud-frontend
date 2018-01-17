@@ -1,6 +1,4 @@
-import Chat from "./Chat/Chat";
 import React, { Component } from "react";
-import moment from "moment";
 import NotificationSystem from "react-notification-system";
 import Modal from "react-modal";
 import MDSpinner from "react-md-spinner";
@@ -9,6 +7,7 @@ import {
   authenticateToken,
   inviteToConference
 } from "../../Services/conference/conferenceApi";
+import Chat from "./Chat/Chat";
 import "./Conference.css";
 import * as rtcHelper from "../../Services/helpers/easyapp";
 import CameraIconPermission from "../../assets/images/camera_permission.png";
