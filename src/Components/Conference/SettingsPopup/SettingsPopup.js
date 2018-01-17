@@ -71,7 +71,7 @@ export default class SettingsPopup extends Component {
               }}
             >
               {this.props.settings.videoDevicesList.map(item => (
-                <option value={item.deviceId}>{item.label}</option>
+                <option key={item.deviceId} value={item.deviceId}>{item.label}</option>
               ))}
             </select>
           </div>
@@ -85,7 +85,7 @@ export default class SettingsPopup extends Component {
               }}
             >
               {this.props.settings.audioDevicesList.map(item => (
-                <option value={item.deviceId}>{item.label}</option>
+                <option key={item.deviceId} value={item.deviceId}>{item.label}</option>
               ))}
             </select>
           </div>
@@ -99,7 +99,7 @@ export default class SettingsPopup extends Component {
               }}
             >
               {this.props.settings.audioDevicesSinkList.map(item => (
-                <option value={item.deviceId}>{item.label}</option>
+                <option key={item.deviceId} value={item.deviceId}>{item.label}</option>
               ))}
             </select>
           </div>

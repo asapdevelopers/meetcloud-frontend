@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import NotificationSystem from "react-notification-system";
+import PropTypes from "prop-types";
 import Modal from "react-modal";
 import MDSpinner from "react-md-spinner";
 import { Redirect } from "react-router-dom";
@@ -32,13 +32,12 @@ class Conference extends Component {
   }
 
   componentDidMount() {
-    this._notificationSystem = this.refs.notificationSystem;
     const domain =
       localStorage.getItem("conference") != null
         ? JSON.parse(localStorage.getItem("conference")).domain
-        : null;
+        : {roomName: ""};
     this.setState({ domain });
-
+    // this._notificationSystem = this.refs.notificationSystem;
     if (domain) {
       authenticateToken(domain.token).then(response => {
         response.json().then(
@@ -131,10 +130,7 @@ class Conference extends Component {
 
   invalidConference = error => {
     if (error) console.log(error);
-    this.setState({
-      redirectHome: true,
-      room: this.props.roomName
-    });
+    this.setState({ redirectHome: true });
   };
 
   saveSettings = () => {
@@ -145,7 +141,6 @@ class Conference extends Component {
 
   showPopup = (message, loading = false, modalType = null) => {
     this.setState({
-      isLoading: loading,
       modal: !loading
     });
     if (modalType) {
@@ -159,7 +154,7 @@ class Conference extends Component {
   };
 
   removePopup = () => {
-    this.setState({ isLoading: false, modal: false });
+    this.setState({ modal: false });
   };
 
   switchCamera = () => {
@@ -222,7 +217,7 @@ class Conference extends Component {
     event.preventDefault();
     inviteToConference(this.state.invitePersonEmail, window.location.href).then(
       response => {
-        response.json().then(data => {
+        response.json().then(res => {
           this.addNotification(
             "Invitation",
             "Your invitation was sent",
@@ -287,7 +282,7 @@ class Conference extends Component {
                   src={CameraIconPermission}
                 />
                 icon in the URL bar above to give Meetcloud access to your
-                computer's camera and microphone.
+                computer&apos;s camera and microphone.
               </span>
             );
             break;
@@ -338,7 +333,7 @@ class Conference extends Component {
 
       modalContent = (
         <div>
-          <h3>Meetcloud can't access your camera or microphone.</h3>
+          <h3>Meetcloud can&apos;t access your camera or microphone.</h3>
           <div>{modalContentBrowser}</div>
         </div>
       );
@@ -358,7 +353,7 @@ class Conference extends Component {
     }
     return (
       <div className="Conference">
-        <NotificationSystem ref="notificationSystem" />
+        {/* <NotificationSystem ref="notificationSystem" /> */}
         <video muted className="videoBackground" id="video-selected" />
         <Modal isOpen={this.state.modal || conference.loading}>
           {modalContent}
@@ -384,7 +379,7 @@ class Conference extends Component {
             conferenceActions={this.props.conferenceActions}
             conference={conference}
             unreadMessages={chat.unreadMessages}
-            openChat={chatActions.swithVisible.bind(null)}
+            openChat={chatActions.swithVisible}
             openSettings={() => this.setState({ showSettings: true })}
           />
         )}
@@ -393,6 +388,8 @@ class Conference extends Component {
           <div className="row start">
             <div className="col">
               <div
+                role="button"
+                aria-hidden
                 className="box box-video"
                 onClick={event => {
                   this.setFullScreenVideo("me");
@@ -405,6 +402,8 @@ class Conference extends Component {
             {peers.map(user => (
               <div key={user.callerEasyrtcid} className="col">
                 <div
+                  role="button"
+                  aria-hidden
                   className="box box-video"
                   onClick={event => this.setFullScreenVideo(user)}
                 >
@@ -421,23 +420,47 @@ class Conference extends Component {
           </div>
         </div>
         <Footer
-          onCameraClick={rtcHelper.switchCamera.bind(null)}
-          onMicClick={rtcHelper.switchMic.bind(null)}
+          onCameraClick={rtcHelper.switchCamera}
+          onMicClick={rtcHelper.switchMic}
           onShareClick={this.shareRoomWithContact}
           onShareScreenClick={this.shareScreen}
           cameraEnabled={conference.cameraEnabled}
           micEnabled={conference.micEnabled}
           shareScreenEnabled={conference.sharingScreen}
-          onHangUp={this.finishCall.bind(null)}
+          onHangUp={this.finishCall}
         />
         <Chat
           messages={chat.messages}
           opened={chat.visible}
-          onCloseChat={chatActions.swithVisible.bind(null)}
-          onSendMessage={this.sendPeerMessage.bind(null)}
+          onCloseChat={chatActions.swithVisible}
+          onSendMessage={this.sendPeerMessage}
         />
       </div>
     );
   }
 }
+
+Conference.propTypes = {
+  conference: PropTypes.shape({
+    domain: PropTypes.object.isRequired
+  }).isRequired,
+  peers: PropTypes.array,
+  roomName: PropTypes.string,
+  conferenceActions: PropTypes.object.isRequired,
+  chat: PropTypes.object.isRequired,
+  settings: PropTypes.object.isRequired,
+    settingsActions: PropTypes.object.isRequired,
+  chatActions: PropTypes.shape({
+    updateGeneralData: PropTypes.func,
+    clearChat: PropTypes.func.isRequired,
+
+  }).isRequired
+};
+
+Conference.defaultProps = {
+  roomName: "test",
+  peers: []
+
+};
+
 export default Conference;

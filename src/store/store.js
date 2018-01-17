@@ -70,6 +70,7 @@ const enhancer = composeEnhancers(middleware);
 // Create the store
 const store = createStore(rootReducer, defaultState, enhancer);
 
-export default store;
 // Run saga middleware
 sagaMiddleware.run(AuthSaga);
+
+export default store;

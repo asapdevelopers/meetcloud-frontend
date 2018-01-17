@@ -2,9 +2,9 @@ import PropTypes from "prop-types";
 import CloseIcon from "react-icons/lib/md/close";
 import MdTagFaces from "react-icons/lib/md/tag-faces";
 import React, { Component } from "react";
-import format from 'date-fns/format'
-import { Picker } from "emoji-mart";
-// import Linkify from 'linkifyjs/react';
+import format from "date-fns/format";
+import { Picker } from "emoji-mart-lite";
+import Linkify from "react-linkify";
 import { emojify } from "react-emojione";
 import "./Chat.css";
 
@@ -73,8 +73,9 @@ class Chat extends Component {
                             <time>{format(message.date, "HH:mm A")}</time>
                           </p>
                           <p>
-                            {/* <Linkify> */}
-                            {emojify(message.msg, this.state.emojiOptions)}
+                            <Linkify properties={{ target: "_blank" }}>
+                              {emojify(message.msg, this.state.emojiOptions)}
+                            </Linkify>
                           </p>
                         </div>
                       </li>
@@ -104,11 +105,12 @@ class Chat extends Component {
                         <div className="msg">
                           <p className="author">
                             {message.source}
-                            <time>{message.date.format("LT")}</time>
+                            <time>{format(message.date, "HH:mm A")}</time>
                           </p>
                           <p>
-                            {/* <Linkify> */}
-                            {emojify(message.msg)}
+                            <Linkify properties={{ target: "_blank" }}>
+                              {emojify(message.msg)}
+                            </Linkify>
                           </p>
                         </div>
                       </li>
@@ -122,15 +124,17 @@ class Chat extends Component {
               <Picker
                 style={{
                   position: "absolute",
-                  bottom: "60px"
+                  bottom: "60px",
+                  width: "100%"
                 }}
                 perLine={9}
                 emojiSize={25}
                 title="Pick your emoji…"
                 emoji="point_up"
                 set="emojione"
-                sheetSize={32}
+                sheetSize={16}
                 onClick={this.addEmoji}
+                showPreview={false}
               />
             )}
             <form onSubmit={event => this.sendMessage(event)}>

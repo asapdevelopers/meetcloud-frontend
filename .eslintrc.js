@@ -20,6 +20,8 @@ module.exports = {
     "import/no-unresolved": [1, { ignore: ["^@storybook/react"] }],
     "no-underscore-dangle": 0,
     "import/extensions": ["error", "never", { packages: "always" }],
+    "jsx-a11y/media-has-caption": [0],
+    "no-console": [0],
     "react/prop-types": [1],
     "react/forbid-prop-types": 0,
     "react/jsx-filename-extension": [
@@ -31,7 +33,7 @@ module.exports = {
     "no-unused-vars": [
       1,
       {
-        argsIgnorePattern: "res|next|^err"
+        argsIgnorePattern: "event|res|next|^err"
       }
     ]
   }

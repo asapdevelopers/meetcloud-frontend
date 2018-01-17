@@ -49,7 +49,7 @@ function messageListener(easyrtcid, msgType, content) {
 
 // Event that add a new stream to the call
 window.easyrtc.setStreamAcceptor((callerEasyrtcid, stream) => {
-  const { peers } = store.getState().state.conference;
+  const { peers } = store.getState().conference;
   const peerIndex = peers.find(x => x.callerEasyrtcid === callerEasyrtcid);
 
   // Adds or updates the user
@@ -101,7 +101,7 @@ window.easyrtc.setStreamAcceptor((callerEasyrtcid, stream) => {
 });
 
 // Event that removes an stream from the call
-window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
+window.easyrtc.setOnStreamClosed((callerEasyrtcid)=> {
   const username = window.easyrtc.idToName(callerEasyrtcid);
   // Check if the stream closed is "screenShare"
   const peerClosed = store
@@ -125,7 +125,7 @@ window.easyrtc.setOnStreamClosed(function(callerEasyrtcid) {
 });
 
 // Media got successfully
-function mediaSuccess(room) {
+function mediaSuccess(res) {
   store.dispatch({ type: conferenceActions.CONFERECE_HIDE_LOADING });
   store.dispatch({
     type: conferenceActions.CONFERECE_UPDATE_JOINED_DATA,
@@ -175,10 +175,10 @@ function mediaError(a, b) {
 }
 
 // Permission checker
-let permissions_interval_checker = null;
+let permissionsIntervalChecker = null;
 
 export function cancelPermissionChecker() {
-  clearInterval(permissions_interval_checker);
+  clearInterval(permissionsIntervalChecker);
 }
 
 function permissionInterval() {
@@ -205,7 +205,7 @@ export function appInit(domainServer, roomName, username) {
   // Permissions checker if Chrome
   const currentBrowser = detectBrowser();
   if (currentBrowser === "chrome") {
-    permissions_interval_checker = setInterval(permissionInterval(), 1000);
+    permissionsIntervalChecker = setInterval(permissionInterval(), 1000);
   }
   // Executes
   setTimeout(() => {
@@ -221,7 +221,7 @@ export function appInit(domainServer, roomName, username) {
         reconnection: false
       });
       window.easyrtc.enableDebug(conferenceConsts.DEBUG);
-      window.easyrtc.setOnError(function(e) {
+      window.easyrtc.setOnError((e)=> {
         console.log("error from easyrtc:", e);
       });
       window.easyrtc.setRoomOccupantListener(callEverybodyElse);
@@ -229,8 +229,8 @@ export function appInit(domainServer, roomName, username) {
       // This can only be changed before connecting so careful. These are used for
       // calling and should be disabled if the media doesn't work otherwise connection
       // will be slower and won't properly work
-      window.easyrtc.enableAudio(true);
-      window.easyrtc.enableVideo(true); // TODO: change this (dev only)
+      window.easyrtc.enableAudio(conferenceConsts.AUDIO_ENABLED);
+      window.easyrtc.enableVideo(conferenceConsts.VIDEO_ENABLED);
       window.easyrtc.enableDataChannels(true);
       window.easyrtc.enableVideoReceive(true);
       window.easyrtc.enableAudioReceive(true);
@@ -248,7 +248,7 @@ export function appInit(domainServer, roomName, username) {
       }
 
       window.easyrtc.setPeerListener(messageListener);
-      window.easyrtc.setDisconnectListener(function() {
+      window.easyrtc.setDisconnectListener(() =>{
         window.easyrtc.showError(
           "LOST-CONNECTION",
           "Lost connection to signaling server"
@@ -299,7 +299,7 @@ export function getAudioSourceList() {
   let selectedAudioDevice = null;
   const audioDevices = [];
 
-  window.easyrtc.getAudioSourceList(function(audioList) {
+  window.easyrtc.getAudioSourceList((audioList) => {
     const savedAudioDeviceId = localStorage.getItem("selectedAudioDeviceId");
 
     for (let i = 0; i < audioList.length; i += 1) {
@@ -485,7 +485,7 @@ export function shareScreen() {
   if (sharingScreen) {
     stopSharingScreen();
   } else {
-    window.getScreenId(function(error, sourceId, screen_constraints) {
+    window.getScreenId((error, sourceId, screenConstraints)=> {
       // Everything is OK
       if (
         error === null ||
@@ -495,8 +495,8 @@ export function shareScreen() {
         navigator.getUserMedia =
           navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
         navigator.getUserMedia(
-          screen_constraints,
-          function(stream) {
+          screenConstraints,
+          (stream) => {
             // TODO:turn off camera
             store.dispatch({ type: conferenceActions.CONFERENCE_SWITCH_SHARE });
             turnOffCamera();
@@ -533,7 +533,7 @@ export function shareScreen() {
               );
             }
           },
-          function(error) {
+          (error)=> {
             console.error(error);
           }
         );

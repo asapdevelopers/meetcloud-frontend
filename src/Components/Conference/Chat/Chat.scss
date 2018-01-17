@@ -36,8 +36,8 @@
 .icon-send {
   cursor: pointer;
   position: fixed;
-  bottom: 65px;
-  right: 20px;
+  bottom: 20px;
+  right: 25px;
   z-index: 3;
   border: none;
   outline: none;
@@ -51,6 +51,7 @@
   align-items: center;
   justify-content: center;
   margin-top: 30px;
+  color: white;
 }
 
 /* CONECTION */
@@ -419,10 +420,8 @@ input.textarea {
 
 .emoji-mart-search {
   margin-top: 6px;
-  padding: 0 6px;
-}
-.emoji-mart-search input {
-  font-size: 16px;
+  padding: 5px 10px;
+  font-size: 14px;
   display: block;
   width: 100%;
   padding: 0.2em 0.6em;

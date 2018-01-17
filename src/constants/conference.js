@@ -6,6 +6,8 @@ export const WAKE_UP_MESSAGE_TYPE = "wakeUpMessage";
 export const SCREEN_SHARING_STREAM_NAME = "ssharing";
 export const DEBUG = false; // TODO
 export const MAX_CALLERS = 10;
+export const AUDIO_ENABLED = true;
+export const VIDEO_ENABLED = false; // dev only
 
 // audios
 export const WAKE_UP_AUDIO = new Audio("../../assets/audios/wake_up.mp3");

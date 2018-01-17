@@ -1,22 +1,22 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './CallButton.css';
+import React from "react";
+import PropTypes from "prop-types";
+import "./CallButton.css";
 
-import Camera from '../../../assets/images/Camera.png';
-import CameraDisabled from '../../../assets/images/CameraDisabled.png';
-import Mic from '../../../assets/images/Mic.png';
-import MicDisabled from '../../../assets/images/MicDisabled.png';
-import ShareScreen from '../../../assets/images/ShareScreen.png';
-import ShareScreenDisabled from '../../../assets/images/ShareScreenDisabled.png';
-import Money from '../../../assets/images/Money.png';
-import Settings from '../../../assets/images/Settings.png';
-import Chat from '../../../assets/images/Chat.png';
-import Invite from '../../../assets/images/Invite.png';
-import HangUp from '../../../assets/images/HangUp.png';
+import Camera from "../../../assets/images/Camera.png";
+import CameraDisabled from "../../../assets/images/CameraDisabled.png";
+import Mic from "../../../assets/images/Mic.png";
+import MicDisabled from "../../../assets/images/MicDisabled.png";
+import ShareScreen from "../../../assets/images/ShareScreen.png";
+import ShareScreenDisabled from "../../../assets/images/ShareScreenDisabled.png";
+import Money from "../../../assets/images/Money.png";
+import Settings from "../../../assets/images/Settings.png";
+import Chat from "../../../assets/images/Chat.png";
+import Invite from "../../../assets/images/Invite.png";
+import HangUp from "../../../assets/images/HangUp.png";
 
-import VideoCamera from '../../../assets/images/camera1.png';
-import Input from '../../../assets/images/input.png';
-import Output from '../../../assets/images/Output.png';
+import VideoCamera from "../../../assets/images/camera1.png";
+import Input from "../../../assets/images/input.png";
+import Output from "../../../assets/images/Output.png";
 
 const ICONS = {
   Camera,
@@ -32,11 +32,11 @@ const ICONS = {
   HangUp,
   VideoCamera,
   Input,
-  Output,
+  Output
 };
 
 const CallButton = ({ onClick, icon, alert }) => {
-  let alertIcon = '';
+  let alertIcon = "";
   if (alert) {
     alertIcon = <div className="alert" />;
   }
@@ -49,13 +49,14 @@ const CallButton = ({ onClick, icon, alert }) => {
 };
 
 CallButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   icon: PropTypes.string.isRequired,
-  alert: PropTypes.bool,
+  alert: PropTypes.number
 };
 
 CallButton.defaultProps = {
-  alert: false,
+  alert: 0,
+  onClick() {}
 };
 
 export default CallButton;
