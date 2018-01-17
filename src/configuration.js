@@ -1,24 +1,11 @@
-const environments = ["local", "test", "prod"];
-const environment = environments[2];
-
-let conferenceApiPrefix;
-
-switch (environment) {
-  case "test":
-    conferenceApiPrefix = "http://localhost:8000/";
-    break;
-  case "prod":
-    conferenceApiPrefix = "https://meetcloud-api.asapdevelopers.com/";
-    break;
-  default:
-    conferenceApiPrefix = "https://localhost:8000/";
-}
+const conferenceApiPrefix = process.env.REACT_APP_API_PREFIX;
 
 function parseRoute(route, params) {
-  for (const k in params) {
-    route = route.replace(`{${k}}`, params[k]);
-  }
-  return route;
+  let newRoute = route;
+  Object.keys(params).forEach(key => {
+    newRoute = route.replace(`{${key}}`, params[key]);
+  });
+  return newRoute;
 }
 
 export const api = {
@@ -33,3 +20,5 @@ export const api = {
     inviteToConference: `${conferenceApiPrefix}site/inviteToConference/`
   }
 };
+
+export default api;
