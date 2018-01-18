@@ -9,6 +9,7 @@ import {
 } from "../../Services/conference/conferenceApi";
 import Chat from "./Chat/Chat";
 import "./Conference.css";
+
 import * as rtcHelper from "../../Services/helpers/easyapp";
 import CameraIconPermission from "../../assets/images/camera_permission.png";
 import ConferenceLogo from "../../assets/images/ConferenceLogo.png";
@@ -35,7 +36,7 @@ class Conference extends Component {
     const domain =
       localStorage.getItem("conference") != null
         ? JSON.parse(localStorage.getItem("conference")).domain
-        : {roomName: ""};
+        : { roomName: "" };
     this.setState({ domain });
     // this._notificationSystem = this.refs.notificationSystem;
     if (domain) {
@@ -106,9 +107,16 @@ class Conference extends Component {
           user.screen
         );
       } else {
+        const streamName = user.hasScreen
+          ? conferenceConsts.SCREEN_SHARING_STREAM_NAME
+          : "default";
+        const streamFile = window.easyrtc.getRemoteStream(
+          user.callerEasyrtcid,
+          streamName
+        );
         window.easyrtc.setVideoObjectSrc(
           document.getElementById("video-selected"),
-          user.stream
+          streamFile
         );
       }
     }
@@ -410,8 +418,8 @@ class Conference extends Component {
                   <UserVideo
                     selected={
                       this.state.selectedUser &&
-                      this.state.selectedUser.callerEasyrtcid === user.callerEasyrtcid
-
+                      this.state.selectedUser.callerEasyrtcid ===
+                        user.callerEasyrtcid
                     }
                     user={user}
                   />
@@ -450,18 +458,16 @@ Conference.propTypes = {
   conferenceActions: PropTypes.object.isRequired,
   chat: PropTypes.object.isRequired,
   settings: PropTypes.object.isRequired,
-    settingsActions: PropTypes.object.isRequired,
+  settingsActions: PropTypes.object.isRequired,
   chatActions: PropTypes.shape({
     updateGeneralData: PropTypes.func,
-    clearChat: PropTypes.func.isRequired,
-
+    clearChat: PropTypes.func.isRequired
   }).isRequired
 };
 
 Conference.defaultProps = {
   roomName: "test",
   peers: []
-
 };
 
 export default Conference;

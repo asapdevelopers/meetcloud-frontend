@@ -481,7 +481,7 @@ export function reconnect() {
 }
 
 export function shareScreen() {
-  const sharingScreen = store.getState().conference.sharingScreen;
+  const {sharingScreen} = store.getState().conference;
   if (sharingScreen) {
     stopSharingScreen();
   } else {
@@ -513,6 +513,7 @@ export function shareScreen() {
               type: conferenceActions.CONFERENCE_ADD_LOCAL_STREAM,
               payload: stream
             });
+
             // OnInactive stop sharing screen
             stream.oninactive = () => {
               if (stream.oninactive) {
@@ -522,7 +523,7 @@ export function shareScreen() {
             };
 
             // add share stream to all peers
-            const peers = store.getState().conference.peers;
+            const {peers} = store.getState().conference;
             for (let i = 0; i < peers.length; i++) {
               window.easyrtc.addStreamToCall(
                 peers[i].callerEasyrtcid,
@@ -533,14 +534,14 @@ export function shareScreen() {
               );
             }
           },
-          (error)=> {
-            console.error(error);
+          (err)=> {
+            console.error(err);
           }
         );
       } else {
         switch (error) {
           case "permission-denied":
-            alert("Permission denied");
+            console.log("Permission denied");
             break;
           case "not-chrome":
             alert("This features work on Google Chrome only");
