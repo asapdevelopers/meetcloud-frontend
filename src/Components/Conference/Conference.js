@@ -345,7 +345,7 @@ class Conference extends Component {
     }
 
     let selfVideoStyles = "selfVideo ";
-    if (this.state.selectedUser) {
+    if (this.state.selectedUser === "me") {
       selfVideoStyles += "selected ";
     }
     if (!conference.sharingScreen) {
@@ -410,7 +410,8 @@ class Conference extends Component {
                   <UserVideo
                     selected={
                       this.state.selectedUser &&
-                      this.state.selectedUser.id === user.callerEasyrtcid
+                      this.state.selectedUser.callerEasyrtcid === user.callerEasyrtcid
+
                     }
                     user={user}
                   />
