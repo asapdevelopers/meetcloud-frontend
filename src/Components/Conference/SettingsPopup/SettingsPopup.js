@@ -58,7 +58,7 @@ export default class SettingsPopup extends Component {
     return (
       <Modal isOpen={this.props.isOpen} className="openSettings">
         <div className="share-text">Settings</div>
-        <div aria-hidden role="button" onClick={onCloseModal}>
+        <div aria-hidden role="button" onClick={onCloseModal} className="closeIcon">
           <CloseIcon className="closeIcon" />
         </div>
         <div className="w-100 d-flex flex-column align-items-center justify-content-center">

@@ -122,6 +122,18 @@ window.easyrtc.setOnStreamClosed((callerEasyrtcid)=> {
       }
     });
   }
+  if(peerClosed && peerClosed.hasScreen){
+    setTimeout(() => {
+        const video =
+          document.getElementById(`u-${callerEasyrtcid}`) ||
+          document.getElementById(`us-${callerEasyrtcid}`);
+        if (video) {
+          console.log("Adding video stream again");
+            window.easyrtc.setVideoObjectSrc(video, peerClosed.stream);
+        }
+
+    }, 100);
+  }
 });
 
 // Media got successfully
