@@ -24,10 +24,32 @@ const UserVideo = ({ user, selected }) => {
       />
     );
   }
+
+  let stylesCamera = selected ? "videoContainer selected mirror" : "videoContainer";
+  if(!user.hasVideo){
+    stylesCamera += " hidden";
+  }
+  let stylesScreen = selected ? "videoContainer selected" : "videoContainer";
+  if(!user.hasScreen){
+    stylesScreen += " hidden";
+  }
+
   return (
     <div>
       <span className="videoName">{user.username}</span>
-      {video}
+      {/* User video (camera) */}
+      <video
+        className={stylesCamera}
+        key={`u-${user.callerEasyrtcid}`}
+        id={`u-${user.callerEasyrtcid}`}
+      />
+      {/* User screen */}
+      <video
+        className={stylesScreen}
+        key={`us-${user.callerEasyrtcid}`}
+        id={`us-${user.callerEasyrtcid}`}
+      />
+      {/* video */}
     </div>
   );
 };

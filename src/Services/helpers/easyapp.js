@@ -76,11 +76,15 @@ window.easyrtc.setStreamAcceptor((callerEasyrtcid, stream) => {
 
   setTimeout(() => {
     let video = null;
+    const selectedDevice = store.getState().settings.audioDeviceSinkSelected;
     if (stream.streamName === conferenceConsts.SCREEN_SHARING_STREAM_NAME) {
       video = document.getElementById(`us-${callerEasyrtcid}`);
       if (video) {
         console.log("Adding share screen stream");
         window.easyrtc.setVideoObjectSrc(video, stream);
+      }
+      if (selectedDevice) {
+        setAudioOutput(video, selectedDevice.deviceId);
       }
     } else {
       video =
@@ -88,15 +92,13 @@ window.easyrtc.setStreamAcceptor((callerEasyrtcid, stream) => {
         document.getElementById(`us-${callerEasyrtcid}`);
       if (video) {
         console.log("Adding video stream");
-
         window.easyrtc.setVideoObjectSrc(video, stream);
-        const selectedDevice = store.getState().settings
-          .audioDeviceSinkSelected;
-        if (selectedDevice) {
-          setAudioOutput(video, selectedDevice.deviceId);
-        }
+      }
+      if (selectedDevice) {
+        setAudioOutput(video, selectedDevice.deviceId);
       }
     }
+
   }, 100);
 });
 
@@ -130,6 +132,14 @@ window.easyrtc.setOnStreamClosed((callerEasyrtcid)=> {
         if (video) {
           console.log("Adding video stream again");
             window.easyrtc.setVideoObjectSrc(video, peerClosed.stream);
+            store.dispatch({
+              type: conferenceActions.CONFERENCE_PEERS_ADD_PEER,
+              payload: {
+                callerEasyrtcid,
+                stream: peerClosed.stream,
+                username
+              }
+            });
         }
 
     }, 100);
@@ -347,7 +357,7 @@ export function getVideoSourceList() {
   let selectedVideoDevice = null;
   const videoDevices = [];
 
-  window.easyrtc.getVideoSourceList(function(videoList) {
+  window.easyrtc.getVideoSourceList((videoList) => {
     const savedVideoDeviceId = localStorage.getItem("selectedVideoDeviceId");
 
     for (let i = 0; i < videoList.length; i++) {
@@ -391,7 +401,7 @@ export function getAudioSinkList() {
   let audioOutputDevices = [];
   let selectedAudioOutputDevice = null;
 
-  window.easyrtc.getAudioSinkList(function(outputList) {
+  window.easyrtc.getAudioSinkList((outputList) => {
     audioOutputDevices = [];
 
     const savedAudioOutputDeviceId = localStorage.getItem(
@@ -509,17 +519,23 @@ export function shareScreen() {
         navigator.getUserMedia(
           screenConstraints,
           (stream) => {
-            // TODO:turn off camera
+            /*
+            const selectedAudioInput = store.getState().settings.audioDeviceSelected;
+            if (selectedAudioInput) {
+              setAudioInput(selectedAudioInput.deviceId);
+            }
+            stream.addTrack(selectedAudioInput);
+            */
+           // TODO:turn off camera
             store.dispatch({ type: conferenceActions.CONFERENCE_SWITCH_SHARE });
             turnOffCamera();
+
             const selfVideo = document.getElementById("self-video-div");
             // Add share plugin as media stream
             window.easyrtc.register3rdPartyLocalMediaStream(
               stream,
               conferenceConsts.SCREEN_SHARING_STREAM_NAME
             );
-            // Set local video stream
-            window.easyrtc.setVideoObjectSrc(selfVideo, stream);
 
             store.dispatch({
               type: conferenceActions.CONFERENCE_ADD_LOCAL_STREAM,
